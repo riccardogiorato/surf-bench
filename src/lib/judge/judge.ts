@@ -133,6 +133,10 @@ export async function grade(
   const flagged =
     verdicts.length === 2 && Math.abs(verdicts[0].score - verdicts[1].score) > 2;
 
-  await writeVerdictsToCache(key, verdicts);
+  // Cache only clean verdicts — don't poison the cache with judge-error scores
+  const errored = verdicts.some((v) => v.rationale.startsWith("judge error"));
+  if (!errored) {
+    await writeVerdictsToCache(key, verdicts);
+  }
   return { verdicts, average, flagged };
 }
