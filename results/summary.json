@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T14:57:05.338Z",
+  "generatedAt": "2026-09-04T16:13:48.214Z",
   "scrape": [
     {
       "provider": "parallel",
@@ -127,7 +127,7 @@
       "total_s": "11.5s",
       "p50_s": "10.9s",
       "wipeouts": 0,
-      "judge_score": "5.5"
+      "judge_score": "7.0"
     },
     {
       "provider": "exa",
@@ -137,7 +137,7 @@
       "total_s": "7.7s",
       "p50_s": "7.9s",
       "wipeouts": 0,
-      "judge_score": "7.4"
+      "judge_score": "8.0"
     },
     {
       "provider": "tavily",
@@ -147,7 +147,7 @@
       "total_s": "24.2s",
       "p50_s": "25.5s",
       "wipeouts": 0,
-      "judge_score": "5.2"
+      "judge_score": "6.7"
     },
     {
       "provider": "parallel",
@@ -157,7 +157,7 @@
       "total_s": "36.7s",
       "p50_s": "38.1s",
       "wipeouts": 0,
-      "judge_score": "3.6"
+      "judge_score": "7.1"
     },
     {
       "provider": "linkup",
@@ -167,59 +167,59 @@
       "total_s": "29.3s",
       "p50_s": "29.7s",
       "wipeouts": 0,
-      "judge_score": "3.8"
+      "judge_score": "6.9"
     }
   ],
   "overall": [
     {
       "provider": "parallel",
-      "agent_ready": "64",
+      "agent_ready": "74",
       "scrape_score": "100",
       "search_score": "32",
-      "quest_score": "60",
+      "quest_score": "88",
       "scrape": "50/50 @ 0.6s",
       "search": "28/29 @ 2.8s",
-      "quest": "15/15 @ 36.7s · judge 3.6"
+      "quest": "15/15 @ 36.7s · judge 7.1"
     },
     {
       "provider": "exa",
-      "agent_ready": "55",
+      "agent_ready": "66",
       "scrape_score": "57",
       "search_score": "48",
-      "quest_score": "60",
+      "quest_score": "92",
       "scrape": "38/50 @ 0.8s",
       "search": "28/29 @ 1.6s",
-      "quest": "15/15 @ 7.7s · judge 7.4"
+      "quest": "15/15 @ 7.7s · judge 8.0"
     },
     {
       "provider": "firecrawl",
-      "agent_ready": "39",
+      "agent_ready": "48",
       "scrape_score": "19",
       "search_score": "37",
-      "quest_score": "60",
+      "quest_score": "88",
       "scrape": "37/50 @ 3.6s",
       "search": "27/29 @ 2.2s",
-      "quest": "15/15 @ 11.5s · judge 5.5"
+      "quest": "15/15 @ 11.5s · judge 7.0"
     },
     {
       "provider": "tavily",
-      "agent_ready": "36",
+      "agent_ready": "45",
       "scrape_score": "19",
       "search_score": "30",
-      "quest_score": "60",
+      "quest_score": "87",
       "scrape": "37/50 @ 2.9s",
       "search": "25/29 @ 2.3s",
-      "quest": "15/15 @ 24.2s · judge 5.2"
+      "quest": "15/15 @ 24.2s · judge 6.7"
     },
     {
       "provider": "linkup",
-      "agent_ready": "35",
+      "agent_ready": "44",
       "scrape_score": "17",
       "search_score": "32",
-      "quest_score": "56",
+      "quest_score": "84",
       "scrape": "33/50 @ 4.1s",
       "search": "20/29 @ 1.7s",
-      "quest": "14/15 @ 29.3s · judge 3.8"
+      "quest": "14/15 @ 29.3s · judge 6.9"
     },
     {
       "provider": "brave",
