@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T12:55:31.820Z",
+  "generatedAt": "2026-09-04T14:57:05.338Z",
   "scrape": [
     {
       "provider": "parallel",
@@ -63,6 +63,7 @@
       "ok": 29,
       "assertions": 27,
       "success": "100%",
+      "avg_s": "1.2s",
       "p50_s": "0.8s",
       "p95_s": "3.4s"
     },
@@ -72,6 +73,7 @@
       "ok": 29,
       "assertions": 27,
       "success": "100%",
+      "avg_s": "2.2s",
       "p50_s": "2.0s",
       "p95_s": "4.6s"
     },
@@ -81,6 +83,7 @@
       "ok": 29,
       "assertions": 20,
       "success": "100%",
+      "avg_s": "1.7s",
       "p50_s": "1.7s",
       "p95_s": "2.8s"
     },
@@ -90,6 +93,7 @@
       "ok": 29,
       "assertions": 25,
       "success": "100%",
+      "avg_s": "2.3s",
       "p50_s": "2.3s",
       "p95_s": "3.9s"
     },
@@ -99,6 +103,7 @@
       "ok": 29,
       "assertions": 28,
       "success": "100%",
+      "avg_s": "2.8s",
       "p50_s": "2.4s",
       "p95_s": "4.4s"
     },
@@ -108,6 +113,7 @@
       "ok": 28,
       "assertions": 28,
       "success": "97%",
+      "avg_s": "1.6s",
       "p50_s": "1.6s",
       "p95_s": "2.3s"
     }
@@ -172,7 +178,7 @@
       "search_score": "32",
       "quest_score": "60",
       "scrape": "50/50 @ 0.6s",
-      "search": "100% @ 2.4s p50",
+      "search": "28/29 @ 2.8s",
       "quest": "15/15 @ 36.7s · judge 3.6"
     },
     {
@@ -182,7 +188,7 @@
       "search_score": "48",
       "quest_score": "60",
       "scrape": "38/50 @ 0.8s",
-      "search": "97% @ 1.6s p50",
+      "search": "28/29 @ 1.6s",
       "quest": "15/15 @ 7.7s · judge 7.4"
     },
     {
@@ -192,7 +198,7 @@
       "search_score": "37",
       "quest_score": "60",
       "scrape": "37/50 @ 3.6s",
-      "search": "100% @ 2.0s p50",
+      "search": "27/29 @ 2.2s",
       "quest": "15/15 @ 11.5s · judge 5.5"
     },
     {
@@ -202,7 +208,7 @@
       "search_score": "30",
       "quest_score": "60",
       "scrape": "37/50 @ 2.9s",
-      "search": "100% @ 2.3s p50",
+      "search": "25/29 @ 2.3s",
       "quest": "15/15 @ 24.2s · judge 5.2"
     },
     {
@@ -212,7 +218,7 @@
       "search_score": "32",
       "quest_score": "56",
       "scrape": "33/50 @ 4.1s",
-      "search": "100% @ 1.7s p50",
+      "search": "20/29 @ 1.7s",
       "quest": "14/15 @ 29.3s · judge 3.8"
     },
     {
@@ -222,7 +228,7 @@
       "search_score": "93",
       "quest_score": "0",
       "scrape": "-",
-      "search": "100% @ 0.8s p50",
+      "search": "27/29 @ 1.2s",
       "quest": "-"
     },
     {

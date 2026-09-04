@@ -27,7 +27,7 @@ By category: 5 social, 4 ecommerce, 2 academic, 1 other — exa's misses concent
 
 ## Search Event — 29 queries × 12 quality dims
 
-| provider | assertions | API success | p50 | p95 |
+| provider | quality assertions passed | API success | p50 | p95 |
 |---|---|---|---|---|
 | <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> **exa** | **28/29** | 97% | 1.6s | 2.3s |
 | <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> parallel | 28/29 | 100% | 2.4s | 4.4s |
@@ -36,7 +36,7 @@ By category: 5 social, 4 ecommerce, 2 academic, 1 other — exa's misses concent
 | <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> tavily | 25/29 | 100% | 2.3s | 3.9s |
 | <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 20/29 | 100% | 1.7s | 2.8s |
 
-**Takeaway**: exa leads on quality (fewest assertion failures); brave is the fastest; linkup trails badly on quality (9/29 assertion failures — entity disambiguation, factuality, safe-search). Serper is implemented but key-gated (no key yet).
+**Takeaway**: each cell counts deterministic quality assertions passed out of 29 queries (12 dims: factuality, recency, diversity, entity disambiguation, intent, multilingual, spam, safe-search, citation, link quality, brand homepage, latency — e.g. "does `Apple` return apple.com"). Every provider API-returned results for ~all queries; the differences are in result *quality*. exa leads (28/29); brave is the fastest (0.8s p50); linkup trails badly (20/29 — 9 misses across entity disambiguation, factuality, safe-search). Serper is implemented but key-gated (no key yet).
 
 ## Quest Event — 15 questions × (search → fetch → judge)
 

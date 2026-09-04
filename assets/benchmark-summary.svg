@@ -15,7 +15,7 @@
 <text x="870" y="164" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">100</text>
 <text x="870" y="186" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">50/50 @ 0.6s</text>
 <text x="1100" y="164" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">32</text>
-<text x="1100" y="186" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 2.4s p50</text>
+<text x="1100" y="186" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">28/29 @ 2.8s</text>
 <text x="1330" y="164" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">60</text>
 <text x="1330" y="186" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">15/15 @ 36.7s · judge 3.6</text>
 <rect y="204" width="1600" height="76" fill="#ffffff"/>
@@ -25,7 +25,7 @@
 <text x="870" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">57</text>
 <text x="870" y="262" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">38/50 @ 0.8s</text>
 <text x="1100" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">48</text>
-<text x="1100" y="262" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">97% @ 1.6s p50</text>
+<text x="1100" y="262" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">28/29 @ 1.6s</text>
 <text x="1330" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">60</text>
 <text x="1330" y="262" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">15/15 @ 7.7s · judge 7.4</text>
 <rect y="280" width="1600" height="76" fill="#f4f2ea"/>
@@ -35,7 +35,7 @@
 <text x="870" y="316" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">19</text>
 <text x="870" y="338" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">37/50 @ 3.6s</text>
 <text x="1100" y="316" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">37</text>
-<text x="1100" y="338" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 2.0s p50</text>
+<text x="1100" y="338" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">27/29 @ 2.2s</text>
 <text x="1330" y="316" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">60</text>
 <text x="1330" y="338" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">15/15 @ 11.5s · judge 5.5</text>
 <rect y="356" width="1600" height="76" fill="#ffffff"/>
@@ -45,7 +45,7 @@
 <text x="870" y="392" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">19</text>
 <text x="870" y="414" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">37/50 @ 2.9s</text>
 <text x="1100" y="392" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">30</text>
-<text x="1100" y="414" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 2.3s p50</text>
+<text x="1100" y="414" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">25/29 @ 2.3s</text>
 <text x="1330" y="392" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">60</text>
 <text x="1330" y="414" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">15/15 @ 24.2s · judge 5.2</text>
 <rect y="432" width="1600" height="76" fill="#f4f2ea"/>
@@ -55,7 +55,7 @@
 <text x="870" y="468" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">17</text>
 <text x="870" y="490" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">33/50 @ 4.1s</text>
 <text x="1100" y="468" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">32</text>
-<text x="1100" y="490" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 1.7s p50</text>
+<text x="1100" y="490" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">20/29 @ 1.7s</text>
 <text x="1330" y="468" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">56</text>
 <text x="1330" y="490" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">14/15 @ 29.3s · judge 3.8</text>
 <rect y="508" width="1600" height="76" fill="#ffffff"/>
@@ -65,7 +65,7 @@
 <text x="870" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">0</text>
 <text x="870" y="566" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">-</text>
 <text x="1100" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">93</text>
-<text x="1100" y="566" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 0.8s p50</text>
+<text x="1100" y="566" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">27/29 @ 1.2s</text>
 <text x="1330" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">0</text>
 <text x="1330" y="566" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">-</text>
 <rect y="584" width="1600" height="76" fill="#f4f2ea"/>

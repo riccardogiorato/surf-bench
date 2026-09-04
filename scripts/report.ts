@@ -114,6 +114,7 @@ function searchRows(): Row[] {
       ok: agg.ok,
       assertions: agg.asserted,
       success: `${Math.round((agg.ok / agg.attempts) * 100)}%`,
+      avg_s: fmtS(st.avg),
       p50_s: fmtS(st.p50),
       p95_s: fmtS(st.p95),
     });
@@ -211,7 +212,7 @@ function overallLeaderboard(
       search_score: searchScore.toFixed(0),
       quest_score: questScore.toFixed(0),
       scrape: s ? `${s.passed}/${s.attempts} @ ${s.avg_usable_s}` : "-",
-      search: se ? `${se.success} @ ${se.p50_s} p50` : "-",
+      search: se ? `${se.assertions}/${se.queries} @ ${se.avg_s}` : "-",
       quest: q ? `${q.answered}/${q.quests} @ ${q.total_s} · judge ${q.judge_score}` : "-",
     });
   }
