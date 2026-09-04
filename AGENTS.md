@@ -6,8 +6,8 @@ Benchmark comparing web-access API providers for AI agents across three events:
 ## Commands
 
 ```bash
-pnpm test      # all three events (Vitest; providers run concurrently, key-gated)
-pnpm report    # aggregate results/raw/*.jsonl → results/*.csv + summary.json + SVG
+bun run test      # all three events (Vitest; providers run concurrently, key-gated)
+bun run report    # aggregate results/raw/*.jsonl → results/*.csv + summary.json + SVG
 npx tsx scripts/hero.ts   # regenerate assets/hero.svg
 ```
 

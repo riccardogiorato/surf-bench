@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T11:39:22.393Z",
+  "generatedAt": "2026-09-04T11:53:08.321Z",
   "scrape": [
     {
       "provider": "parallel",
@@ -141,7 +141,7 @@
       "total_s": "24.2s",
       "p50_s": "25.5s",
       "wipeouts": 0,
-      "judge_score": "5.4"
+      "judge_score": "5.3"
     },
     {
       "provider": "parallel",
@@ -191,7 +191,7 @@
       "agent_ready": "36",
       "scrape": "37/50 @ 2.9s",
       "search": "100% @ 2.3s p50",
-      "quest": "15/15 @ 24.2s · judge 5.4"
+      "quest": "15/15 @ 24.2s · judge 5.3"
     },
     {
       "provider": "linkup",

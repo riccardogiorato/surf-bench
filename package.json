@@ -9,8 +9,10 @@
   "scripts": {
     "test": "vitest run src",
     "dev": "vitest watch src",
-    "dev:ui": "pnpm vite preview --outDir html",
-    "report": "tsx scripts/report.ts"
+    "dev:ui": "bunx vite preview --outDir html",
+    "report": "bun run scripts/report.ts",
+    "hero": "bun run scripts/hero.ts",
+    "judge": "bun run scripts/judge-quest.ts"
   },
   "dependencies": {
     "@ai-sdk/togetherai": "3.0.44",

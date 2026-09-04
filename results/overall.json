@@ -25,7 +25,7 @@
     "agent_ready": "36",
     "scrape": "37/50 @ 2.9s",
     "search": "100% @ 2.3s p50",
-    "quest": "15/15 @ 24.2s · judge 5.4"
+    "quest": "15/15 @ 24.2s · judge 5.3"
   },
   {
     "provider": "linkup",

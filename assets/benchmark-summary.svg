@@ -36,7 +36,7 @@
 <text x="302" y="291" font-family="Verdana,Arial,sans-serif" font-size="13"  fill="#111">36</text>
 <text x="678.6666666666667" y="291" font-family="Verdana,Arial,sans-serif" font-size="13"  fill="#111">37/50 @ 2.9s</text>
 <text x="1055.3333333333335" y="291" font-family="Verdana,Arial,sans-serif" font-size="13"  fill="#111">100% @ 2.3s p50</text>
-<text x="1432" y="291" font-family="Verdana,Arial,sans-serif" font-size="13"  fill="#111">15/15 @ 24.2s · judge 5.4</text>
+<text x="1432" y="291" font-family="Verdana,Arial,sans-serif" font-size="13"  fill="#111">15/15 @ 24.2s · judge 5.3</text>
 <rect x="50" y="310" width="1400" height="40" fill="#f4f2ea"/>
 <image x="58" y="317" width="24" height="24" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEUAAAD////09PTr6+vl5eXu7u6/v7+wsLBtbW3U1NS1tbXc3NydnZ3ExMR3d3f6+vqVlZVISEjLy8uoqKiHh4diYmKOjo5bW1tWVlYmJiY0NDSAgIA/Pz8YGBhoaGhNTU0fHx8LCwsbZFgyAAAB8ElEQVRYhe1V2bKrIBCkETQuQeMa9RiT///Ji4i4hJibVJ2q82C/KAw9NUzPDIQcOHDgV3EpPS+pvqYLBwpx9B3fB1jUikR+6c8XfA5+Hf9q6aL4mM/gz4sEuH7IdxEulyXQfcQvEK83POmw8EIaO+fT/ziguG12GAyc5i0/XyZARwD4+cAU0tXlfQDrI62kMyR6lW3v94TTJgApo0sIMK1T4+sF/FUGbgDvySBMqXd+wHb53SrEDAg0jU97FFvOCiW8ZTSYdGPozeauEP5cdh0HrWfHgf5Lsdscc7aaeJVOc7VwN4ICZ/3Xq+xbQuO7OcimbF+BbGUppzXonoNQX7DCVu5Gy1ch3XOgU9A/8Y18JkYrmrGRLxa+rCVVYQ7uj+5lewslVgNYJmGL4BS5oe5Keq6fjxASqfjiZTGNqBLXmTqaM8YoYBXDHeafY6RUqNtgmgdeWRleCttwGYrEXwy0e+tSFXAa3WQ1D8NCO2+2XT9CZjozOt88FbUTiNqEN9HyTZlNAJUFpI7nqbpuIGZjhFyM1X1l1jQT8gCPUZGuVLlO8/vKKpDxIYCbtDL7YJP6IRMDmwbPr4msLpmBRCaFCwt5OjKwvd5mfUjT4Dx8PduLge6+fIdGKfemwQVOvmPmePuwPN7YDxw4cOCP4x8LFhGpYZOEYQAAAABJRU5ErkJggg=="/>
 <text x="124" y="337" font-family="Verdana,Arial,sans-serif" font-size="15" font-weight="bold" fill="#111">linkup</text>

@@ -117,7 +117,7 @@ scripts/report.ts   aggregates results/raw/*.jsonl → results/*.csv + summary.j
 ```bash
 git clone https://github.com/riccardogiorato/surf-bench.git
 cd surf-bench
-pnpm install
+bun install
 cp .example.env .env
 ```
 
@@ -138,8 +138,8 @@ TOGETHER_API_KEY=    # judge panel via Together AI
 Run the benchmark:
 
 ```bash
-pnpm test      # all three events
-pnpm report    # aggregate results/raw/*.jsonl → results/*.csv + summary.json
+bun test      # all three events
+bun run report    # aggregate results/raw/*.jsonl → results/*.csv + summary.json
 ```
 
 ## Contributing
