@@ -68,9 +68,10 @@ const QUEST_RUBRIC =
   "You are a strict but fair judge at a web-benchmark contest. Given a QUESTION and CONTENT fetched from the web, score 0-10 whether the content contains a usable answer to the question. 10 = the answer is present, specific and quotable. 7-9 = answer is present but partial. 4-6 = only partially relevant. 1-3 = mostly irrelevant. 0 = nothing usable (blocked page, login wall, boilerplate).";
 
 // Throttle: 2 judge calls in flight; per-call timeout; exponential backoff.
-const runThrottled = createConcurrencyLimiter(4);
+const runThrottled = createConcurrencyLimiter(2);
 
 async function askJudge(
+  panelName: string,
   model: string,
   question: string,
   artifact: string,
@@ -106,7 +107,7 @@ async function askJudge(
         return {
           score: Math.max(0, Math.min(10, Number(parsed.score))),
           rationale: String(parsed.rationale ?? "").slice(0, 300),
-          judge: model,
+          judge: panelName,
         };
       } catch (e) {
         lastError = e;
@@ -131,7 +132,7 @@ export async function grade(
   const verdicts = await Promise.all(
     PANEL.map(async (p) => {
       try {
-        return await askJudge(p.model, question, artifact);
+        return await askJudge(p.name, p.model, question, artifact);
       } catch (e) {
         return {
           score: 0,
