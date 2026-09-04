@@ -21,7 +21,7 @@ npx tsx scripts/hero.ts   # regenerate assets/hero.svg
 ## Conventions
 
 - All providers are key-gated: absent `*_API_KEY` in `.env` → provider skipped, no errors.
-- Judge panel: Kimi K3 + GLM-5.3 via Together AI REST (case-sensitive model slugs `moonshotai/Kimi-K3`, `zai-org/GLM-5.3`). Together rate-limits aggressively — judge calls are throttled (2 in flight) with backoff; verdicts cached by content hash; judge-error verdicts are never cached.
+- Judge panel: Kimi K3 + GLM-5.3 via Together AI REST (case-sensitive model slugs `moonshotai/Kimi-K3`, `zai-org/GLM-5.3`). Together rate-limits aggressively — judge calls are throttled (4 in flight) with backoff; verdicts cached by content hash; judge-error verdicts are never cached.
 - Wipeout rule: >30s per leg = DNF.
 - Records dedupe by (provider, case) keeping the LAST line in the jsonl.
 - The Y2K theme: retro windows, bevels, Silkscreen pixel accents. Design doc lives locally at `docs/surfbench-design.html` (gitignored on purpose).
