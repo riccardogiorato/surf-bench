@@ -110,6 +110,8 @@ src/suites/search/  12 quality dims × search providers
 src/suites/scrape/  50-URL gauntlet × 6 fetch providers
 src/suites/quest/   15 questions × both-legs providers + judging pass
 scripts/report.ts   aggregates results/raw/*.jsonl → results/*.csv + summary.json + SVG
+scripts/hero.ts     regenerates the Y2K README hero (assets/hero.svg)
+scripts/judge-quest.ts  standalone judge pass (cached, resumable)
 ```
 
 ## Getting Started
@@ -138,8 +140,10 @@ TOGETHER_API_KEY=    # judge panel via Together AI
 Run the benchmark:
 
 ```bash
-bun test      # all three events
-bun run report    # aggregate results/raw/*.jsonl → results/*.csv + summary.json
+bun run test      # all three events (vitest; providers key-gated and concurrent)
+bun run report    # aggregate results/raw/*.jsonl → results/*.csv + summary.json + SVG
+bun run judge     # re-grade quest content with the judge panel (cached, resumable)
+bun run hero      # regenerate assets/hero.svg
 ```
 
 ## Contributing
