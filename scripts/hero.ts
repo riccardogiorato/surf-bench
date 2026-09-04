@@ -5,69 +5,70 @@ import { faviconDataUri } from "./favicons.js";
 // big bench name, short description, provider chips with embedded favicons.
 
 function chip(label: string, x: number, y: number, logo: string): string {
-  const w = Math.max(150, label.length * 10 + 44);
+  const w = Math.max(420, label.length * 13 + 60);
   const hasLogo = logo.length > 0;
   const labelX = hasLogo ? w / 2 + 12 : w / 2;
   const logoSvg = hasLogo
-    ? `<image x="10" y="10" width="20" height="20" href="${logo}"/>`
+    ? `<image x="20" y="20" width="32" height="32" href="${logo}"/>`
     : "";
   return (
     `<g transform="translate(${x} ${y})">` +
-    `<rect x="3" y="3" width="${w}" height="40" fill="#0a0a0a"/>` +
-    `<rect width="${w}" height="40" fill="#c0c0c0" stroke="#ffffff" stroke-width="2"/>` +
-    `<rect x="1.5" y="1.5" width="${w - 3}" height="37" fill="none" stroke="#808080" stroke-width="1"/>` +
+    `<rect x="4" y="4" width="${w}" height="72" fill="#0a0a0a"/>` +
+    `<rect width="${w}" height="72" fill="#c0c0c0" stroke="#ffffff" stroke-width="2"/>` +
+    `<rect x="1.5" y="1.5" width="${w - 3}" height="69" fill="none" stroke="#808080" stroke-width="1"/>` +
     logoSvg +
-    `<text x="${labelX}" y="27" font-family="Verdana,Arial,sans-serif" font-size="16" font-weight="bold" fill="#111111" text-anchor="middle">${label}</text>` +
+    `<text x="${labelX}" y="47" font-family="Verdana,Arial,sans-serif" font-size="28" font-weight="bold" fill="#111111" text-anchor="middle">${label}</text>` +
     `</g>`
   );
 }
 
 function main() {
-  const W = 1600, H = 520;
+  const W = 1600, H = 900; // 16:9 OG image
   const svg: string[] = [];
 
   svg.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="ht hd">`);
   svg.push(`<title id="ht">SurfBench</title>`);
-  svg.push(`<desc id="hd">A Y2K desktop window frame: SurfBench, the web-access benchmark for agents — search, scrape, quest events across eight providers.</desc>`);
-  svg.push(`<defs><pattern id="dith" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#008080"/><rect x="1" y="1" width="1" height="1" fill="#007a7a"/></pattern></defs>`);
-  svg.push(`<rect width="${W}" height="${H}" fill="url(#dith)"/>`);
+  svg.push(`<desc id="hd">SurfBench — the web-access benchmark for agents: search, scrape, quest events across eight providers.</desc>`);
+  svg.push(`<rect width="${W}" height="${H}" fill="#c0c0c0"/>`);
 
-  // window — slim 36px dithered frame around it
-  const wx = 36, wy = 36, ww = 1528, wh = 448;
-  svg.push(`<g transform="translate(${wx} ${wy})">`);
-  svg.push(`<rect x="8" y="8" width="${ww}" height="${wh}" fill="#0a0a0a" opacity="0.35"/>`);
-  svg.push(`<rect width="${ww}" height="${wh}" fill="#c0c0c0" stroke="#ffffff" stroke-width="2"/>`);
-  svg.push(`<rect x="2" y="2" width="${ww - 4}" height="${wh - 4}" fill="none" stroke="#808080" stroke-width="2"/>`);
-  // titlebar
-  svg.push(`<rect x="4" y="4" width="${ww - 8}" height="34" fill="#000080"/>`);
-  svg.push(`<text x="16" y="27" font-family="Verdana,Arial,sans-serif" font-size="15" font-weight="bold" fill="#ffffff">SurfBench — The Web Access Benchmark for Agents</text>`);
-  // titlebar buttons
-  [ww - 92, ww - 62, ww - 32].forEach((bx, i) => {
-    svg.push(`<rect x="${bx}" y="10" width="22" height="20" fill="#c0c0c0" stroke="#0a0a0a"/>`);
-    const glyph = i === 2 ? "✕" : i === 1 ? "□" : "_";
-    svg.push(`<text x="${bx + 11}" y="25" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#111111" text-anchor="middle">${glyph}</text>`);
-  });
+  // titlebar strip
+  svg.push(`<rect width="${W}" height="52" fill="#000080"/>`);
+  svg.push(`<text x="32" y="36" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#ffffff">SurfBench</text>`);
+
   // content plate
-  svg.push(`<rect x="14" y="46" width="${ww - 28}" height="${wh - 60}" fill="#ffffff" stroke="#808080"/>`);
+  svg.push(`<rect x="16" y="68" width="${W - 32}" height="${H - 84}" fill="#ffffff" stroke="#808080" stroke-width="2"/>`);
 
-  // big name
-  svg.push(`<text x="60" y="150" font-family="Verdana,Arial,sans-serif" font-size="96" font-weight="bold" fill="#111111" letter-spacing="-3">Surf<tspan fill="#000080">Bench</tspan></text>`);
-  // short description
-  svg.push(`<text x="62" y="200" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#444444">Find the fastest, highest-quality web access API for your agents.</text>`);
-  svg.push(`<text x="62" y="234" font-family="Verdana,Arial,sans-serif" font-size="15" fill="#0a0a0a">Three events: search / scrape / quest — judged, timed, 30s wipeout rule.</text>`);
+  // ===== LEFT 60%: name, description, provider chips =====
+  svg.push(`<text x="80" y="250" font-family="Silkscreen,Verdana,monospace" font-size="110" font-weight="bold" fill="#111111">Surf<tspan fill="#000080">Bench</tspan></text>`);
+  svg.push(`<text x="86" y="330" font-family="Verdana,Arial,sans-serif" font-size="40" fill="#444444">The web access benchmark for agents.</text>`);
 
-  // provider chips — tight taskbar cluster, two rows of four
   const providers = ["firecrawl", "exa", "linkup", "tavily", "parallel", "jina", "brave", "serper"];
   providers.forEach((p, i) => {
-    const col = i % 4, row = Math.floor(i / 4);
-    const x = 60 + col * 186;
-    const y = 274 + row * 62;
+    const col = i % 2, row = Math.floor(i / 2);
+    const x = 80 + col * 460;
+    const y = 420 + row * 100;
     svg.push(chip(p, x, y, faviconDataUri(p)));
   });
 
-  // status bar
-  svg.push(`<text x="60" y="${wh - 24}" font-family="Verdana,monospace" font-size="13" fill="#000080">*** 50 waves · 29 queries · 15 quests · judged by Kimi K3 + GLM-5.3 ***</text>`);
-  svg.push(`</g>`);
+  // ===== RIGHT 40%: three event winner panels, stacked =====
+  const panels: Array<[string, string, string]> = [
+    ["SEARCH", "29 queries / 12 dims", "winner: brave 0.9s p50"],
+    ["SCRAPE", "50-URL gauntlet", "winner: parallel 50/50 @ 0.6s"],
+    ["QUEST", "15 questions + judge", "winner: exa 7.7s · judge 7.4"],
+  ];
+  panels.forEach((p, i) => {
+    const x = 1020;
+    const y = 200 + i * 220;
+    const w = 500, h = 170;
+    svg.push(`<g transform="translate(${x} ${y})">`);
+    svg.push(`<rect x="5" y="5" width="${w}" height="${h}" fill="#0a0a0a"/>`);
+    svg.push(`<rect width="${w}" height="${h}" fill="#f4f2ea" stroke="#808080" stroke-width="2"/>`);
+    svg.push(`<rect x="4" y="4" width="${w - 8}" height="42" fill="#000080"/>`);
+    svg.push(`<text x="20" y="30" font-family="Verdana,Arial,sans-serif" font-size="20" font-weight="bold" fill="#ffffff">${p[0]}</text>`);
+    svg.push(`<text x="20" y="86" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111111">${p[1]}</text>`);
+    svg.push(`<text x="20" y="130" font-family="Verdana,Arial,sans-serif" font-size="21" fill="#000080" font-weight="bold">${p[2]}</text>`);
+    svg.push(`</g>`);
+  });
 
   svg.push(`</svg>`);
   fs.writeFileSync("assets/hero.svg", svg.join("\n"));
