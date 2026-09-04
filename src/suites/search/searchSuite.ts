@@ -27,19 +27,24 @@ export function defineSearchDim<T extends SearchDimCase>(
             `[${dim}] ${testCase.query}`,
             async () => {
               const response = await search(testCase.query, numResults);
-              await recordSearchRun({
-                provider: name,
-                dim,
-                query: testCase.query,
-                response,
-              });
 
-              if (response.error) {
-                expect(response.error).toBeUndefined();
-                return;
+              let assertOk = false;
+              try {
+                if (response.error) {
+                  expect(response.error).toBeUndefined();
+                }
+                expect(response.results.length).toBeGreaterThan(0);
+                assert(response.results, testCase);
+                assertOk = true;
+              } finally {
+                await recordSearchRun({
+                  provider: name,
+                  dim,
+                  query: testCase.query,
+                  response,
+                  assertOk,
+                });
               }
-              expect(response.results.length).toBeGreaterThan(0);
-              assert(response.results, testCase);
             },
             120000,
           );

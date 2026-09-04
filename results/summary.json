@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T11:26:59.274Z",
+  "generatedAt": "2026-09-04T11:39:22.393Z",
   "scrape": [
     {
       "provider": "parallel",
@@ -61,6 +61,7 @@
       "provider": "brave",
       "queries": 29,
       "ok": 29,
+      "assertions": 27,
       "success": "100%",
       "p50_s": "0.8s",
       "p95_s": "3.4s"
@@ -69,6 +70,7 @@
       "provider": "firecrawl",
       "queries": 29,
       "ok": 29,
+      "assertions": 27,
       "success": "100%",
       "p50_s": "2.0s",
       "p95_s": "4.6s"
@@ -77,6 +79,7 @@
       "provider": "linkup",
       "queries": 29,
       "ok": 29,
+      "assertions": 20,
       "success": "100%",
       "p50_s": "1.7s",
       "p95_s": "2.8s"
@@ -85,6 +88,7 @@
       "provider": "tavily",
       "queries": 29,
       "ok": 29,
+      "assertions": 25,
       "success": "100%",
       "p50_s": "2.3s",
       "p95_s": "3.9s"
@@ -93,6 +97,7 @@
       "provider": "parallel",
       "queries": 29,
       "ok": 29,
+      "assertions": 28,
       "success": "100%",
       "p50_s": "2.4s",
       "p95_s": "4.4s"
@@ -101,6 +106,7 @@
       "provider": "exa",
       "queries": 29,
       "ok": 28,
+      "assertions": 28,
       "success": "97%",
       "p50_s": "1.6s",
       "p95_s": "2.3s"
@@ -135,7 +141,7 @@
       "total_s": "24.2s",
       "p50_s": "25.5s",
       "wipeouts": 0,
-      "judge_score": "7.1"
+      "judge_score": "5.4"
     },
     {
       "provider": "parallel",
@@ -155,7 +161,7 @@
       "total_s": "29.3s",
       "p50_s": "29.7s",
       "wipeouts": 0,
-      "judge_score": "5.9"
+      "judge_score": "4.9"
     }
   ],
   "overall": [
@@ -175,28 +181,28 @@
     },
     {
       "provider": "firecrawl",
-      "agent_ready": "40",
+      "agent_ready": "39",
       "scrape": "37/50 @ 3.6s",
       "search": "100% @ 2.0s p50",
       "quest": "15/15 @ 11.5s · judge 5.5"
     },
     {
-      "provider": "linkup",
-      "agent_ready": "40",
-      "scrape": "33/50 @ 4.1s",
-      "search": "100% @ 1.7s p50",
-      "quest": "14/15 @ 29.3s · judge 5.9"
-    },
-    {
       "provider": "tavily",
-      "agent_ready": "38",
+      "agent_ready": "36",
       "scrape": "37/50 @ 2.9s",
       "search": "100% @ 2.3s p50",
-      "quest": "15/15 @ 24.2s · judge 7.1"
+      "quest": "15/15 @ 24.2s · judge 5.4"
+    },
+    {
+      "provider": "linkup",
+      "agent_ready": "35",
+      "scrape": "33/50 @ 4.1s",
+      "search": "100% @ 1.7s p50",
+      "quest": "14/15 @ 29.3s · judge 4.9"
     },
     {
       "provider": "brave",
-      "agent_ready": "33",
+      "agent_ready": "31",
       "scrape": "-",
       "search": "100% @ 0.8s p50",
       "quest": "-"

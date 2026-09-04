@@ -1,8 +1,8 @@
 provider,agent_ready,scrape,search,quest
 parallel,64,50/50 @ 0.6s,100% @ 2.4s p50,15/15 @ 36.7s · judge -
 exa,55,38/50 @ 0.8s,97% @ 1.6s p50,15/15 @ 7.7s · judge 7.4
-firecrawl,40,37/50 @ 3.6s,100% @ 2.0s p50,15/15 @ 11.5s · judge 5.5
-linkup,40,33/50 @ 4.1s,100% @ 1.7s p50,14/15 @ 29.3s · judge 5.9
-tavily,38,37/50 @ 2.9s,100% @ 2.3s p50,15/15 @ 24.2s · judge 7.1
-brave,33,-,100% @ 0.8s p50,-
+firecrawl,39,37/50 @ 3.6s,100% @ 2.0s p50,15/15 @ 11.5s · judge 5.5
+tavily,36,37/50 @ 2.9s,100% @ 2.3s p50,15/15 @ 24.2s · judge 5.4
+linkup,35,33/50 @ 4.1s,100% @ 1.7s p50,14/15 @ 29.3s · judge 4.9
+brave,31,-,100% @ 0.8s p50,-
 jina,6,33/50 @ 11.9s,-,-

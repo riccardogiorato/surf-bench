@@ -15,28 +15,28 @@
   },
   {
     "provider": "firecrawl",
-    "agent_ready": "40",
+    "agent_ready": "39",
     "scrape": "37/50 @ 3.6s",
     "search": "100% @ 2.0s p50",
     "quest": "15/15 @ 11.5s · judge 5.5"
   },
   {
-    "provider": "linkup",
-    "agent_ready": "40",
-    "scrape": "33/50 @ 4.1s",
-    "search": "100% @ 1.7s p50",
-    "quest": "14/15 @ 29.3s · judge 5.9"
-  },
-  {
     "provider": "tavily",
-    "agent_ready": "38",
+    "agent_ready": "36",
     "scrape": "37/50 @ 2.9s",
     "search": "100% @ 2.3s p50",
-    "quest": "15/15 @ 24.2s · judge 7.1"
+    "quest": "15/15 @ 24.2s · judge 5.4"
+  },
+  {
+    "provider": "linkup",
+    "agent_ready": "35",
+    "scrape": "33/50 @ 4.1s",
+    "search": "100% @ 1.7s p50",
+    "quest": "14/15 @ 29.3s · judge 4.9"
   },
   {
     "provider": "brave",
-    "agent_ready": "33",
+    "agent_ready": "31",
     "scrape": "-",
     "search": "100% @ 0.8s p50",
     "quest": "-"

@@ -3,6 +3,7 @@
     "provider": "brave",
     "queries": 29,
     "ok": 29,
+    "assertions": 27,
     "success": "100%",
     "p50_s": "0.8s",
     "p95_s": "3.4s"
@@ -11,6 +12,7 @@
     "provider": "firecrawl",
     "queries": 29,
     "ok": 29,
+    "assertions": 27,
     "success": "100%",
     "p50_s": "2.0s",
     "p95_s": "4.6s"
@@ -19,6 +21,7 @@
     "provider": "linkup",
     "queries": 29,
     "ok": 29,
+    "assertions": 20,
     "success": "100%",
     "p50_s": "1.7s",
     "p95_s": "2.8s"
@@ -27,6 +30,7 @@
     "provider": "tavily",
     "queries": 29,
     "ok": 29,
+    "assertions": 25,
     "success": "100%",
     "p50_s": "2.3s",
     "p95_s": "3.9s"
@@ -35,6 +39,7 @@
     "provider": "parallel",
     "queries": 29,
     "ok": 29,
+    "assertions": 28,
     "success": "100%",
     "p50_s": "2.4s",
     "p95_s": "4.4s"
@@ -43,6 +48,7 @@
     "provider": "exa",
     "queries": 29,
     "ok": 28,
+    "assertions": 28,
     "success": "97%",
     "p50_s": "1.6s",
     "p95_s": "2.3s"

@@ -1,7 +1,7 @@
-provider,queries,ok,success,p50_s,p95_s
-brave,29,29,100%,0.8s,3.4s
-firecrawl,29,29,100%,2.0s,4.6s
-linkup,29,29,100%,1.7s,2.8s
-tavily,29,29,100%,2.3s,3.9s
-parallel,29,29,100%,2.4s,4.4s
-exa,29,28,97%,1.6s,2.3s
+provider,queries,ok,assertions,success,p50_s,p95_s
+brave,29,29,27,100%,0.8s,3.4s
+firecrawl,29,29,27,100%,2.0s,4.6s
+linkup,29,29,20,100%,1.7s,2.8s
+tavily,29,29,25,100%,2.3s,3.9s
+parallel,29,29,28,100%,2.4s,4.4s
+exa,29,28,28,97%,1.6s,2.3s

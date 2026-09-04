@@ -56,6 +56,7 @@ export async function recordSearchRun(input: {
   dim: string;
   query: string;
   response: SearchResponse;
+  assertOk?: boolean;
 }) {
   await appendRecord("search", input.provider, {
     provider: input.provider,
@@ -64,6 +65,7 @@ export async function recordSearchRun(input: {
     latencyMs: input.response.latencyMs,
     numResults: input.response.results.length,
     error: input.response.error ?? null,
+    assertOk: input.assertOk ?? null,
   });
 }
 

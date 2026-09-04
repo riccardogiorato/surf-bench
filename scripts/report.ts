@@ -91,11 +91,11 @@ function scrapeRows(): Row[] {
 function searchRows(): Row[] {
   const records = readJsonl("search");
   const byProvider = new Map<string, {
-    attempts: number; ok: number; latencies: number[];
+    attempts: number; ok: number; asserted: number; latencies: number[];
   }>();
   for (const r of records) {
     if (!byProvider.has(r.provider as string)) {
-      byProvider.set(r.provider as string, { attempts: 0, ok: 0, latencies: [] });
+      byProvider.set(r.provider as string, { attempts: 0, ok: 0, asserted: 0, latencies: [] });
     }
     const agg = byProvider.get(r.provider as string)!;
     agg.attempts++;
@@ -103,6 +103,7 @@ function searchRows(): Row[] {
       agg.ok++;
       if (typeof r.latencyMs === "number") agg.latencies.push(r.latencyMs);
     }
+    if (r.assertOk === true) agg.asserted++;
   }
   const rows: Row[] = [];
   for (const [provider, agg] of byProvider) {
@@ -111,6 +112,7 @@ function searchRows(): Row[] {
       provider,
       queries: agg.attempts,
       ok: agg.ok,
+      assertions: agg.asserted,
       success: `${Math.round((agg.ok / agg.attempts) * 100)}%`,
       p50_s: fmtS(st.p50),
       p95_s: fmtS(st.p95),
@@ -193,7 +195,7 @@ function overallLeaderboard(
         Math.max(0.25, bestAvgS / Math.max(parseS(s.avg_usable_s), 0.01))
       : 0;
     const searchScore = se && se.queries > 0
-      ? (Number(se.ok) / Number(se.queries)) * 100 *
+      ? (Number(se.assertions) / Number(se.queries)) * 100 *
         Math.max(0.25, bestSearchP50 / Math.max(parseS(se.p50_s), 0.01))
       : 0;
     const questScore = q && q.quests > 0
