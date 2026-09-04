@@ -280,9 +280,9 @@ function writeScoreboardSvg(rows: Row[]) {
     String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const parts: string[] = [];
 
-  const colLogo = 24;
-  const colName = 100;
-  const medalX = 62;
+  const colLogo = 90;
+  const colName = 150;
+  const medalX = 36;
   const cols: Array<[string, string, number]> = [
     ["agent-ready", "composite 0–100", 640],
     ["scrape", "fetch 50 URLs", 870],
@@ -290,7 +290,7 @@ function writeScoreboardSvg(rows: Row[]) {
     ["quest", "search→fetch→judge", 1330],
   ];
   // tier medal by final rank
-  const medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣"];
+  const medals = ["🥇", "🥈", "🥉"];
 
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="SurfBench overall leaderboard">`);
   parts.push(`<rect width="${W}" height="${H}" fill="#c0c0c0"/>`);
@@ -299,6 +299,7 @@ function writeScoreboardSvg(rows: Row[]) {
 
   // header row
   parts.push(`<rect y="64" width="${W}" height="52" fill="#c0c0c0"/>`);
+  parts.push(`<text x="${medalX}" y="90" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">rank</text>`);
   parts.push(`<text x="${colName}" y="90" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">provider</text>`);
   cols.forEach(([label, sub, x]) => {
     parts.push(`<text x="${x}" y="90" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">${esc(label)}</text>`);
