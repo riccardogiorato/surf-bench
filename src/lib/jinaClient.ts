@@ -7,7 +7,7 @@ import { createConcurrencyLimiter } from "./concurrency.js";
 const JINA_API_KEY = process.env.JINA_API_KEY ?? "";
 const runLimited = createConcurrencyLimiter(5); // free tier is ~20 rpm; 5 in-flight is safe
 
-export const jinaScraperImpl: ScraperFunction = async (
+const jinaScraperImpl: ScraperFunction = async (
   url: string,
   timeout = 30000
 ) => {

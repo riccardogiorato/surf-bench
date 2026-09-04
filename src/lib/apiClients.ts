@@ -1,4 +1,3 @@
-import { createTogetherAI } from "@ai-sdk/togetherai";
 import { LinkupClient } from "linkup-sdk";
 import Firecrawl from "@mendable/firecrawl-js";
 import { Exa } from "exa-js";
@@ -9,10 +8,6 @@ import "dotenv/config";
 
 export const firecrawlClient = new Firecrawl({
   apiKey: process.env.FIRECRAWL_API_KEY ?? "",
-});
-
-export const togetheraiClient = createTogetherAI({
-  apiKey: process.env.TOGETHER_API_KEY ?? "",
 });
 
 export const linkupClient = new LinkupClient({

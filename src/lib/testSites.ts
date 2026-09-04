@@ -4,7 +4,7 @@ import { TestSite } from "./types.js";
 // Includes real-world use cases (jobs, real estate, social media) and content quality sites (academic, news, technical, e-commerce)
 
 // Job listing test sites - structured employment data
-export const jobListingTestSites: TestSite[] = [
+const jobListingTestSites: TestSite[] = [
   {
     name: "Weworkremotely Remote Full Stack Jobs",
     url: "https://weworkremotely.com/categories/remote-full-stack-programming-jobs#job-listings",
@@ -23,7 +23,7 @@ export const jobListingTestSites: TestSite[] = [
 ];
 
 // Real estate test sites - property listings and details
-export const realEstateTestSites: TestSite[] = [
+const realEstateTestSites: TestSite[] = [
   {
     name: "Zillow Single Family Home",
     url: "https://www.zillow.com/homedetails/123-Main-St-Anytown-CA-90210/12345_zpid/",
@@ -47,7 +47,7 @@ export const realEstateTestSites: TestSite[] = [
 ];
 
 // Social media test sites - public profiles and posts (within ToS)
-export const socialMediaTestSites: TestSite[] = [
+const socialMediaTestSites: TestSite[] = [
   {
     name: "Instagram NASA Profile",
     url: "https://www.instagram.com/nasa/",
@@ -71,35 +71,35 @@ export const socialMediaTestSites: TestSite[] = [
 ];
 
 // Academic test sites - research papers and scholarly content
-export const academicTestSites: TestSite[] = [
+const academicTestSites: TestSite[] = [
   { name: "arXiv Computer Science Paper", url: "https://arxiv.org/abs/2301.00001", category: "academic" },
   { name: "PubMed Medical Article", url: "https://pubmed.ncbi.nlm.nih.gov/36000000/", category: "academic" },
   { name: "IEEE Xplore Technical Paper", url: "https://ieeexplore.ieee.org/document/9000000", category: "academic" }
 ];
 
 // News test sites - articles with potential paywalls
-export const newsTestSites: TestSite[] = [
+const newsTestSites: TestSite[] = [
   { name: "BBC Technology News", url: "https://www.bbc.com/news/technology", category: "news" },
   { name: "Reuters Business Article", url: "https://www.reuters.com/business/", category: "news" },
   { name: "New York Times Technology", url: "https://www.nytimes.com/section/technology", category: "news" }
 ];
 
 // Technical documentation sites - structured content with code examples
-export const technicalTestSites: TestSite[] = [
+const technicalTestSites: TestSite[] = [
   { name: "MDN Web API Documentation", url: "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API", category: "technical" },
   { name: "Stack Overflow Question", url: "https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values", category: "technical" },
   { name: "GitHub TypeScript README", url: "https://github.com/microsoft/TypeScript/blob/main/README.md", category: "technical" }
 ];
 
 // E-commerce sites - product information and structured data
-export const ecommerceTestSites: TestSite[] = [
+const ecommerceTestSites: TestSite[] = [
   { name: "Amazon Product Page", url: "https://www.amazon.com/New-Amazon-Kindle-glare-free-adjustable/dp/B0DDZQTYHL", category: "ecommerce" },
   { name: "Shopify merch store", url: "https://shopify.supply/products/shopify-counter", category: "ecommerce" },
   { name: "Tesla Store Product", url: "https://shop.tesla.com/product/model-s-key-fob", category: "ecommerce" }
 ];
 
 // High-traffic and common scrape targets - added from current web traffic and marketplace rankings
-export const popularWebTestSites: TestSite[] = [
+const popularWebTestSites: TestSite[] = [
   { name: "YouTube TED Channel", url: "https://www.youtube.com/@TED", category: "social" },
   { name: "Reddit Technology Community", url: "https://www.reddit.com/r/technology/", category: "social" },
   { name: "Wikipedia Artificial Intelligence", url: "https://en.wikipedia.org/wiki/Artificial_intelligence", category: "technical" },
@@ -128,7 +128,7 @@ export const popularWebTestSites: TestSite[] = [
 ];
 
 // Extra test sites - additional sites for testing
-export const extraTestSites: TestSite[] = [
+const extraTestSites: TestSite[] = [
   { name: "Together AI", url: "https://www.together.ai/", category: "extra" },
   { name: "Nutlope", url: "https://www.nutlope.com/", category: "extra" }
 ];

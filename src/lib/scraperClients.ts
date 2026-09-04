@@ -293,20 +293,20 @@ async function checkTavily(): Promise<boolean> {
 
 // Cached scraper functions, each capped at VENDOR_MAX_CONCURRENCY in-flight
 // requests (parallel keeps its own lower cap inside parallelClient.ts)
-export const firecrawlScraper = withCache(
+const firecrawlScraper = withCache(
   "firecrawl",
   limitVendorConcurrency(firecrawlScraperImpl),
 );
-export const exaScraper = withCache(
+const exaScraper = withCache(
   "exa",
   limitVendorConcurrency(exaScraperImpl),
 );
-export const linkupScraper = withCache(
+const linkupScraper = withCache(
   "linkup",
   limitVendorConcurrency(linkupScraperImpl),
 );
-export const parallelScraper = withCache("parallel", parallelScraperImpl);
-export const tavilyScraper = withCache(
+const parallelScraper = withCache("parallel", parallelScraperImpl);
+const tavilyScraper = withCache(
   "tavily",
   limitVendorConcurrency(tavilyScraperImpl),
 );
@@ -355,12 +355,3 @@ export const scraperClients: ScraperClient[] = [
       ]
     : []),
 ];
-
-// Export individual implementations for direct use if needed
-export {
-  firecrawlScraperImpl,
-  exaScraperImpl,
-  linkupScraperImpl,
-  parallelScraperImpl,
-  tavilyScraperImpl,
-};

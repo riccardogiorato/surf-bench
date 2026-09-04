@@ -6,7 +6,7 @@ import cp from "child_process";
 // endpoint (follows redirects) and cached under cache/favicons. Data URIs
 // render on GitHub, unlike remote <image> hrefs inside SVG files.
 
-export const PROVIDER_DOMAINS: Record<string, string> = {
+const PROVIDER_DOMAINS: Record<string, string> = {
   parallel: "parallel.ai",
   tavily: "tavily.com",
   firecrawl: "firecrawl.dev",

@@ -62,11 +62,11 @@ async function writeVerdictsToCache(key: string, verdicts: Verdict[]) {
   }
 }
 
-export const QUEST_RUBRIC =
+const QUEST_RUBRIC =
   "You are a strict but fair judge at a web-benchmark contest. Given a QUESTION and CONTENT fetched from the web, score 0-10 whether the content contains a usable answer to the question. 10 = the answer is present, specific and quotable. 7-9 = answer is present but partial. 4-6 = only partially relevant. 1-3 = mostly irrelevant. 0 = nothing usable (blocked page, login wall, boilerplate).";
 
 // Throttle: 2 judge calls in flight; per-call timeout; exponential backoff.
-const runThrottled = createConcurrencyLimiter(2);
+const runThrottled = createConcurrencyLimiter(4);
 
 async function askJudge(
   model: string,
