@@ -81,7 +81,9 @@ export default class VendorTableReporter {
     const cacheVendors = fs
       .readdirSync("cache", { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
-      .map((entry) => entry.name);
+      .map((entry) => entry.name)
+      // search/judge caches are per-query/per-artifact stores, not scraper vendors
+      .filter((entry) => entry !== "search" && entry !== "judge");
 
     return [
       ...PREFERRED_VENDOR_ORDER.filter((vendor) =>
