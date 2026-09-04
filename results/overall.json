@@ -1,0 +1,51 @@
+[
+  {
+    "provider": "parallel",
+    "agent_ready": "64",
+    "scrape": "50/50 @ 0.6s",
+    "search": "100% @ 2.4s p50",
+    "quest": "15/15 @ 36.7s · judge -"
+  },
+  {
+    "provider": "exa",
+    "agent_ready": "55",
+    "scrape": "38/50 @ 0.8s",
+    "search": "97% @ 1.6s p50",
+    "quest": "15/15 @ 7.7s · judge 7.4"
+  },
+  {
+    "provider": "firecrawl",
+    "agent_ready": "40",
+    "scrape": "37/50 @ 3.6s",
+    "search": "100% @ 2.0s p50",
+    "quest": "15/15 @ 11.5s · judge 5.5"
+  },
+  {
+    "provider": "linkup",
+    "agent_ready": "40",
+    "scrape": "33/50 @ 4.1s",
+    "search": "100% @ 1.7s p50",
+    "quest": "14/15 @ 29.3s · judge 5.9"
+  },
+  {
+    "provider": "tavily",
+    "agent_ready": "38",
+    "scrape": "37/50 @ 2.9s",
+    "search": "100% @ 2.3s p50",
+    "quest": "15/15 @ 24.2s · judge 7.1"
+  },
+  {
+    "provider": "brave",
+    "agent_ready": "33",
+    "scrape": "-",
+    "search": "100% @ 0.8s p50",
+    "quest": "-"
+  },
+  {
+    "provider": "jina",
+    "agent_ready": "6",
+    "scrape": "33/50 @ 11.9s",
+    "search": "-",
+    "quest": "-"
+  }
+]

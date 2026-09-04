@@ -4,16 +4,16 @@
     "queries": 29,
     "ok": 29,
     "success": "100%",
-    "p50_s": "0.9s",
-    "p95_s": "3.2s"
+    "p50_s": "0.8s",
+    "p95_s": "3.4s"
   },
   {
     "provider": "firecrawl",
     "queries": 29,
     "ok": 29,
     "success": "100%",
-    "p50_s": "1.9s",
-    "p95_s": "4.3s"
+    "p50_s": "2.0s",
+    "p95_s": "4.6s"
   },
   {
     "provider": "linkup",
@@ -29,7 +29,7 @@
     "ok": 29,
     "success": "100%",
     "p50_s": "2.3s",
-    "p95_s": "3.8s"
+    "p95_s": "3.9s"
   },
   {
     "provider": "parallel",
@@ -44,7 +44,7 @@
     "queries": 29,
     "ok": 28,
     "success": "97%",
-    "p50_s": "1.5s",
+    "p50_s": "1.6s",
     "p95_s": "2.3s"
   }
 ]

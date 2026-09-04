@@ -10,16 +10,32 @@ SurfBench is an open benchmark that compares web-access APIs on the three things
 
 > Six providers ran all events; serper is implemented but key-gated (no key in `.env` yet). Times are averages/p50/p95 over successful rides only. Judge scores are the Kimi K3 + GLM-5.3 panel average, 0–10.
 
+### Overall Agent-Ready Leaderboard
+
+Composite across all three events: scrape score (success × speed), search score (success × speed), quest score (answered% × 60 + judge score × 4). Details in `results/overall.csv`.
+
+| provider | agent-ready | scrape | search | quest |
+|---|---|---|---|---|
+| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> **parallel** | **64** | 50/50 @ 0.6s | 100% @ 2.4s p50 | 15/15 @ 36.7s |
+| <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> **exa** | 55 | 38/50 @ 0.8s | 97% @ 1.6s p50 | 15/15 @ 7.7s · judge 7.4 |
+| <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> **firecrawl** | 40 | 37/50 @ 3.6s | 100% @ 2.0s p50 | 15/15 @ 11.5s |
+| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> **linkup** | 40 | 33/50 @ 4.1s | 100% @ 1.7s p50 | 14/15 @ 29.3s |
+| <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> **tavily** | 38 | 37/50 @ 2.9s | 100% @ 2.3s p50 | 15/15 @ 24.2s |
+| <img src="https://www.google.com/s2/favicons?domain=brave.com&sz=32" width="16" height="16" alt=""> **brave** | 33 | – | 100% @ 0.8s p50 | – |
+| <img src="https://www.google.com/s2/favicons?domain=jina.ai&sz=32" width="16" height="16" alt=""> **jina** | 6 | 33/50 @ 11.9s | – | – |
+
+*Search-only and fetch-only providers score lower on the composite because they can't run every event — that's the point: for an agent you need both legs.*
+
 ### Scrape Event — 50 real, messy URLs (bot-prevention obstacle course)
 
 | provider | usable success | avg usable | p50 | p95 |
 |---|---|---|---|---|
-| **parallel** | **50/50** | **0.6s** | 0.5s | 0.9s |
-| exa | 38/50 | 0.8s | 0.3s | 1.4s |
-| firecrawl | 37/50 | 3.6s | 1.9s | 10.5s |
-| tavily | 37/50 | 2.9s | 0.3s | 12.2s |
-| linkup | 33/50 | 4.1s | 4.3s | 8.8s |
-| jina | 33/50 | 11.9s | 8.8s | 39.2s |
+| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> **parallel** | **50/50** | **0.6s** | 0.5s | 0.9s |
+| <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> exa | 38/50 | 0.8s | 0.3s | 1.4s |
+| <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> firecrawl | 37/50 | 3.6s | 1.9s | 10.5s |
+| <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> tavily | 37/50 | 2.9s | 0.3s | 12.2s |
+| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 33/50 | 4.1s | 4.3s | 8.8s |
+| <img src="https://www.google.com/s2/favicons?domain=jina.ai&sz=32" width="16" height="16" alt=""> jina | 33/50 | 11.9s | 8.8s | 39.2s |
 
 **Takeaway**: parallel is the only provider with full coverage — and it's fast. Tavily has the quickest p50 but misses the hardest pages (marketplaces, social). Jina is the slowest leg on the board.
 
@@ -27,24 +43,24 @@ SurfBench is an open benchmark that compares web-access APIs on the three things
 
 | provider | success | p50 | p95 |
 |---|---|---|---|
-| brave | 100% | **0.9s** | 3.2s |
-| exa | 97% | 1.5s | 2.3s |
-| linkup | 100% | 1.7s | 2.8s |
-| firecrawl | 100% | 1.9s | 4.3s |
-| tavily | 100% | 2.3s | 3.8s |
-| parallel | 100% | 2.4s | 4.4s |
+| <img src="https://www.google.com/s2/favicons?domain=brave.com&sz=32" width="16" height="16" alt=""> **brave** | 100% | **0.9s** | 3.2s |
+| <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> exa | 97% | 1.5s | 2.3s |
+| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 100% | 1.7s | 2.8s |
+| <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> firecrawl | 100% | 1.9s | 4.3s |
+| <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> tavily | 100% | 2.3s | 3.8s |
+| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> parallel | 100% | 2.4s | 4.4s |
 
-**Takeaway**: brave is the fastest search on the board; every provider passed essentially all of the quality assertions — search APIs are commoditized on quality, speed and result *shape* are the differentiators. Serper is implemented but needs a key.
+**Takeaway**: brave is the fastest search on the board; quality assertions passed across the board — speed and result *shape* are the differentiators. Serper is implemented but needs a key.
 
 ### Quest Event — 15 questions × (search → fetch → judge)
 
 | provider | answered | avg total | p50 | wipeouts | judge |
 |---|---|---|---|---|---|
-| exa | 15/15 | **7.7s** | 7.9s | 0 | pending |
-| firecrawl | 15/15 | 11.5s | 10.9s | 0 | pending |
-| linkup | 14/15 | 29.3s | 29.7s | 0 | pending |
-| tavily | 15/15 | 24.2s | 25.5s | 0 | pending |
-| parallel | 15/15 | 36.7s | 38.1s | 0 | pending |
+| <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> **exa** | 15/15 | **7.7s** | 7.9s | 0 | pending |
+| <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> firecrawl | 15/15 | 11.5s | 10.9s | 0 | pending |
+| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 14/15 | 29.3s | 29.7s | 0 | pending |
+| <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> tavily | 15/15 | 24.2s | 25.5s | 0 | pending |
+| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> parallel | 15/15 | 36.7s | 38.1s | 0 | pending |
 
 **Takeaway**: exa is the fastest full quest (7.7s); parallel, despite the best scrape leg, is the slowest full quest (36.7s) — its search leg is the slowest too. Linkup dropped one quest.
 

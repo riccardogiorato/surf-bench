@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { faviconDataUri } from "./favicons.js";
 
 // Aggregates results/raw/{scrape,search,quest}.jsonl into
 // results/{scrape,search,quest}.csv + results/summary.json + the scoreboard SVG.
@@ -155,6 +156,69 @@ function questRows(): Row[] {
   return rows.sort((a, b) => (b.answered as number) - (a.answered as number));
 }
 
+// ---------- overall agent-ready composite ----------
+// Explainable composite per event (0-100), then averaged:
+//   scrape: success% x (fastest avg / provider avg), speed floored at 0.25
+//   search: success% x (fastest p50 / provider p50), speed floored at 0.25
+//   quest:  answered% x 60 + judge/10 x 40 (judge = answer quality)
+function overallLeaderboard(
+  scrape: Row[],
+  search: Row[],
+  quest: Row[],
+): Row[] {
+  const bestAvgS = Math.min(
+    ...scrape.filter((r) => parseS(r.avg_usable_s) > 0).map((r) => parseS(r.avg_usable_s)),
+  );
+  const bestSearchP50 = Math.min(
+    ...search.filter((r) => parseS(r.p50_s) > 0).map((r) => parseS(r.p50_s)),
+  );
+  const bestQuestS = Math.min(
+    ...quest.filter((r) => parseS(r.total_s) > 0).map((r) => parseS(r.total_s)),
+  );
+
+  const providers = new Set<string>([
+    ...scrape.map((r) => String(r.provider)),
+    ...search.map((r) => String(r.provider)),
+    ...quest.map((r) => String(r.provider)),
+  ]);
+
+  const rows: Row[] = [];
+  for (const p of providers) {
+    const s = scrape.find((r) => r.provider === p);
+    const se = search.find((r) => r.provider === p);
+    const q = quest.find((r) => r.provider === p);
+
+    const scrapeScore = s && s.attempts > 0
+      ? (Number(s.passed) / Number(s.attempts)) * 100 *
+        Math.max(0.25, bestAvgS / Math.max(parseS(s.avg_usable_s), 0.01))
+      : 0;
+    const searchScore = se && se.queries > 0
+      ? (Number(se.ok) / Number(se.queries)) * 100 *
+        Math.max(0.25, bestSearchP50 / Math.max(parseS(se.p50_s), 0.01))
+      : 0;
+    const questScore = q && q.quests > 0
+      ? (Number(q.answered) / Number(q.quests)) * 60 +
+        (parseS(q.judge_score) / 10) * 40
+      : 0;
+
+    const overall = (scrapeScore + searchScore + questScore) / 3;
+    rows.push({
+      provider: p,
+      agent_ready: overall.toFixed(0),
+      scrape: `${s ? `${s.passed}/${s.attempts} @ ${s.avg_usable_s}` : "-"}`,
+      search: se ? `${se.success} @ ${se.p50_s} p50` : "-",
+      quest: q ? `${q.answered}/${q.quests} @ ${q.total_s} · judge ${q.judge_score}` : "-",
+    });
+  }
+  return rows.sort((a, b) => Number(b.agent_ready) - Number(a.agent_ready));
+}
+
+function parseS(s: string | number): number {
+  if (typeof s === "number") return s;
+  const m = /^([\d.]+)s$/.exec(String(s));
+  return m ? Number(m[1]) : 0;
+}
+
 // ---------- output ----------
 function writeCsv(name: string, rows: Row[]) {
   if (rows.length === 0) return;
@@ -185,52 +249,70 @@ function main() {
   writeCsv("search", search);
   writeCsv("quest", quest);
 
-  fs.writeFileSync(
-    path.join(OUT_DIR, "summary.json"),
-    JSON.stringify({ generatedAt: new Date().toISOString(), scrape, search, quest }, null, 2) + "\n"
-  );
-
   console.log("== Scrape =="); console.log(markdownTable("scrape", scrape));
   console.log("== Search =="); console.log(markdownTable("search", search));
   console.log("== Quest =="); console.log(markdownTable("quest", quest));
 
+  const overall = overallLeaderboard(scrape, search, quest);
+  console.log("== Overall agent-ready =="); console.log(markdownTable("overall", overall));
+
   fs.writeFileSync("results/README-tables.md", [
+    "## Overall Agent-Ready", markdownTable("overall", overall), "",
     "## Scrape Event", markdownTable("scrape", scrape), "",
     "## Search Event", markdownTable("search", search), "",
     "## Quest Event", markdownTable("quest", quest), "",
   ].join("\n"));
 
-  writeScoreboardSvg(scrape);
+  fs.writeFileSync(
+    path.join(OUT_DIR, "summary.json"),
+    JSON.stringify({ generatedAt: new Date().toISOString(), scrape, search, quest, overall }, null, 2) + "\n"
+  );
+  writeCsv("overall", overall);
+
+  writeScoreboardSvg(overall);
 }
 
+// Overall agent-ready leaderboard across all three events, drawn as the Y2K
+// scoreboard window with embedded provider favicons (base64 data URIs).
 function writeScoreboardSvg(rows: Row[]) {
-  const W = 1500, H = rows.length * 46 + 150;
+  const W = 1500;
+  const H = rows.length * 46 + 150;
   const esc = (s: string | number) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const parts: string[] = [];
-  parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="SurfBench leaderboard">`);
-  parts.push(`<rect width="${W}" height="${H}" fill="#008080"/>`);
-  // dithered desktop
-  parts.push(`<rect width="${W}" height="${H}" fill="url(#dither)"/>`);
+  parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="SurfBench overall leaderboard">`);
   parts.push(`<defs><pattern id="dither" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#008080"/><rect x="1" y="1" width="1" height="1" fill="#007a7a"/></pattern></defs>`);
-  // title bar
+  parts.push(`<rect width="${W}" height="${H}" fill="url(#dither)"/>`);
   parts.push(`<rect x="30" y="30" width="${W - 60}" height="40" fill="#000080"/>`);
-  parts.push(`<text x="50" y="56" font-family="Verdana,Arial,sans-serif" font-size="20" font-weight="bold" fill="#fff">📊 SurfBench Scoreboard</text>`);
-  // window body
+  parts.push(`<text x="50" y="56" font-family="Verdana,Arial,sans-serif" font-size="20" font-weight="bold" fill="#fff">SurfBench — Overall Agent-Ready Leaderboard</text>`);
   parts.push(`<rect x="30" y="70" width="${W - 60}" height="${H - 100}" fill="#c0c0c0"/>`);
-  // table header
+
   const cols = rows.length ? Object.keys(rows[0]) : ["provider"];
-  const colW = Math.min(200, (W - 120) / cols.length);
+  const bodyX = 92;
+  const firstColW = 210;
+  const restW = W - 160 - firstColW;
+  const restCols = Math.max(cols.length - 1, 1);
+  const restW2 = W - 160 - firstColW;
+  const restCols2 = restCols;
+  const colX = (i: number) => (i === 0 ? bodyX : bodyX + firstColW + (i - 1) * (restW / Math.max(cols.length - 2, 1)));
+
   cols.forEach((c, i) => {
-    parts.push(`<text x="${60 + i * colW}" y="105" font-family="Verdana,Arial,sans-serif" font-size="16" font-weight="bold" fill="#111">${esc(c)}</text>`);
+    parts.push(`<text x="${colX(i)}" y="105" font-family="Verdana,Arial,sans-serif" font-size="15" font-weight="bold" fill="#111">${esc(c)}</text>`);
   });
+
   rows.forEach((r, ri) => {
-    const y = 145 + ri * 46;
-    // beveled row background
+    const y = 148 + ri * 46;
     parts.push(`<rect x="50" y="${y - 22}" width="${W - 100}" height="40" fill="${ri % 2 ? "#ffffff" : "#f4f2ea"}"/>`);
+    const uri = faviconDataUri(String(r.provider));
+    if (uri) {
+      parts.push(`<image x="58" y="${y - 15}" width="24" height="24" href="${uri}"/>`);
+    }
     cols.forEach((c, ci) => {
-      parts.push(`<text x="${62 + ci * colW}" y="${y + 4}" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#111">${esc(r[c] ?? "")}</text>`);
+      const val = esc(r[c] ?? "");
+      const isProvider = ci === 0;
+      parts.push(`<text x="${colX(ci) + (isProvider ? 32 : 0)}" y="${y + 5}" font-family="Verdana,Arial,sans-serif" font-size="${isProvider ? 15 : 13}" ${isProvider ? 'font-weight="bold"' : ""} fill="#111">${val}</text>`);
     });
   });
+
   parts.push(`</svg>`);
   fs.writeFileSync("assets/benchmark-summary.svg", parts.join("\n"));
 }
