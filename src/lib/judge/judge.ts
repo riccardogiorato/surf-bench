@@ -9,12 +9,12 @@ import "dotenv/config";
 // Together rate limits are dynamic and aggressive, so calls are throttled to
 // 2 in flight and retried with exponential backoff.
 const PANEL = [
-  // Kimi K3 is a thinking model — thinking is disabled via chat template kwarg
-  // for fast, cheap verdicts; GLM-5.3 takes reasoning_effort.
+  // Both judges run reasoning_effort "low" — Kimi K3 with the chat-template
+  // kwarg still spent its whole budget thinking and returned empty content.
   {
     name: "kimi-k3",
     model: "moonshotai/Kimi-K3",
-    extra: { chat_template_kwargs: { enable_thinking: false } },
+    extra: { reasoning_effort: "low" },
   },
   {
     name: "glm-5.3",
@@ -24,9 +24,11 @@ const PANEL = [
 ] as const;
 
 const JUDGE_CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 1 week
-const CALL_TIMEOUT_MS = 60000;
+const CALL_TIMEOUT_MS = 90000;
 const MAX_ATTEMPTS = 5;
-const MAX_OUTPUT_TOKENS = 2048; // headroom for reasoning models
+const MAX_OUTPUT_TOKENS = 8192; // headroom: Kimi K3's thinking must fit alongside the JSON reply
+
+const JUDGE_ERROR_PREFIX = "judge error:";
 
 interface JudgeCacheEntry {
   verdicts: Verdict[];
@@ -140,12 +142,18 @@ export async function grade(
     }),
   );
 
-  const average = verdicts.reduce((s, v) => s + v.score, 0) / verdicts.length;
+  // A failed judge call is not a 0-quality vote — average only clean verdicts.
+  // If every judge errored, average is NaN and the record must be re-graded.
+  const clean = verdicts.filter((v) => !v.rationale.startsWith(JUDGE_ERROR_PREFIX));
+  const average =
+    clean.length > 0
+      ? clean.reduce((s, v) => s + v.score, 0) / clean.length
+      : Number.NaN;
   const flagged =
-    verdicts.length === 2 && Math.abs(verdicts[0].score - verdicts[1].score) > 2;
+    clean.length === 2 && Math.abs(clean[0].score - clean[1].score) > 2;
 
   // Cache only clean verdicts — don't poison the cache with judge-error scores
-  const errored = verdicts.some((v) => v.rationale.startsWith("judge error"));
+  const errored = verdicts.length !== clean.length;
   if (!errored) {
     await writeVerdictsToCache(key, verdicts);
   }

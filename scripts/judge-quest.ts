@@ -16,9 +16,14 @@ async function main() {
     latest.set(`${rec.provider}|${rec.questId}`, rec);
   }
 
-  const pending = [...latest.values()].filter(
-    (r) => r.content && r.content.length > 200 && r.judgeAverage === undefined,
-  );
+  const pending = [...latest.values()].filter((r) => {
+    if (!r.content || r.content.length <= 200) return false;
+    if (r.judgeAverage === undefined) return true;
+    // re-grade records poisoned by judge-error verdicts (counted as 0 before)
+    return (r.judgeVerdicts ?? []).some((v: any) =>
+      v.rationale?.startsWith("judge error"),
+    );
+  });
   console.log(`records: ${latest.size}, pending: ${pending.length}`);
 
   for (const result of pending) {
@@ -29,6 +34,10 @@ async function main() {
         quest.question,
         result.content ?? "",
       );
+      if (Number.isNaN(average)) {
+        console.error(`${result.provider} ${result.questId}: ALL JUDGES ERRORED — record kept, re-run to retry`);
+        continue;
+      }
       await recordQuestRun({
         ...result,
         judgeAverage: average,

@@ -201,7 +201,7 @@ function overallLeaderboard(
       : 0;
     const questScore = q && q.quests > 0
       ? (Number(q.answered) / Number(q.quests)) * 60 +
-        (parseS(q.judge_score) / 10) * 40
+        (parseNum(q.judge_score) / 10) * 40
       : 0;
 
     const overall = (scrapeScore + searchScore + questScore) / 3;
@@ -223,6 +223,12 @@ function parseS(s: string | number): number {
   if (typeof s === "number") return s;
   const m = /^([\d.]+)s$/.exec(String(s));
   return m ? Number(m[1]) : 0;
+}
+
+// plain number parse for judge scores ("7.4" etc. — parseS only reads time strings)
+function parseNum(s: string | number): number {
+  const n = typeof s === "number" ? s : Number.parseFloat(String(s));
+  return Number.isFinite(n) ? n : 0;
 }
 
 // ---------- output ----------
