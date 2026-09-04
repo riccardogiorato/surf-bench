@@ -10,7 +10,7 @@ SurfBench compares web-access APIs on the three things agents actually do: **sea
 
 ![Overall agent-ready leaderboard](assets/benchmark-summary.svg)
 
-| provider | agent-ready | scrape (50 URLs) | search (29 queries) | quest (15 questions) |
+| provider | agent-ready (0–100) | scrape — fetch 50 URLs | search — find 29 queries | quest — search→fetch→judge (15 questions) |
 |---|---|---|---|---|
 | <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> **parallel** | **74** | 50/50 @ 0.6s | 28/29 @ 2.8s | 15/15 @ 36.7s · judge 7.1 |
 | <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> **exa** | 66 | 38/50 @ 0.8s | 28/29 @ 1.6s | 15/15 @ 7.7s · judge 8.0 |

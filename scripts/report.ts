@@ -270,33 +270,39 @@ function main() {
 // scoreboard window with embedded provider favicons (base64 data URIs).
 // Overall agent-ready leaderboard across all three events, drawn edge-to-edge
 // (no dithered margin) with embedded provider favicons and large readable text.
+// Overall agent-ready leaderboard SVG: tier medals, per-event scores 0-100
+// with a "max" reference row, quest labeled as the search→fetch pipeline.
 function writeScoreboardSvg(rows: Row[]) {
   const W = 1600;
   const rowH = 76;
   const H = rows.length * rowH + 148;
-  const esc = (s: string | number) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const esc = (s: string | number) =>
+    String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const parts: string[] = [];
 
-  // fixed column positions — nothing overflows
-  const colLogo = 24;       // logo x
-  const colName = 100;      // provider name x
-  const cols: Array<[string, number]> = [
-    ["agent-ready", 640],
-    ["scrape", 870],
-    ["search", 1100],
-    ["quest", 1330],
+  const colLogo = 24;
+  const colName = 100;
+  const medalX = 62;
+  const cols: Array<[string, string, number]> = [
+    ["agent-ready", "composite 0–100", 640],
+    ["scrape", "fetch 50 URLs", 870],
+    ["search", "find 29 queries", 1100],
+    ["quest", "search→fetch→judge", 1330],
   ];
+  // tier medal by final rank
+  const medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣"];
 
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="SurfBench overall leaderboard">`);
   parts.push(`<rect width="${W}" height="${H}" fill="#c0c0c0"/>`);
-  // titlebar
   parts.push(`<rect width="${W}" height="64" fill="#000080"/>`);
   parts.push(`<text x="28" y="43" font-family="Verdana,Arial,sans-serif" font-size="26" font-weight="bold" fill="#ffffff">SurfBench — Overall Agent-Ready Leaderboard</text>`);
+
   // header row
   parts.push(`<rect y="64" width="${W}" height="52" fill="#c0c0c0"/>`);
-  parts.push(`<text x="${colName}" y="102" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">provider</text>`);
-  cols.forEach(([label, x]) => {
-    parts.push(`<text x="${x}" y="102" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">${esc(label)}</text>`);
+  parts.push(`<text x="${colName}" y="90" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">provider</text>`);
+  cols.forEach(([label, sub, x]) => {
+    parts.push(`<text x="${x}" y="90" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">${esc(label)}</text>`);
+    parts.push(`<text x="${x}" y="110" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#555">${esc(sub)}</text>`);
   });
 
   rows.forEach((r, ri) => {
@@ -307,12 +313,14 @@ function writeScoreboardSvg(rows: Row[]) {
     if (uri) {
       parts.push(`<image x="${colLogo}" y="${y - 17}" width="34" height="34" href="${uri}"/>`);
     }
+    parts.push(`<text x="${medalX}" y="${y + 10}" font-family="Verdana,Arial,sans-serif" font-size="24">${medals[ri] ?? ""}</text>`);
     parts.push(`<text x="${colName}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r.provider)}</text>`);
-    parts.push(`<text x="${cols[0][1]}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">${esc(r.agent_ready)}</text>`);
+    parts.push(`<text x="${cols[0][2]}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">${esc(r.agent_ready)}</text>`);
+    parts.push(`<text x="${cols[0][2] + 70}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="14" fill="#666">/100</text>`);
     const cells: Array<[string, string, number]> = [
-      ["scrape_score", "scrape", cols[1][1]],
-      ["search_score", "search", cols[2][1]],
-      ["quest_score", "quest", cols[3][1]],
+      ["scrape_score", "scrape", cols[1][2]],
+      ["search_score", "search", cols[2][2]],
+      ["quest_score", "quest", cols[3][2]],
     ];
     cells.forEach(([scoreKey, detailKey, x]) => {
       parts.push(`<text x="${x}" y="${y - 2}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r[scoreKey] ?? "-")}</text>`);
