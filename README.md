@@ -41,16 +41,16 @@ Composite across all three events: scrape score (success × speed), search score
 
 ### Search Event — 29 queries × 12 quality dims
 
-| provider | success | p50 | p95 |
-|---|---|---|---|
-| <img src="https://www.google.com/s2/favicons?domain=brave.com&sz=32" width="16" height="16" alt=""> **brave** | 100% | **0.9s** | 3.2s |
-| <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> exa | 97% | 1.5s | 2.3s |
-| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 100% | 1.7s | 2.8s |
-| <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> firecrawl | 100% | 1.9s | 4.3s |
-| <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> tavily | 100% | 2.3s | 3.8s |
-| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> parallel | 100% | 2.4s | 4.4s |
+| provider | assertions | success | p50 | p95 |
+|---|---|---|---|---|
+| <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> **exa** | **28/29** | 97% | 1.5s | 2.3s |
+| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> parallel | 28/29 | 100% | 2.4s | 4.4s |
+| <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> firecrawl | 27/29 | 100% | 1.9s | 4.3s |
+| <img src="https://www.google.com/s2/favicons?domain=brave.com&sz=32" width="16" height="16" alt=""> brave | 27/29 | 100% | **0.9s** | 3.2s |
+| <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> tavily | 25/29 | 100% | 2.3s | 3.8s |
+| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 20/29 | 100% | 1.7s | 2.8s |
 
-**Takeaway**: brave is the fastest search on the board; quality assertions passed across the board — speed and result *shape* are the differentiators. Serper is implemented but needs a key.
+**Takeaway**: exa leads on quality (fewest assertion failures); brave is the fastest; linkup trails badly on quality (9/29 assertion failures — entity disambiguation, factuality, safe-search). Serper is implemented but needs a key.
 
 ### Quest Event — 15 questions × (search → fetch → judge)
 
