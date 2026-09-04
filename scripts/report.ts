@@ -289,10 +289,10 @@ function writeScoreboardSvg(rows: Row[]) {
   const colLogo = 24;       // logo x
   const colName = 100;      // provider name x
   const cols: Array<[string, number]> = [
-    ["agent-ready", 470],
-    ["scrape", 700],
-    ["search", 990],
-    ["quest", 1150],
+    ["agent-ready", 640],
+    ["scrape", 870],
+    ["search", 1100],
+    ["quest", 1330],
   ];
 
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="SurfBench overall leaderboard">`);
