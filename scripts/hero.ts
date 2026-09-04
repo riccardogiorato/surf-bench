@@ -1,110 +1,66 @@
 import fs from "fs";
 
-// Generates assets/hero.svg — the Y2K portal illustration for the README.
-// The mascot renders from a string-grid sprite via a tiny run-length loop,
-// so no hand-authored pixel rect math.
+// Generates assets/hero.svg — a simple Y2K window-frame hero for the README:
+// big bench name, short description, provider chips. No mascot.
 
-const PAL: Record<string, string> = {
-  N: "#0d2c4d", W: "#ffffff", F: "#bfe0ff", B: "#2e86de", D: "#1b4f8a",
-  K: "#101820", G: "#7fb3ff", Y: "#f0a832", O: "#b96f10",
-};
-
-const CURL: string[] = [
-  ".......NNNNN..........",
-  ".....NNWWWWWNN........",
-  "....NWWWWFWWWWN.......",
-  "...NWWFWNNWWWFWN......",
-  "...NWWWN...NWWBBN.....",
-  "..NWWWN....NWBBBBN....",
-  "..NWWN....NBBBBBBN....",
-  "..NWWN...NBBBBBBBBN...",
-  "..NWBN..NBBBBBBBBBBN..",
-  "..NBBN.NBBBBBBBBBBBBN.",
-  "..NBBBNBBBBBBBBBBBBBN.",
-  ".NBBBBBBBBBBBBBBBBBBN.",
-  "NBBBBBBBBBBBBBBBBBBBBN",
-  "NBBBKKKKKKKKKKKKKKBBBN",
-  "NBBBKGGGKBBBBKGGGKBBBN",
-  "NBBBBBBBBBBBBBBBBBBBBN",
-  "NBBBBBBBBBBBBBBBBBBBBN",
-  "NBBBBBBBBBBBBBBBBBBBBN",
-  "NBBBNNBBBBBBBBBBNNBBBBN",
-  "NBBBBBNNNNNNNNNNBBBBBN",
-  ".NNBBBBBBBBBBBBBBBBNN.",
-  "...YYYYYYWWYYYYYYYY...",
-  "..OYYYYYYYYYYYYYYYYO..",
-  "...OOOOOOOOOOOOOOOO...",
-];
-
-function spriteSvg(scale: number): string {
-  const parts: string[] = [];
-  CURL.forEach((row, y) => {
-    let x = 0;
-    while (x < row.length) {
-      const ch = row[x];
-      if (ch === ".") { x++; continue; }
-      let run = 1;
-      while (x + run < row.length && row[x + run] === ch) run++;
-      parts.push(`<rect x="${x}" y="${y}" width="${run}" height="1" fill="${PAL[ch]}"/>`);
-      x += run;
-    }
-  });
-  return `<g shape-rendering="crispEdges" transform="scale(${scale})">${parts.join("")}</g>`;
-}
-
-// --- hero composition: dithered desktop, icon plate, window, badges ---
-function badge(text: string, bg: string, fg: string): string {
+function chip(label: string, x: number, y: number): string {
+  const w = Math.max(110, label.length * 9 + 28);
   return (
-    `<rect width="88" height="31" fill="${bg}"/>` +
-    `<text x="44" y="20" font-family="Verdana,Arial,sans-serif" font-size="9" font-weight="bold" fill="${fg}" text-anchor="middle">${text}</text>`
+    `<g transform="translate(${x} ${y})">` +
+    `<rect x="3" y="3" width="${w}" height="36" fill="#0a0a0a"/>` +
+    `<rect width="${w}" height="36" fill="#c0c0c0" stroke="#ffffff" stroke-width="2"/>` +
+    `<rect x="1.5" y="1.5" width="${w - 3}" height="33" fill="none" stroke="#808080" stroke-width="1"/>` +
+    `<text x="${w / 2}" y="24" font-family="Verdana,Arial,sans-serif" font-size="15" font-weight="bold" fill="#111111" text-anchor="middle">${label}</text>` +
+    `</g>`
   );
 }
 
 function main() {
-  const W = 1600, H = 600;
+  const W = 1600, H = 560;
   const svg: string[] = [];
 
   svg.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="ht hd">`);
   svg.push(`<title id="ht">SurfBench</title>`);
-  svg.push(`<desc id="hd">Pixel wave mascot curl.exe on a teal dithered desktop beside a retro browser window.</desc>`);
+  svg.push(`<desc id="hd">A Y2K desktop window frame: SurfBench, the web-access benchmark for agents — search, scrape, quest events across eight providers.</desc>`);
   svg.push(`<defs><pattern id="dith" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#008080"/><rect x="1" y="1" width="1" height="1" fill="#007a7a"/></pattern></defs>`);
   svg.push(`<rect width="${W}" height="${H}" fill="url(#dith)"/>`);
 
-  // mascot icon plate
-  svg.push(`<g transform="translate(90 110)">`);
-  svg.push(`<rect x="-12" y="-12" width="246" height="300" fill="#f4faff" stroke="#808080" stroke-width="3"/>`);
-  svg.push(`<rect width="222" height="276" fill="#d8ecff"/>`);
-  svg.push(spriteSvg(10));
-  svg.push(`<text y="298" font-family="Verdana,monospace" font-size="13" fill="#ffffff" font-weight="bold">curl.exe</text>`);
-  svg.push(`</g>`);
+  // window
+  const wx = 130, wy = 70, ww = 1340, wh = 420;
+  svg.push(`<g transform="translate(${wx} ${wy})">`);
+  svg.push(`<rect x="8" y="8" width="${ww}" height="${wh}" fill="#0a0a0a" opacity="0.35"/>`);
+  svg.push(`<rect width="${ww}" height="${wh}" fill="#c0c0c0" stroke="#ffffff" stroke-width="2"/>`);
+  svg.push(`<rect x="2" y="2" width="${ww - 4}" height="${wh - 4}" fill="none" stroke="#808080" stroke-width="2"/>`);
+  // titlebar
+  svg.push(`<rect x="4" y="4" width="${ww - 8}" height="34" fill="#000080"/>`);
+  svg.push(`<text x="16" y="27" font-family="Verdana,Arial,sans-serif" font-size="15" font-weight="bold" fill="#ffffff">SurfBench — The Web Access Benchmark for Agents</text>`);
+  // titlebar buttons
+  [ww - 92, ww - 62, ww - 32].forEach((bx, i) => {
+    svg.push(`<rect x="${bx}" y="10" width="22" height="20" fill="#c0c0c0" stroke="#0a0a0a"/>`);
+    const glyph = i === 2 ? "✕" : i === 1 ? "□" : "_";
+    svg.push(`<text x="${bx + 11}" y="25" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#111111" text-anchor="middle">${glyph}</text>`);
+  });
+  // content plate
+  svg.push(`<rect x="14" y="46" width="${ww - 28}" height="${wh - 60}" fill="#ffffff" stroke="#808080"/>`);
 
-  // browser window
-  svg.push(`<g transform="translate(400 110)">`);
-  svg.push(`<rect width="1100" height="380" fill="#c0c0c0" stroke="#0a0a0a" stroke-width="2"/>`);
-  svg.push(`<rect x="3" y="3" width="1094" height="30" fill="#000080"/>`);
-  svg.push(`<text x="16" y="24" font-family="Verdana,Arial,sans-serif" font-size="15" font-weight="bold" fill="#ffffff">SurfBench — The Web Access Benchmark</text>`);
-  svg.push(`<rect x="14" y="44" width="1072" height="320" fill="#ffffff" stroke="#808080"/>`);
-  svg.push(`<text x="36" y="92" font-family="Verdana,Arial,sans-serif" font-size="34" font-weight="bold" fill="#111111">SurfBench</text>`);
-  svg.push(`<text x="36" y="126" font-family="Verdana,Arial,sans-serif" font-size="15" fill="#444444">The benchmark that hires the best web assistant for your agent.</text>`);
-  svg.push(`<text x="36" y="164" font-family="Verdana,Arial,sans-serif" font-size="14" fill="#111111">Events: search / scrape / quest</text>`);
-  svg.push(`<text x="36" y="190" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#111111">Providers: firecrawl exa linkup tavily parallel jina brave serper</text>`);
-  svg.push(`<text x="36" y="216" font-family="Verdana,Arial,sans-serif" font-size="14" fill="#111111">Judges: Kimi K3 + GLM-5 via Together AI</text>`);
-  svg.push(`<text x="36" y="242" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#111111">30s wipeout rule: slow is a DQ, not a data point</text>`);
-  svg.push(`<rect x="36" y="270" width="440" height="30" fill="#ffffff" stroke="#808080"/>`);
-  svg.push(`<text x="48" y="290" font-family="Verdana,monospace" font-size="13" fill="#444444">which provider should my agent use?</text>`);
-  svg.push(`<rect x="488" y="270" width="84" height="30" fill="#c0c0c0" stroke="#0a0a0a"/>`);
-  svg.push(`<text x="506" y="290" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#111111">Surf!</text>`);
-  svg.push(`<rect x="36" y="316" width="1050" height="8" fill="#ffd800"/>`);
-  svg.push(`<text x="36" y="352" font-family="Verdana,monospace" font-size="12" fill="#000080">*** SEARCH: tavily fastest *** SCRAPE: parallel most waves *** QUEST: see results/ ***</text>`);
-  svg.push(`</g>`);
+  // big name
+  svg.push(`<text x="60" y="150" font-family="Verdana,Arial,sans-serif" font-size="86" font-weight="bold" fill="#111111" letter-spacing="-2">Surf<tspan fill="#000080">Bench</tspan></text>`);
+  // short description
+  svg.push(`<text x="62" y="196" font-family="Verdana,Arial,sans-serif" font-size="19" fill="#444444">Find the fastest, highest-quality web access API for your agents.</text>`);
+  svg.push(`<text x="62" y="228" font-family="Verdana,Arial,sans-serif" font-size="15" fill="#0a0a0a">Three events: search / scrape / quest — judged, timed, 30s wipeout rule.</text>`);
 
-  // badges row
-  svg.push(`<g transform="translate(90 470)">`);
-  svg.push(badge("SURF BENCH", "#000080", "#ffffff"));
-  svg.push(`<g transform="translate(96 0)">${badge("POWERED BY VITEST", "#1084d0", "#ffffff")}</g>`);
-  svg.push(`<g transform="translate(192 0)">${badge("JUDGED BY LLMS", "#ffd800", "#3a2c00")}</g>`);
-  svg.push(`<g transform="translate(288 0)">${badge("30S WIPEOUT", "#ff6600", "#ffffff")}</g>`);
-  svg.push(`<g transform="translate(384 0)">${badge("PNPM INSIDE", "#c0c0c0", "#111111")}</g>`);
+  // provider chips — two rows of four
+  const providers = ["firecrawl", "exa", "linkup", "tavily", "parallel", "jina", "brave", "serper"];
+  providers.forEach((p, i) => {
+    const col = i % 4, row = Math.floor(i / 4);
+    const x = 60 + col * 316;
+    const y = 270 + row * 54;
+    svg.push(chip(p, x, y));
+  });
+
+  // status bar
+  svg.push(`<rect x="14" y="${wh - 14}" width="${ww - 28}" height="0" fill="none"/>`);
+  svg.push(`<text x="60" y="${wh - 24}" font-family="Verdana,monospace" font-size="13" fill="#000080">*** 50 waves · 29 queries · 15 quests · judged by Kimi K3 + GLM-5.3 ***</text>`);
   svg.push(`</g>`);
 
   svg.push(`</svg>`);

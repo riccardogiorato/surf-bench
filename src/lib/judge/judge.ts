@@ -9,8 +9,18 @@ import "dotenv/config";
 // Together rate limits are dynamic and aggressive, so calls are throttled to
 // 2 in flight and retried with exponential backoff.
 const PANEL = [
-  { name: "kimi-k3", model: "moonshotai/Kimi-K3" },
-  { name: "glm-5.3", model: "zai-org/GLM-5.3" },
+  // Kimi K3 is a thinking model — thinking is disabled via chat template kwarg
+  // for fast, cheap verdicts; GLM-5.3 takes reasoning_effort.
+  {
+    name: "kimi-k3",
+    model: "moonshotai/Kimi-K3",
+    extra: { chat_template_kwargs: { enable_thinking: false } },
+  },
+  {
+    name: "glm-5.3",
+    model: "zai-org/GLM-5.3",
+    extra: { reasoning_effort: "low" },
+  },
 ] as const;
 
 const JUDGE_CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 1 week
@@ -79,6 +89,7 @@ async function askJudge(
             messages: [{ role: "user", content: prompt }],
             max_tokens: MAX_OUTPUT_TOKENS,
             temperature: 0,
+            ...PANEL.find((p) => p.model === model)?.extra,
           }),
           signal: AbortSignal.timeout(CALL_TIMEOUT_MS),
         });
