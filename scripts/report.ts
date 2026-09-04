@@ -207,7 +207,10 @@ function overallLeaderboard(
     rows.push({
       provider: p,
       agent_ready: overall.toFixed(0),
-      scrape: `${s ? `${s.passed}/${s.attempts} @ ${s.avg_usable_s}` : "-"}`,
+      scrape_score: scrapeScore.toFixed(0),
+      search_score: searchScore.toFixed(0),
+      quest_score: questScore.toFixed(0),
+      scrape: s ? `${s.passed}/${s.attempts} @ ${s.avg_usable_s}` : "-",
       search: se ? `${se.success} @ ${se.p50_s} p50` : "-",
       quest: q ? `${q.answered}/${q.quests} @ ${q.total_s} · judge ${q.judge_score}` : "-",
     });
@@ -222,13 +225,6 @@ function parseS(s: string | number): number {
 }
 
 // ---------- output ----------
-function writeCsv(name: string, rows: Row[]) {
-  if (rows.length === 0) return;
-  const cols = Object.keys(rows[0]);
-  const csv = [cols.join(","), ...rows.map((r) => cols.map((c) => r[c]).join(","))].join("\n");
-  fs.writeFileSync(path.join("results", `${name}.csv`), csv + "\n");
-  fs.writeFileSync(path.join("results", `${name}.json`), JSON.stringify(rows, null, 2) + "\n");
-}
 
 function markdownTable(name: string, rows: Row[]): string {
   if (rows.length === 0) return `_no ${name} results yet_`;
@@ -247,9 +243,6 @@ function main() {
   const quest = questRows();
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
-  writeCsv("scrape", scrape);
-  writeCsv("search", search);
-  writeCsv("quest", quest);
 
   console.log("== Scrape =="); console.log(markdownTable("scrape", scrape));
   console.log("== Search =="); console.log(markdownTable("search", search));
@@ -258,18 +251,10 @@ function main() {
   const overall = overallLeaderboard(scrape, search, quest);
   console.log("== Overall agent-ready =="); console.log(markdownTable("overall", overall));
 
-  fs.writeFileSync("results/README-tables.md", [
-    "## Overall Agent-Ready", markdownTable("overall", overall), "",
-    "## Scrape Event", markdownTable("scrape", scrape), "",
-    "## Search Event", markdownTable("search", search), "",
-    "## Quest Event", markdownTable("quest", quest), "",
-  ].join("\n"));
-
   fs.writeFileSync(
     path.join(OUT_DIR, "summary.json"),
     JSON.stringify({ generatedAt: new Date().toISOString(), scrape, search, quest, overall }, null, 2) + "\n"
   );
-  writeCsv("overall", overall);
 
   writeScoreboardSvg(overall);
 }
@@ -280,7 +265,7 @@ function main() {
 // (no dithered margin) with embedded provider favicons and large readable text.
 function writeScoreboardSvg(rows: Row[]) {
   const W = 1600;
-  const rowH = 64;
+  const rowH = 76;
   const H = rows.length * rowH + 148;
   const esc = (s: string | number) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const parts: string[] = [];
@@ -316,10 +301,16 @@ function writeScoreboardSvg(rows: Row[]) {
       parts.push(`<image x="${colLogo}" y="${y - 17}" width="34" height="34" href="${uri}"/>`);
     }
     parts.push(`<text x="${colName}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r.provider)}</text>`);
-    parts.push(`<text x="${cols[0][1]}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">${esc(r.agent_ready)}</text>`);
-    parts.push(`<text x="${cols[1][1]}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">${esc(r.scrape)}</text>`);
-    parts.push(`<text x="${cols[2][1]}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">${esc(r.search)}</text>`);
-    parts.push(`<text x="${cols[3][1]}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">${esc(r.quest)}</text>`);
+    parts.push(`<text x="${cols[0][1]}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">${esc(r.agent_ready)}</text>`);
+    const cells: Array<[string, string, number]> = [
+      ["scrape_score", "scrape", cols[1][1]],
+      ["search_score", "search", cols[2][1]],
+      ["quest_score", "quest", cols[3][1]],
+    ];
+    cells.forEach(([scoreKey, detailKey, x]) => {
+      parts.push(`<text x="${x}" y="${y - 2}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r[scoreKey] ?? "-")}</text>`);
+      parts.push(`<text x="${x}" y="${y + 20}" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">${esc(r[detailKey] ?? "")}</text>`);
+    });
   });
 
   parts.push(`</svg>`);

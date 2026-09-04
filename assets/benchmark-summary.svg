@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="596" viewBox="0 0 1600 596" role="img" aria-label="SurfBench overall leaderboard">
-<rect width="1600" height="596" fill="#c0c0c0"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="680" viewBox="0 0 1600 680" role="img" aria-label="SurfBench overall leaderboard">
+<rect width="1600" height="680" fill="#c0c0c0"/>
 <rect width="1600" height="64" fill="#000080"/>
 <text x="28" y="43" font-family="Verdana,Arial,sans-serif" font-size="26" font-weight="bold" fill="#ffffff">SurfBench — Overall Agent-Ready Leaderboard</text>
 <rect y="64" width="1600" height="52" fill="#c0c0c0"/>
@@ -8,53 +8,74 @@
 <text x="870" y="102" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">scrape</text>
 <text x="1100" y="102" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">search</text>
 <text x="1330" y="102" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">quest</text>
-<rect y="128" width="1600" height="64" fill="#f4f2ea"/>
-<image x="24" y="143" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAYFBMVEX///8AAAAYGBgpKSnMzMx+fn65ubkQEBBkZGTV1dXi4uIJCQk9PT0TExPl5eUsLCyWlpZ2dnaQkJDt7e339/egoKCHh4fc3NxaWlpfX1+urq5PT09CQkI1NTVUVFTGxsaLeUlPAAABiUlEQVRYhe2X65aCIBSFwwumqJGCptb4/m/ZkCUHRQKmWXNZff/PXp7b5rjbvfnf1BGvmjiOmz71iG7pAQEGnjKX8LGb4pLiRhAkKDhF9vEsbTMBPueCEBFCPuUODhJ3oZtMmZ72N7o9dlV4GWxKSVBbB2X3Dxd8gIb0piB8nIkHUbo7STBTIEMpa1o9oANSkQrBaJdBpNBDMaeZ+ilYugSfQ0mui0kxoCHBkgKANCNZd+FBgpIVBRAj3bqOrMwkZRKuUNYb+VgEp5LKeTFfAYODNZqHicca9koRlvNcIdgygjQonUV8IYBBhWisFXg45DQJjTHbEWvoh1xyMQpsUJcAe2fyEWC6DJ6k8OUiOreRGrP1GCQLXEb5e6DmdVYMJSPuhqJY2sXD0txM9WkPfGz919EaHtfNTSwr+byfF5sADgTDpdRvHBigJ4X5RAHAE6cDn7J0Uzt8jqxX4H1ozqdurpy6of2LOnYEuqA4ti9Htwe57U9wCgaeOYVPZOKHo6m41w/Hmz/FFSJmJyUNUT/wAAAAAElFTkSuQmCC"/>
-<text x="100" y="169" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">parallel</text>
-<text x="640" y="169" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">64</text>
-<text x="870" y="169" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">50/50 @ 0.6s</text>
-<text x="1100" y="169" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">100% @ 2.4s p50</text>
-<text x="1330" y="169" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">15/15 @ 36.7s · judge 4.3</text>
-<rect y="192" width="1600" height="64" fill="#ffffff"/>
-<image x="24" y="207" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAYFBMVEUfQO3w8v7///+7xfqWpvf9/f/DzPphePKdrPexvPlVbvF1ifSisPils/jb4Pz2+P5EX/BmffPV2/wmRu44Vu9CXvB8j/QjQ+3L0/ttg/MtTO7i5v08We/Q1/tQavHr7v3UMFLmAAAAkElEQVQ4jd2SzQ6CQAyE21mqgMCCoCg/8v5v6QbDwWxNueKcmvZL2mlL9FfK+EvnCHDgZFMqyBUAly0uUMYtHCpff8IG11YBpPbVmu/Y35QhndAdRQj6BxrNRQAow5MoQarVV2AYecpl7n8C9JJ54U6tBxenIAbiFe0FzBZ7hrRsWouyVm0eyz638TDmyx1ab/9IBsdakyN7AAAAAElFTkSuQmCC"/>
-<text x="100" y="233" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">exa</text>
-<text x="640" y="233" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">55</text>
-<text x="870" y="233" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">38/50 @ 0.8s</text>
-<text x="1100" y="233" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">97% @ 1.6s p50</text>
-<text x="1330" y="233" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">15/15 @ 7.7s · judge 7.4</text>
-<rect y="256" width="1600" height="64" fill="#f4f2ea"/>
-<image x="24" y="271" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAe1BMVEX/////TQD/UQD/KQD//fz/IwD/NQD/TAD//Pv/MAD/AAD/QgD/y7P/GgD/+fb/OwD/poL/7ub/9O7/4tX/YQn/sJD/j1//upz/ZiL/iVf/dzn/bin/mGz/vaH/xKz/4NP/2cr/0Lz/6N//oXj/gkv/1cT/lWf/YxX/cTRRFkaZAAABh0lEQVRIid2V23aCMBBFM+QCSQjUa63YiFht//8LCwSMIAnksZ3lC6zZzpkzQ4LQPw3S/kJitw9EUqXeURIArGiEDyFEhgEkBKhqAMg/QiTVAIhqcYmUN0B8XFyhiBsA+MK2SaXafKCbZfkoMvnA02X5J9YB7HNRhbQTVAO6xuecImfRKwJcomqbzeRnNh9othNsroEcbMRaAZuRdHoGgEVAV35BCkYh3/wF5BgA7vXpNR9yXwmzpaNQmbvEDXdJEbOA9CyttkuB7TjUejqbJOizB/ilsn45uxCZ+XCgXeyrncjW1XFe9gBDhOAH4Jj2GQPvhPNd/fwV9wCeXsCb/UvZDEv35YBOd10+PDXOb/BMhX5qkTi3mlf4YfJ006STQLV5rkQqvS6hwri+77ZNp+jeEvLqAMwUpN1Osm6npxyfBEGNq7h8Nr050eJvRwFENB03eOH+I/Yg42GD9THOXR3UkSAmi+GrPC98X1yCpByqFD/+i4ig42Cqm/vcxfVyNAbev38ifgFqHQ8FZqCT6wAAAABJRU5ErkJggg=="/>
-<text x="100" y="297" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">firecrawl</text>
-<text x="640" y="297" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">39</text>
-<text x="870" y="297" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">37/50 @ 3.6s</text>
-<text x="1100" y="297" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">100% @ 2.0s p50</text>
-<text x="1330" y="297" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">15/15 @ 11.5s · judge 5.5</text>
-<rect y="320" width="1600" height="64" fill="#ffffff"/>
-<image x="24" y="335" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAQlBMVEVHcEwfHh4fHh7//PYfHh4fHh4fHh4fHh4fHh4eHR3///wUExMDAgN1dHHr6eNQTk3W1M8+PTy9u7eHhYOwrqqZl5RwUD9bAAAACnRSTlMAav//+4GW7cckfOp3rwAAAhhJREFUWIXtl8uWpSAMRRW8FyQIiPr/v1rBtzzEkh70oLKWM7I9CSSEqlqsrb+cM9aQrDWMcf6t2+psLWd5z6sxfkJ8yIM/h/Y5/F/ap9B/JbTv/Unj8sALAISjgF/n/2ysreoSf0Lq6lsG+JalwCUhDZBSPgEkcyiNsHkASwLkJKgYshpYlagC0IpSKnrIAJoUAANwAJuT0FQJ/8H503wQCQD0agWonIQ4QNrFHwljJgtRAOjNHyV094S4ArMDqDD3QaQAYs2BeAWA3hiz/N5Y/SYErIOOLgcJ3iTRidgA9+5/gP8egKfwCsAmGfJuAMqoC6A3wujgXCcBeuh7/M5IbJJq8kWkAAScYFwMm0kEYFimu4q4AUwWBcPQbTbOBSrodCmPdAgKczhI6Sp7taPH5AEAriliR5Tj0Vv2HkNPXSoAgMuS+/+8NgqgYpJJAGg7SJCLvxilVH4ETphOK5CYaKs3fyflsLXL0fG8lUEIbtXqb3BdrzfrJxFr0x4A5htpWWkJkOAcBCfJA5xuFON1w7k6wrPsh7DdCMIGdQODGcJqugL27aOYKX8piRWjD+iOOy1CiNkVIKfTbj8CeAOG3C/F7JWWAOAOzqdO2XMruAVchiy3i8rY7tmI58yb0qDvOk1iyU4JYN6gCdnL1LO7SfUhoHjYLh73ix8cRUloeOGji7T/4tlX/vB8Tdj93eOx7PFd8vz/AekeNLACSjiYAAAAAElFTkSuQmCC"/>
-<text x="100" y="361" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">tavily</text>
-<text x="640" y="361" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">36</text>
-<text x="870" y="361" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">37/50 @ 2.9s</text>
-<text x="1100" y="361" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">100% @ 2.3s p50</text>
-<text x="1330" y="361" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">15/15 @ 24.2s · judge 5.2</text>
-<rect y="384" width="1600" height="64" fill="#f4f2ea"/>
-<image x="24" y="399" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEUAAAD////09PTr6+vl5eXu7u6/v7+wsLBtbW3U1NS1tbXc3NydnZ3ExMR3d3f6+vqVlZVISEjLy8uoqKiHh4diYmKOjo5bW1tWVlYmJiY0NDSAgIA/Pz8YGBhoaGhNTU0fHx8LCwsbZFgyAAAB8ElEQVRYhe1V2bKrIBCkETQuQeMa9RiT///Ji4i4hJibVJ2q82C/KAw9NUzPDIQcOHDgV3EpPS+pvqYLBwpx9B3fB1jUikR+6c8XfA5+Hf9q6aL4mM/gz4sEuH7IdxEulyXQfcQvEK83POmw8EIaO+fT/ziguG12GAyc5i0/XyZARwD4+cAU0tXlfQDrI62kMyR6lW3v94TTJgApo0sIMK1T4+sF/FUGbgDvySBMqXd+wHb53SrEDAg0jU97FFvOCiW8ZTSYdGPozeauEP5cdh0HrWfHgf5Lsdscc7aaeJVOc7VwN4ICZ/3Xq+xbQuO7OcimbF+BbGUppzXonoNQX7DCVu5Gy1ch3XOgU9A/8Y18JkYrmrGRLxa+rCVVYQ7uj+5lewslVgNYJmGL4BS5oe5Keq6fjxASqfjiZTGNqBLXmTqaM8YoYBXDHeafY6RUqNtgmgdeWRleCttwGYrEXwy0e+tSFXAa3WQ1D8NCO2+2XT9CZjozOt88FbUTiNqEN9HyTZlNAJUFpI7nqbpuIGZjhFyM1X1l1jQT8gCPUZGuVLlO8/vKKpDxIYCbtDL7YJP6IRMDmwbPr4msLpmBRCaFCwt5OjKwvd5mfUjT4Dx8PduLge6+fIdGKfemwQVOvmPmePuwPN7YDxw4cOCP4x8LFhGpYZOEYQAAAABJRU5ErkJggg=="/>
-<text x="100" y="425" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">linkup</text>
-<text x="640" y="425" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">35</text>
-<text x="870" y="425" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">33/50 @ 4.1s</text>
-<text x="1100" y="425" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">100% @ 1.7s p50</text>
-<text x="1330" y="425" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">14/15 @ 29.3s · judge 4.3</text>
-<rect y="448" width="1600" height="64" fill="#ffffff"/>
-<image x="24" y="463" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAUVBMVEVHcEz/QAD/QQD/////SgD/QwD/OQD/PAD/PgD/KwD/MAD/RwD/KAD/QQD/UAD/OwD/IQD/TQT/NgD/VAn/7un/29P/bU3/jXX/q5r/xLf/CwAIaoj2AAAACnRSTlMAYAv/3qwghzrR7UleYgAAA+lJREFUWIWdV9mi6iAMdGmtUihbocv/f+gNhbCVnuO50QerZhiGIYTbrRXv0QXzwSGUUuTd/Ot1PvMAPAKo17f5r1G2GBD1+C7/0fl0jxAZAIXPdwCQ32bwBYLj2If8mgGBF+3Dn5oxdNMku06G8RsMCKEfQin9DE3mE4SEwPSzBh6DUkEbc+l0BJCZBtwH5lOX7yBOCJ2OAJwFBkwRZi2nRIUpwNDkAgHyA8Co18VCAldEruYJYRYmIGMXdlkDBUFFieDGDwBsdknztq7HBx9mXc3xaHZkIESfAfQaGajt+WOsO+aLfCleyGBcfs5/Pq1AhEc1Bwcw2t/yn08uPECp4nAAyHH+HcDsXsR7YxXYIcBszLZtpkpzX3khDxkqBu9DAy+AsZS6hR8X1HPeLHGq7bs1KEOlwQD5wAATVq04mJAw/0jBSooKjQs7724KxSq4CWiWrSCYh4+M+LUXnFO1ZHNadgfwyWfgCMhy1qti2n8CG6/lbweASCUu2KCSeyNhUa2oFA0AmQjTMYXqbzMN4y6ihq6nAFaenJlLF2wiiLLuJfRMTiLe/TKWPrQ0ABpR/DArv4y5k15+GQuELawiZIhchNltbgdQOHHymylHkDw+SKLT92NzL/RhOyeEVfG4M8GI0SNShIJSFtY7FhSGWZrxuPgLwRXF3QwA5VH5mLCk4bgrYXrzTlzHyMCKWNJuZaSiigMbCXV0tJZBGdRBxAUr2rksD6kqK7TDQo9DQQmcC1TEUJVrCfyGxrIe/WS0YozY9Lyng6E+6x9TBMjNAPLl+0iGcwGUvNURTyZW1GVdmHAVOIX+BDBEEfMdMSuWPzoRPMD9BPCODPJ8ybnOnxGANtqdyCD53sDZzJRMHLYwhfPZCtEHgOTmTbnTmal0WqGI9CzB7XEPAFNwkrEE6qqWFApqWMlF4OF6lgC2dOwPnJuNhdLOXSU1i3MPfJqPfM+g2ebI2KEwNhKwYCzjCxR2wV1zEBi0m60+b3E4yY9ZN7jr0pBBs0e63VOLM7KlOiVnS32HdPRI7a73lTHg1UHgdpZrkgKDZj7UNQSAt6oaBSgEKjK46jf7TAOmbN7iMOp6ZWTQlgDcnDEYwULRkmBAbBMPBpdte9FojiydTKFbDwyuO+YhZwDvo5SC/qnRPBi0bOjjIXMG4CelZ8NUvC94BuQyH6yQGPgbCyekaHUdgx+vPkPJoLqxHAyuJ4AcEoOxui+4+PXq9eou7wvw/nxzbRrwvsCq+wJRVw6q4t21GXy+vve5e9P5zvTl8IHEiQH/w8UVSeQa/Gl4JIEyct79dfhAAhn8x/CBxMHgP4f3MbDuF+v+A4tzcSbr/fGlAAAAAElFTkSuQmCC"/>
-<text x="100" y="489" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">brave</text>
-<text x="640" y="489" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">31</text>
-<text x="870" y="489" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">-</text>
-<text x="1100" y="489" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">100% @ 0.8s p50</text>
-<text x="1330" y="489" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">-</text>
-<rect y="512" width="1600" height="64" fill="#f4f2ea"/>
-<image x="24" y="527" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAPFBMVEVHcEwAlZX0ZGTrYGAAlJTwY2MAlJQAkZHzZGQAkpL0ZGS1aGgGjo7nX1/uYmIBkJDsYWEAkZEAlJQAkJB5vhSIAAAAEHRSTlMAwug73J/vaf2fzg0lJWVTJvrNkQAAAZpJREFUWIXtl9GSgyAMRRVEEAoC+f9/XcB2aZUgo06d2dm83+NNiIF03TdCTUjwNv3sPThfCOeHR4P+MbgQUAgHfmoyAA6NsQHA3WlAJf4BFwCG2x3cnoK/HfAHUrgfcLqIcDqF/mYAnC/i3SlcUINrHShNKdX6KIAySYSwRDJzBGCIsK8Qlqk2gH8BlLSfIXWjg+V9QK1YAYQwTQCXHjl6LU8I0wAAN0c9KegDQTcAxvhGYkV9qIPaTyE+smgpgRRm/xRiDdcHkHMgewDwvGbACrqbQsjSoHor2A4gtRHDHTzLiALAx0OUFQDRdUAfP4DLA4BWAclAV+6i9ypigOePVANUHSxdWGmDnRqkHuiOn0Kehsf6APKqgfyLCaDxRhrzzMJzkNi/AG6c88RSqAGKAMCP7zMTmwfPCmwBoX6rVatMIOWRFuxvFq3NTE56WgJAsF/Y9NTGg5A5S57V4VE1b+WRYFaD/f1m4b/qIEcXTcXCfx0h8XZjH/cjX5bUsef1NVWZdDmGq3F1vXI/9BOfH6qsa4xz6lr8AHc5kPU1PyPPAAAAAElFTkSuQmCC"/>
-<text x="100" y="553" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">jina</text>
-<text x="640" y="553" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">6</text>
-<text x="870" y="553" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">33/50 @ 11.9s</text>
-<text x="1100" y="553" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">-</text>
-<text x="1330" y="553" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">-</text>
+<rect y="128" width="1600" height="76" fill="#f4f2ea"/>
+<image x="24" y="149" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAYFBMVEX///8AAAAYGBgpKSnMzMx+fn65ubkQEBBkZGTV1dXi4uIJCQk9PT0TExPl5eUsLCyWlpZ2dnaQkJDt7e339/egoKCHh4fc3NxaWlpfX1+urq5PT09CQkI1NTVUVFTGxsaLeUlPAAABiUlEQVRYhe2X65aCIBSFwwumqJGCptb4/m/ZkCUHRQKmWXNZff/PXp7b5rjbvfnf1BGvmjiOmz71iG7pAQEGnjKX8LGb4pLiRhAkKDhF9vEsbTMBPueCEBFCPuUODhJ3oZtMmZ72N7o9dlV4GWxKSVBbB2X3Dxd8gIb0piB8nIkHUbo7STBTIEMpa1o9oANSkQrBaJdBpNBDMaeZ+ilYugSfQ0mui0kxoCHBkgKANCNZd+FBgpIVBRAj3bqOrMwkZRKuUNYb+VgEp5LKeTFfAYODNZqHicca9koRlvNcIdgygjQonUV8IYBBhWisFXg45DQJjTHbEWvoh1xyMQpsUJcAe2fyEWC6DJ6k8OUiOreRGrP1GCQLXEb5e6DmdVYMJSPuhqJY2sXD0txM9WkPfGz919EaHtfNTSwr+byfF5sADgTDpdRvHBigJ4X5RAHAE6cDn7J0Uzt8jqxX4H1ozqdurpy6of2LOnYEuqA4ti9Htwe57U9wCgaeOYVPZOKHo6m41w/Hmz/FFSJmJyUNUT/wAAAAAElFTkSuQmCC"/>
+<text x="100" y="175" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">parallel</text>
+<text x="640" y="172" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">64</text>
+<text x="870" y="164" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">100</text>
+<text x="870" y="186" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">50/50 @ 0.6s</text>
+<text x="1100" y="164" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">32</text>
+<text x="1100" y="186" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 2.4s p50</text>
+<text x="1330" y="164" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">60</text>
+<text x="1330" y="186" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">15/15 @ 36.7s · judge 4.3</text>
+<rect y="204" width="1600" height="76" fill="#ffffff"/>
+<image x="24" y="225" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAYFBMVEUfQO3w8v7///+7xfqWpvf9/f/DzPphePKdrPexvPlVbvF1ifSisPils/jb4Pz2+P5EX/BmffPV2/wmRu44Vu9CXvB8j/QjQ+3L0/ttg/MtTO7i5v08We/Q1/tQavHr7v3UMFLmAAAAkElEQVQ4jd2SzQ6CQAyE21mqgMCCoCg/8v5v6QbDwWxNueKcmvZL2mlL9FfK+EvnCHDgZFMqyBUAly0uUMYtHCpff8IG11YBpPbVmu/Y35QhndAdRQj6BxrNRQAow5MoQarVV2AYecpl7n8C9JJ54U6tBxenIAbiFe0FzBZ7hrRsWouyVm0eyz638TDmyx1ab/9IBsdakyN7AAAAAElFTkSuQmCC"/>
+<text x="100" y="251" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">exa</text>
+<text x="640" y="248" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">55</text>
+<text x="870" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">57</text>
+<text x="870" y="262" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">38/50 @ 0.8s</text>
+<text x="1100" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">48</text>
+<text x="1100" y="262" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">97% @ 1.6s p50</text>
+<text x="1330" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">60</text>
+<text x="1330" y="262" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">15/15 @ 7.7s · judge 7.4</text>
+<rect y="280" width="1600" height="76" fill="#f4f2ea"/>
+<image x="24" y="301" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAe1BMVEX/////TQD/UQD/KQD//fz/IwD/NQD/TAD//Pv/MAD/AAD/QgD/y7P/GgD/+fb/OwD/poL/7ub/9O7/4tX/YQn/sJD/j1//upz/ZiL/iVf/dzn/bin/mGz/vaH/xKz/4NP/2cr/0Lz/6N//oXj/gkv/1cT/lWf/YxX/cTRRFkaZAAABh0lEQVRIid2V23aCMBBFM+QCSQjUa63YiFht//8LCwSMIAnksZ3lC6zZzpkzQ4LQPw3S/kJitw9EUqXeURIArGiEDyFEhgEkBKhqAMg/QiTVAIhqcYmUN0B8XFyhiBsA+MK2SaXafKCbZfkoMvnA02X5J9YB7HNRhbQTVAO6xuecImfRKwJcomqbzeRnNh9othNsroEcbMRaAZuRdHoGgEVAV35BCkYh3/wF5BgA7vXpNR9yXwmzpaNQmbvEDXdJEbOA9CyttkuB7TjUejqbJOizB/ilsn45uxCZ+XCgXeyrncjW1XFe9gBDhOAH4Jj2GQPvhPNd/fwV9wCeXsCb/UvZDEv35YBOd10+PDXOb/BMhX5qkTi3mlf4YfJ006STQLV5rkQqvS6hwri+77ZNp+jeEvLqAMwUpN1Osm6npxyfBEGNq7h8Nr050eJvRwFENB03eOH+I/Yg42GD9THOXR3UkSAmi+GrPC98X1yCpByqFD/+i4ig42Cqm/vcxfVyNAbev38ifgFqHQ8FZqCT6wAAAABJRU5ErkJggg=="/>
+<text x="100" y="327" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">firecrawl</text>
+<text x="640" y="324" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">39</text>
+<text x="870" y="316" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">19</text>
+<text x="870" y="338" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">37/50 @ 3.6s</text>
+<text x="1100" y="316" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">37</text>
+<text x="1100" y="338" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 2.0s p50</text>
+<text x="1330" y="316" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">60</text>
+<text x="1330" y="338" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">15/15 @ 11.5s · judge 5.5</text>
+<rect y="356" width="1600" height="76" fill="#ffffff"/>
+<image x="24" y="377" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAQlBMVEVHcEwfHh4fHh7//PYfHh4fHh4fHh4fHh4fHh4eHR3///wUExMDAgN1dHHr6eNQTk3W1M8+PTy9u7eHhYOwrqqZl5RwUD9bAAAACnRSTlMAav//+4GW7cckfOp3rwAAAhhJREFUWIXtl8uWpSAMRRW8FyQIiPr/v1rBtzzEkh70oLKWM7I9CSSEqlqsrb+cM9aQrDWMcf6t2+psLWd5z6sxfkJ8yIM/h/Y5/F/ap9B/JbTv/Unj8sALAISjgF/n/2ysreoSf0Lq6lsG+JalwCUhDZBSPgEkcyiNsHkASwLkJKgYshpYlagC0IpSKnrIAJoUAANwAJuT0FQJ/8H503wQCQD0agWonIQ4QNrFHwljJgtRAOjNHyV094S4ArMDqDD3QaQAYs2BeAWA3hiz/N5Y/SYErIOOLgcJ3iTRidgA9+5/gP8egKfwCsAmGfJuAMqoC6A3wujgXCcBeuh7/M5IbJJq8kWkAAScYFwMm0kEYFimu4q4AUwWBcPQbTbOBSrodCmPdAgKczhI6Sp7taPH5AEAriliR5Tj0Vv2HkNPXSoAgMuS+/+8NgqgYpJJAGg7SJCLvxilVH4ETphOK5CYaKs3fyflsLXL0fG8lUEIbtXqb3BdrzfrJxFr0x4A5htpWWkJkOAcBCfJA5xuFON1w7k6wrPsh7DdCMIGdQODGcJqugL27aOYKX8piRWjD+iOOy1CiNkVIKfTbj8CeAOG3C/F7JWWAOAOzqdO2XMruAVchiy3i8rY7tmI58yb0qDvOk1iyU4JYN6gCdnL1LO7SfUhoHjYLh73ix8cRUloeOGji7T/4tlX/vB8Tdj93eOx7PFd8vz/AekeNLACSjiYAAAAAElFTkSuQmCC"/>
+<text x="100" y="403" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">tavily</text>
+<text x="640" y="400" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">36</text>
+<text x="870" y="392" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">19</text>
+<text x="870" y="414" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">37/50 @ 2.9s</text>
+<text x="1100" y="392" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">30</text>
+<text x="1100" y="414" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 2.3s p50</text>
+<text x="1330" y="392" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">60</text>
+<text x="1330" y="414" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">15/15 @ 24.2s · judge 5.2</text>
+<rect y="432" width="1600" height="76" fill="#f4f2ea"/>
+<image x="24" y="453" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEUAAAD////09PTr6+vl5eXu7u6/v7+wsLBtbW3U1NS1tbXc3NydnZ3ExMR3d3f6+vqVlZVISEjLy8uoqKiHh4diYmKOjo5bW1tWVlYmJiY0NDSAgIA/Pz8YGBhoaGhNTU0fHx8LCwsbZFgyAAAB8ElEQVRYhe1V2bKrIBCkETQuQeMa9RiT///Ji4i4hJibVJ2q82C/KAw9NUzPDIQcOHDgV3EpPS+pvqYLBwpx9B3fB1jUikR+6c8XfA5+Hf9q6aL4mM/gz4sEuH7IdxEulyXQfcQvEK83POmw8EIaO+fT/ziguG12GAyc5i0/XyZARwD4+cAU0tXlfQDrI62kMyR6lW3v94TTJgApo0sIMK1T4+sF/FUGbgDvySBMqXd+wHb53SrEDAg0jU97FFvOCiW8ZTSYdGPozeauEP5cdh0HrWfHgf5Lsdscc7aaeJVOc7VwN4ICZ/3Xq+xbQuO7OcimbF+BbGUppzXonoNQX7DCVu5Gy1ch3XOgU9A/8Y18JkYrmrGRLxa+rCVVYQ7uj+5lewslVgNYJmGL4BS5oe5Keq6fjxASqfjiZTGNqBLXmTqaM8YoYBXDHeafY6RUqNtgmgdeWRleCttwGYrEXwy0e+tSFXAa3WQ1D8NCO2+2XT9CZjozOt88FbUTiNqEN9HyTZlNAJUFpI7nqbpuIGZjhFyM1X1l1jQT8gCPUZGuVLlO8/vKKpDxIYCbtDL7YJP6IRMDmwbPr4msLpmBRCaFCwt5OjKwvd5mfUjT4Dx8PduLge6+fIdGKfemwQVOvmPmePuwPN7YDxw4cOCP4x8LFhGpYZOEYQAAAABJRU5ErkJggg=="/>
+<text x="100" y="479" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">linkup</text>
+<text x="640" y="476" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">35</text>
+<text x="870" y="468" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">17</text>
+<text x="870" y="490" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">33/50 @ 4.1s</text>
+<text x="1100" y="468" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">32</text>
+<text x="1100" y="490" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 1.7s p50</text>
+<text x="1330" y="468" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">56</text>
+<text x="1330" y="490" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">14/15 @ 29.3s · judge 4.3</text>
+<rect y="508" width="1600" height="76" fill="#ffffff"/>
+<image x="24" y="529" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAUVBMVEVHcEz/QAD/QQD/////SgD/QwD/OQD/PAD/PgD/KwD/MAD/RwD/KAD/QQD/UAD/OwD/IQD/TQT/NgD/VAn/7un/29P/bU3/jXX/q5r/xLf/CwAIaoj2AAAACnRSTlMAYAv/3qwghzrR7UleYgAAA+lJREFUWIWdV9mi6iAMdGmtUihbocv/f+gNhbCVnuO50QerZhiGIYTbrRXv0QXzwSGUUuTd/Ot1PvMAPAKo17f5r1G2GBD1+C7/0fl0jxAZAIXPdwCQ32bwBYLj2If8mgGBF+3Dn5oxdNMku06G8RsMCKEfQin9DE3mE4SEwPSzBh6DUkEbc+l0BJCZBtwH5lOX7yBOCJ2OAJwFBkwRZi2nRIUpwNDkAgHyA8Co18VCAldEruYJYRYmIGMXdlkDBUFFieDGDwBsdknztq7HBx9mXc3xaHZkIESfAfQaGajt+WOsO+aLfCleyGBcfs5/Pq1AhEc1Bwcw2t/yn08uPECp4nAAyHH+HcDsXsR7YxXYIcBszLZtpkpzX3khDxkqBu9DAy+AsZS6hR8X1HPeLHGq7bs1KEOlwQD5wAATVq04mJAw/0jBSooKjQs7724KxSq4CWiWrSCYh4+M+LUXnFO1ZHNadgfwyWfgCMhy1qti2n8CG6/lbweASCUu2KCSeyNhUa2oFA0AmQjTMYXqbzMN4y6ihq6nAFaenJlLF2wiiLLuJfRMTiLe/TKWPrQ0ABpR/DArv4y5k15+GQuELawiZIhchNltbgdQOHHymylHkDw+SKLT92NzL/RhOyeEVfG4M8GI0SNShIJSFtY7FhSGWZrxuPgLwRXF3QwA5VH5mLCk4bgrYXrzTlzHyMCKWNJuZaSiigMbCXV0tJZBGdRBxAUr2rksD6kqK7TDQo9DQQmcC1TEUJVrCfyGxrIe/WS0YozY9Lyng6E+6x9TBMjNAPLl+0iGcwGUvNURTyZW1GVdmHAVOIX+BDBEEfMdMSuWPzoRPMD9BPCODPJ8ybnOnxGANtqdyCD53sDZzJRMHLYwhfPZCtEHgOTmTbnTmal0WqGI9CzB7XEPAFNwkrEE6qqWFApqWMlF4OF6lgC2dOwPnJuNhdLOXSU1i3MPfJqPfM+g2ebI2KEwNhKwYCzjCxR2wV1zEBi0m60+b3E4yY9ZN7jr0pBBs0e63VOLM7KlOiVnS32HdPRI7a73lTHg1UHgdpZrkgKDZj7UNQSAt6oaBSgEKjK46jf7TAOmbN7iMOp6ZWTQlgDcnDEYwULRkmBAbBMPBpdte9FojiydTKFbDwyuO+YhZwDvo5SC/qnRPBi0bOjjIXMG4CelZ8NUvC94BuQyH6yQGPgbCyekaHUdgx+vPkPJoLqxHAyuJ4AcEoOxui+4+PXq9eou7wvw/nxzbRrwvsCq+wJRVw6q4t21GXy+vve5e9P5zvTl8IHEiQH/w8UVSeQa/Gl4JIEyct79dfhAAhn8x/CBxMHgP4f3MbDuF+v+A4tzcSbr/fGlAAAAAElFTkSuQmCC"/>
+<text x="100" y="555" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">brave</text>
+<text x="640" y="552" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">31</text>
+<text x="870" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">0</text>
+<text x="870" y="566" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">-</text>
+<text x="1100" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">93</text>
+<text x="1100" y="566" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">100% @ 0.8s p50</text>
+<text x="1330" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">0</text>
+<text x="1330" y="566" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">-</text>
+<rect y="584" width="1600" height="76" fill="#f4f2ea"/>
+<image x="24" y="605" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAPFBMVEVHcEwAlZX0ZGTrYGAAlJTwY2MAlJQAkZHzZGQAkpL0ZGS1aGgGjo7nX1/uYmIBkJDsYWEAkZEAlJQAkJB5vhSIAAAAEHRSTlMAwug73J/vaf2fzg0lJWVTJvrNkQAAAZpJREFUWIXtl9GSgyAMRRVEEAoC+f9/XcB2aZUgo06d2dm83+NNiIF03TdCTUjwNv3sPThfCOeHR4P+MbgQUAgHfmoyAA6NsQHA3WlAJf4BFwCG2x3cnoK/HfAHUrgfcLqIcDqF/mYAnC/i3SlcUINrHShNKdX6KIAySYSwRDJzBGCIsK8Qlqk2gH8BlLSfIXWjg+V9QK1YAYQwTQCXHjl6LU8I0wAAN0c9KegDQTcAxvhGYkV9qIPaTyE+smgpgRRm/xRiDdcHkHMgewDwvGbACrqbQsjSoHor2A4gtRHDHTzLiALAx0OUFQDRdUAfP4DLA4BWAclAV+6i9ypigOePVANUHSxdWGmDnRqkHuiOn0Kehsf6APKqgfyLCaDxRhrzzMJzkNi/AG6c88RSqAGKAMCP7zMTmwfPCmwBoX6rVatMIOWRFuxvFq3NTE56WgJAsF/Y9NTGg5A5S57V4VE1b+WRYFaD/f1m4b/qIEcXTcXCfx0h8XZjH/cjX5bUsef1NVWZdDmGq3F1vXI/9BOfH6qsa4xz6lr8AHc5kPU1PyPPAAAAAElFTkSuQmCC"/>
+<text x="100" y="631" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">jina</text>
+<text x="640" y="628" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">6</text>
+<text x="870" y="620" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">17</text>
+<text x="870" y="642" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">33/50 @ 11.9s</text>
+<text x="1100" y="620" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">0</text>
+<text x="1100" y="642" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">-</text>
+<text x="1330" y="620" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">0</text>
+<text x="1330" y="642" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">-</text>
 </svg>

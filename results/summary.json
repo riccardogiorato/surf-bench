@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T12:26:11.405Z",
+  "generatedAt": "2026-09-04T12:28:17.879Z",
   "scrape": [
     {
       "provider": "parallel",
@@ -168,6 +168,9 @@
     {
       "provider": "parallel",
       "agent_ready": "64",
+      "scrape_score": "100",
+      "search_score": "32",
+      "quest_score": "60",
       "scrape": "50/50 @ 0.6s",
       "search": "100% @ 2.4s p50",
       "quest": "15/15 @ 36.7s · judge 4.3"
@@ -175,6 +178,9 @@
     {
       "provider": "exa",
       "agent_ready": "55",
+      "scrape_score": "57",
+      "search_score": "48",
+      "quest_score": "60",
       "scrape": "38/50 @ 0.8s",
       "search": "97% @ 1.6s p50",
       "quest": "15/15 @ 7.7s · judge 7.4"
@@ -182,6 +188,9 @@
     {
       "provider": "firecrawl",
       "agent_ready": "39",
+      "scrape_score": "19",
+      "search_score": "37",
+      "quest_score": "60",
       "scrape": "37/50 @ 3.6s",
       "search": "100% @ 2.0s p50",
       "quest": "15/15 @ 11.5s · judge 5.5"
@@ -189,6 +198,9 @@
     {
       "provider": "tavily",
       "agent_ready": "36",
+      "scrape_score": "19",
+      "search_score": "30",
+      "quest_score": "60",
       "scrape": "37/50 @ 2.9s",
       "search": "100% @ 2.3s p50",
       "quest": "15/15 @ 24.2s · judge 5.2"
@@ -196,6 +208,9 @@
     {
       "provider": "linkup",
       "agent_ready": "35",
+      "scrape_score": "17",
+      "search_score": "32",
+      "quest_score": "56",
       "scrape": "33/50 @ 4.1s",
       "search": "100% @ 1.7s p50",
       "quest": "14/15 @ 29.3s · judge 4.3"
@@ -203,6 +218,9 @@
     {
       "provider": "brave",
       "agent_ready": "31",
+      "scrape_score": "0",
+      "search_score": "93",
+      "quest_score": "0",
       "scrape": "-",
       "search": "100% @ 0.8s p50",
       "quest": "-"
@@ -210,6 +228,9 @@
     {
       "provider": "jina",
       "agent_ready": "6",
+      "scrape_score": "17",
+      "search_score": "0",
+      "quest_score": "0",
       "scrape": "33/50 @ 11.9s",
       "search": "-",
       "quest": "-"
