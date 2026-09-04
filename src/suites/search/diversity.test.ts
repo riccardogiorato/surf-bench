@@ -1,3 +1,4 @@
+import { expect } from "vitest";
 import { defineSearchDim } from "./searchSuite.js";
 
 // Dim 3: diversity — results should not all come from one domain

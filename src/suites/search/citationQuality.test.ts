@@ -1,3 +1,4 @@
+import { expect } from "vitest";
 import { defineSearchDim } from "./searchSuite.js";
 
 // Dim 2: citation quality — authoritative sources rank for topical queries

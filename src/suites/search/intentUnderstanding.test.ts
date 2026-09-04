@@ -1,3 +1,4 @@
+import { expect } from "vitest";
 import { defineSearchDim } from "./searchSuite.js";
 
 // Dim 6: query intent understanding — ambiguous single tokens resolve to the

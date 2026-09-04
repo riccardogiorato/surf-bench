@@ -1,3 +1,4 @@
+import { expect } from "vitest";
 import { defineSearchDim } from "./searchSuite.js";
 
 // Dim 8: link quality — at least one trusted domain in the top results

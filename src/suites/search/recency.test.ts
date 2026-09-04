@@ -1,3 +1,4 @@
+import { expect } from "vitest";
 import { defineSearchDim } from "./searchSuite.js";
 
 // Dim 10: recency — results surface the current year for fresh-events queries

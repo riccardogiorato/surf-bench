@@ -1,3 +1,4 @@
+import { expect } from "vitest";
 import { defineSearchDim } from "./searchSuite.js";
 
 // Dim 12: spam/ad avoidance — no obvious spam domains for buy-intent queries
