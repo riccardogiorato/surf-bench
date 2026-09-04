@@ -34,6 +34,3 @@ export function parallelClientFactory(): Parallel {
   }
   return parallelClient;
 }
-
-// Serper is key-gated like every other provider (no SDK, plain REST).
-export const serperKey = process.env.SERPER_API_KEY ?? "";
