@@ -98,6 +98,35 @@ export const ecommerceTestSites: TestSite[] = [
   { name: "Tesla Store Product", url: "https://shop.tesla.com/product/model-s-key-fob", category: "ecommerce" }
 ];
 
+// High-traffic and common scrape targets - added from current web traffic and marketplace rankings
+export const popularWebTestSites: TestSite[] = [
+  { name: "YouTube TED Channel", url: "https://www.youtube.com/@TED", category: "social" },
+  { name: "Reddit Technology Community", url: "https://www.reddit.com/r/technology/", category: "social" },
+  { name: "Wikipedia Artificial Intelligence", url: "https://en.wikipedia.org/wiki/Artificial_intelligence", category: "technical" },
+  { name: "Facebook NASA Page", url: "https://www.facebook.com/NASA/", category: "social" },
+  { name: "LinkedIn OpenAI Company", url: "https://www.linkedin.com/company/openai/", category: "social" },
+  { name: "TikTok NASA Profile", url: "https://www.tiktok.com/@nasa", category: "social" },
+  { name: "Pinterest Home Decor Ideas", url: "https://www.pinterest.com/search/pins/?q=home%20decor", category: "social" },
+  { name: "IMDb Top Movies", url: "https://www.imdb.com/chart/top/", category: "extra" },
+  { name: "ESPN NBA Scores", url: "https://www.espn.com/nba/scoreboard", category: "extra" },
+  { name: "Weather.com New York Forecast", url: "https://weather.com/weather/today/l/USNY0996:1:US", category: "extra" },
+  { name: "CNN World News", url: "https://www.cnn.com/world", category: "news" },
+  { name: "The Verge Tech News", url: "https://www.theverge.com/tech", category: "news" },
+  { name: "AP News Technology", url: "https://apnews.com/hub/technology", category: "news" },
+  { name: "eBay Wireless Headphones Search", url: "https://www.ebay.com/sch/i.html?_nkw=wireless+headphones", category: "ecommerce" },
+  { name: "Walmart Wireless Headphones Search", url: "https://www.walmart.com/search?q=wireless+headphones", category: "ecommerce" },
+  { name: "Etsy Handmade Mug Search", url: "https://www.etsy.com/search?q=handmade+mug", category: "ecommerce" },
+  { name: "Target Wireless Headphones Search", url: "https://www.target.com/s?searchTerm=wireless+headphones", category: "ecommerce" },
+  { name: "Home Depot Cordless Drill Search", url: "https://www.homedepot.com/s/cordless%20drill", category: "ecommerce" },
+  { name: "Best Buy Laptop Search", url: "https://www.bestbuy.com/site/searchpage.jsp?st=laptop", category: "ecommerce" },
+  { name: "Craigslist NYC Apartments", url: "https://newyork.craigslist.org/search/apa", category: "realestate" },
+  { name: "Yelp San Francisco Coffee", url: "https://www.yelp.com/search?find_desc=Coffee&find_loc=San+Francisco%2C+CA", category: "extra" },
+  { name: "Tripadvisor NYC Hotels", url: "https://www.tripadvisor.com/Hotels-g60763-New_York_City_New_York-Hotels.html", category: "extra" },
+  { name: "Booking.com NYC Hotels", url: "https://www.booking.com/searchresults.html?ss=New+York", category: "extra" },
+  { name: "Apple iPhone Product", url: "https://www.apple.com/iphone-16/", category: "ecommerce" },
+  { name: "Hacker News Front Page", url: "https://news.ycombinator.com/", category: "technical" }
+];
+
 // Extra test sites - additional sites for testing
 export const extraTestSites: TestSite[] = [
   { name: "Together AI", url: "https://www.together.ai/", category: "extra" },
@@ -113,5 +142,6 @@ export const ALL_TEST_SITES: TestSite[] = [
   ...newsTestSites,
   ...technicalTestSites,
   ...ecommerceTestSites,
+  ...popularWebTestSites,
   ...extraTestSites
 ].sort((a, b) => a.name.localeCompare(b.name));

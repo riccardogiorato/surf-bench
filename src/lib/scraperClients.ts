@@ -5,8 +5,19 @@ import {
   linkupClient,
   tavilyClient,
 } from "./apiClients.js";
+import { createConcurrencyLimiter } from "./concurrency.js";
 import { withCache } from "./cache/withCache.js";
-import { fetchParallelMcpContent } from "./parallelMcpClient.js";
+import { fetchParallelContent } from "./parallelClient.js";
+
+// Cap each provider at 5 in-flight scrapes so vendors can run fully in
+// parallel without changing the per-provider load of earlier benchmark runs
+// (which ran 5-at-a-time through vitest's default maxConcurrency).
+const VENDOR_MAX_CONCURRENCY = 5;
+
+function limitVendorConcurrency(fn: ScraperFunction): ScraperFunction {
+  const runLimited = createConcurrencyLimiter(VENDOR_MAX_CONCURRENCY);
+  return (url, timeout) => runLimited(() => fn(url, timeout));
+}
 
 // Scraper client interface
 export interface ScraperClient {
@@ -144,22 +155,20 @@ const linkupScraperImpl: ScraperFunction = async (
   }
 };
 
-// Parallel Search MCP scraper implementation
+// Parallel Search scraper implementation using the official parallel-web SDK
 const parallelScraperImpl: ScraperFunction = async (
   url: string,
   timeout = 30000,
 ) => {
-  const startTime = Date.now();
-
   try {
-    const response = await fetchParallelMcpContent(url, timeout);
+    const response = await fetchParallelContent(url, timeout);
 
     return {
       url,
       response: {
         title: response.title,
         content: response.content,
-        scrapingTimeMs: Date.now() - startTime,
+        scrapingTimeMs: response.scrapingTimeMs,
       },
     };
   } catch (error) {
@@ -261,7 +270,7 @@ async function checkLinkup(): Promise<boolean> {
 
 async function checkParallel(): Promise<boolean> {
   try {
-    const result = await fetchParallelMcpContent("https://parallel.ai/", 30000);
+    const result = await fetchParallelContent("https://parallel.ai/", 30000);
     return result.content.length > 0;
   } catch (error) {
     return false;
@@ -280,16 +289,28 @@ async function checkTavily(): Promise<boolean> {
   }
 }
 
-// Cached scraper functions
-export const firecrawlScraper = withCache("firecrawl", firecrawlScraperImpl);
-export const exaScraper = withCache("exa", exaScraperImpl);
-export const linkupScraper = withCache("linkup", linkupScraperImpl);
+// Cached scraper functions, each capped at VENDOR_MAX_CONCURRENCY in-flight
+// requests (parallel keeps its own lower cap inside parallelClient.ts)
+export const firecrawlScraper = withCache(
+  "firecrawl",
+  limitVendorConcurrency(firecrawlScraperImpl),
+);
+export const exaScraper = withCache(
+  "exa",
+  limitVendorConcurrency(exaScraperImpl),
+);
+export const linkupScraper = withCache(
+  "linkup",
+  limitVendorConcurrency(linkupScraperImpl),
+);
 export const parallelScraper = withCache("parallel", parallelScraperImpl);
-export const tavilyScraper = withCache("tavily", tavilyScraperImpl);
+export const tavilyScraper = withCache(
+  "tavily",
+  limitVendorConcurrency(tavilyScraperImpl),
+);
 
-const shouldRunParallel =
-  !!process.env.PARALLEL_API_KEY ||
-  process.env.INCLUDE_ANONYMOUS_PARALLEL === "true";
+// The official Parallel REST API requires an API key
+const shouldRunParallel = !!process.env.PARALLEL_API_KEY;
 
 // Scraper clients array for testing
 export const scraperClients: ScraperClient[] = [

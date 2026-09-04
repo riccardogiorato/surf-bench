@@ -4,7 +4,12 @@ import { evaluateScrapedContent } from "../lib/contentQuality.js";
 import { scraperClients } from "../lib/scraperClients.js";
 import { ALL_TEST_SITES } from "../lib/testSites.js";
 
-describe("Web Scraper Evaluation", () => {
+const SCRAPE_TIMEOUT_MS = 90000;
+const TEST_TIMEOUT_MS = 900000;
+
+// All vendor suites share one concurrent pool so providers run in parallel;
+// per-provider load is capped inside each scraper implementation.
+describe.concurrent("Web Scraper Evaluation", () => {
   // Run all vendor-site combinations in parallel
   scraperClients.forEach(({ name, scrape }) => {
     describe(`${name} vendor`, () => {
@@ -13,7 +18,7 @@ describe("Web Scraper Evaluation", () => {
           `should scrape ${testSite.name}`,
           async () => {
             const startTime = Date.now();
-            const result = await scrape(testSite.url);
+            const result = await scrape(testSite.url, SCRAPE_TIMEOUT_MS);
             const endTime = Date.now();
             const totalTime = endTime - startTime;
 
@@ -55,8 +60,8 @@ describe("Web Scraper Evaluation", () => {
             }
             expect(quality.ok).toBe(true);
           },
-          60000,
-        ); // 60 second timeout for scraping operations
+          TEST_TIMEOUT_MS,
+        );
       });
     });
   });

@@ -1,59 +1,64 @@
-<svg width="1100" height="590" viewBox="0 0 1100 590" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<svg width="980" height="460" viewBox="0 0 980 460" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Web scraper benchmark summary</title>
-  <desc id="desc">Quality-aware benchmark results for Parallel, Tavily, Firecrawl, Exa, and Linkup.</desc>
+  <desc id="desc">Quality-aware 50-site benchmark results for Parallel, Tavily, Firecrawl, Linkup, and Exa.</desc>
   <defs>
     <filter id="panelShadow" x="-12%" y="-12%" width="124%" height="140%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#111827" flood-opacity="0.08"/>
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#111827" flood-opacity="0.08"/>
     </filter>
   </defs>
 
-  <rect width="1100" height="590" rx="28" fill="#FBFCFE"/>
-  <rect x="1" y="1" width="1098" height="588" rx="27" stroke="#E5E7EB" stroke-width="2"/>
-  <rect x="32" y="32" width="1036" height="526" rx="22" fill="#FFFFFF" stroke="#E5E7EB" filter="url(#panelShadow)"/>
+  <rect width="980" height="460" rx="28" fill="#FBFCFE"/>
+  <rect x="1" y="1" width="978" height="458" rx="27" stroke="#E5E7EB" stroke-width="2"/>
+  <rect x="31" y="31" width="918" height="398" rx="22" fill="#FFFFFF" stroke="#E5E7EB" filter="url(#panelShadow)"/>
 
-  <text x="70" y="88" fill="#111827" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="34" font-weight="700">Web Scrapers Evals</text>
-  <text x="70" y="122" fill="#6B7280" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17">Quality-aware benchmark for LLM and agent web access</text>
+  <text x="60" y="70" fill="#111827" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="32" font-weight="700">Web Scrapers Evals</text>
+  <text x="60" y="98" fill="#6B7280" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16">50-site quality-aware benchmark for LLM and agent web access</text>
 
-  <text x="70" y="178" fill="#9CA3AF" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15" font-weight="700">USABLE SUCCESS</text>
-  <text x="650" y="178" fill="#9CA3AF" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15" font-weight="700">AVERAGE TIME</text>
+  <text x="60" y="138" fill="#9CA3AF" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" font-weight="700">USABLE SUCCESS</text>
+  <text x="790" y="138" fill="#9CA3AF" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14" font-weight="700">AVG USABLE TIME</text>
 
   <g font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-    <image x="70" y="201" width="26" height="26" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAYFBMVEX///8dHBoAAAASEQ5eXl3x8fGysbGBgYAZGBbPz88pKCbJycgbGhgVFBLX19Z7e3oLCANLSkm7u7uQkJCHh4Zqamlvb27h4eFDQkH5+fk8OzowMC5RUVCampmmpqXBwcCxW53tAAABoklEQVRYhc2X2RaCIBBAZVxwIylTMZf+/y+zzGPDYpAPed84hxmYhWHG8wy02UiDW0pIJ+prlISmfXqaQQAAZzkhJI99Pi3E0NhKt2P3lJ54yi8wgFtkdzotrjNlyv0XbNYRAwxuhgTVTA8rFycVC+UKtbPjgNwLulKUFhJnjHjFdQFqVaCsET1niJggoFDk0Qk89sk2Ska0eFmBCss/gWzTA2Gr4Il3Xs5wcHxfhyBMMFlr2hnpKWW3LpG4Z5iLJgRPuBTKnM/yo7LzSw6syTC/zES6QNIZbgCQYwVMOLlggssaT45xaE4SB02m0EzDU4yfaBQYYzARS8Do1d9itQmn3lBIVOCbkZWzQLWg6QMzKS5cHDpHB49U4vpLmP6KjQmuTtwdxn2J5FONnY6prLL7MR0ay5J2MXFXnPoqqrvL+u6PpY2km0aG801fm4rt56rLoi2U791R/v9sN1m727wBlxrCvqWAMnpQXLuEa6ursN1sV84edG/3D8bw29D149j3MXh2ePBkEFu9P+Poe7YfOjXDd28/fL/vgcb/k7GzfwA4QDbEYc0sKAAAAABJRU5ErkJggg=="/>
-    <text x="106" y="223" fill="#111827" font-size="20" font-weight="700">Parallel</text>
-    <rect x="220" y="202" width="330" height="28" rx="8" fill="#F1F5F9"/>
-    <rect x="220" y="202" width="330" height="28" rx="8" fill="#A78BFA"/>
-    <text x="515" y="223" fill="#111827" font-size="18" font-weight="700">25/25</text>
-    <text x="650" y="223" fill="#7C3AED" font-size="20" font-weight="700">3.7s</text>
+    <rect x="56" y="158" width="40" height="40" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <image x="65" y="167" width="22" height="22" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAYFBMVEX///8dHBoAAAASEQ5eXl3x8fGysbGBgYAZGBbPz88pKCbJycgbGhgVFBLX19Z7e3oLCANLSkm7u7uQkJCHh4Zqamlvb27h4eFDQkH5+fk8OzowMC5RUVCampmmpqXBwcCxW53tAAABoklEQVRYhc2X2RaCIBBAZVxwIylTMZf+/y+zzGPDYpAPed84hxmYhWHG8wy02UiDW0pIJ+prlISmfXqaQQAAZzkhJI99Pi3E0NhKt2P3lJ54yi8wgFtkdzotrjNlyv0XbNYRAwxuhgTVTA8rFycVC+UKtbPjgNwLulKUFhJnjHjFdQFqVaCsET1niJggoFDk0Qk89sk2Ska0eFmBCss/gWzTA2Gr4Il3Xs5wcHxfhyBMMFlr2hnpKWW3LpG4Z5iLJgRPuBTKnM/yo7LzSw6syTC/zES6QNIZbgCQYwVMOLlggssaT45xaE4SB02m0EzDU4yfaBQYYzARS8Do1d9itQmn3lBIVOCbkZWzQLWg6QMzKS5cHDpHB49U4vpLmP6KjQmuTtwdxn2J5FONnY6prLL7MR0ay5J2MXFXnPoqqrvL+u6PpY2km0aG801fm4rt56rLoi2U791R/v9sN1m727wBlxrCvqWAMnpQXLuEa6ursN1sV84edG/3D8bw29D149j3MXh2ePBkEFu9P+Poe7YfOjXDd28/fL/vgcb/k7GzfwA4QDbEYc0sKAAAAABJRU5ErkJggg=="/>
+    <text x="112" y="185" fill="#111827" font-size="19" font-weight="700">Parallel</text>
+    <rect x="260" y="164" width="360" height="28" rx="8" fill="#F1F5F9"/>
+    <rect x="260" y="164" width="360" height="28" rx="8" fill="#A78BFA"/>
+    <text x="650" y="185" fill="#111827" font-size="18" font-weight="700">50/50</text>
+    <text x="790" y="185" fill="#7C3AED" font-size="20" font-weight="700">0.6s</text>
 
-    <image x="70" y="256" width="26" height="26" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEMklEQVRYhcWXXVCUVRjHf+e8uyzI4rvDgqPxNXwbHzcK2YzaFNYFgnbn1FVTjWNidduQNXIbU0rjmGmWQobZRaVeOOMQ0Ea22ER+DBe5DMiIAirDtm3Ygu97unj5kI+FhYX6z7w37zznPP/zPOf5n+cRGRkZoBRAJvAGsB1IA1YBNkAQHRTwCBgBbgMXgaNAD4Bt3HkpcBh4ahkczoQA7IA+/hUCW4G3gV81l65nAieAp1fAeThCqUAx0KK5dL0a2PUfOX8cKUBIAuWLda6UQlmpiwYCKJdYF25RWLMmmbi4uOUgkSaB+EitDcOguKiQhlMneOvNvWiaFi2BeBtWqS0IpRROp5Oqqj08WVTME6kpeL1XaP3REw0RmyTC/CtTsXPHdrZtew6MMXSXi6qqPSS53dGkQshIrEzTJDsni927XyfG4bB+GgabNpXy0su7EGLpBRQhAUVpaQnZ2VkTqmktttl54fkyEhKcS46C5tL1moWMhBAMDQ3h83XhTkxkXWoKD0dG+Oz45zQ2nuXWrd4lOYcIIyCEYGBgkMYzZ7np8wGSUCjE9+cu4Gn7GdM0V5bABAmbzYaUE0sEmqahyYi3iI7AYrAYpVw8ASEBDTQt7O2Pj19FcnJSREQiEqFJ30LQ8VsHd/r6cDgcBINBlFIYhjFpo5TitVdf4cWdlTR82ci3350jEAiEFSuRkZ4ecf2YponbnUhRUSHd3T3cv/+AgoL1xMXFTlanEIJ9+/ayZeszjI0+xNPq4cgnx+j4/erSCBiGMRnqpKQkag7sp7KiHI+njXeq36fuYC0lJRumRcFut0+dWNN4cO8edXWHOf3V17P2nzcFUko2btzAn34/w8N+amreo3JHBUJqrNZ1YmMdxK9OwB7rxM4UAUxjSrBMRVJyMvn5eUgpZ5VsWAKmaZKWlsqhjz4gFAoxMDjI5i2bEVLS29NDbe2HhP4J0dzUgveyd9plKyt7lty8XBCCwbv91DecpvHMN9OiuTABpcjNyWHturXEOBzk5ueBUvR29/Du/gNc/qUdKSUHD308a63T6SQrM5Omph84cvQ4165dB5izasISEEBBwXrr8RkPm2manDzVgOentskcyxlCpJTii5P1NLe04vW2Ewj8Ne9zHVYHHI4YCgsLph5MIZD2GCoqynG7E8PWtxACn6+LS5eaCAb/XrBXsGH17dNio5QiIWE1mVlZgMRUimAgQH//AB0dVxkdHZ1305lRmQfKhjU02GeeYmRkhPPnL9Du9XLjRid/3PTR13cHv9+PaZpR9QCP4ZHISE8fBlxz0gMYVzohBFLK5XI8Ab/EGpfmhGDqFdTm0f4ocFtizWpR99dLgAIuSuAY0P4/EGgHPtVcuj4MXMea1VJY+RFNAVewhtNOzaXrAHeBZmAMa4J1ABqWTizXeB4EuoB6oBroRAj+BajZemNynEWXAAAAAElFTkSuQmCC"/>
-    <text x="106" y="278" fill="#111827" font-size="20" font-weight="700">Tavily</text>
-    <rect x="220" y="257" width="330" height="28" rx="8" fill="#F1F5F9"/>
-    <rect x="220" y="257" width="277" height="28" rx="8" fill="#86EFAC"/>
-    <text x="515" y="278" fill="#111827" font-size="18" font-weight="700">21/25</text>
-    <text x="650" y="278" fill="#16A34A" font-size="20" font-weight="700">0.3s</text>
+    <rect x="56" y="206" width="40" height="40" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <image x="65" y="215" width="22" height="22" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAYFBMVEUfQO3w8v7///+7xfqWpvf9/f/DzPphePKdrPexvPlVbvF1ifSisPils/jb4Pz2+P5EX/BmffPV2/wmRu44Vu9CXvB8j/QjQ+3L0/ttg/MtTO7i5v08We/Q1/tQavHr7v3UMFLmAAAAkElEQVQ4jd2SzQ6CQAyE21mqgMCCoCg/8v5v6QbDwWxNueKcmvZL2mlL9FfK+EvnCHDgZFMqyBUAly0uUMYtHCpff8IG11YBpPbVmu/Y35QhndAdRQj6BxrNRQAow5MoQarVV2AYecpl7n8C9JJ54U6tBxenIAbiFe0FzBZ7hrRsWouyVm0eyz638TDmyx1ab/9IBsdakyN7AAAAAElFTkSuQmCC"/>
+    <text x="112" y="233" fill="#111827" font-size="19" font-weight="700">Exa</text>
+    <rect x="260" y="212" width="360" height="28" rx="8" fill="#F1F5F9"/>
+    <rect x="260" y="212" width="274" height="28" rx="8" fill="#FCD34D"/>
+    <text x="650" y="233" fill="#111827" font-size="18" font-weight="700">38/50</text>
+    <text x="790" y="233" fill="#D97706" font-size="20" font-weight="700">0.8s</text>
 
-    <image x="70" y="311" width="26" height="26" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAdVBMVEX/////TQD//fz/Vg3/Ugf/+vj/YBv/7eX/XRb/Uwj/dzz/WhP/8+3/39L/jFr/6N//kWH/y7T/tpb/18X/pHz/cjX/bCz/xqz/nHH/w6r/hVD/0Lv/oHb/waX/1MH/so//fEP/l2n/qoX/bzH/h1P/ZyT/8OkHE4YGAAABaUlEQVRIie2V2XqEIAxGDaK4DO4zOkPd2tr3f8SiuOCooLf9mjswh/AnIRrGv42WF+QiAH5yuwJQE3AQXgBCGwB7F2L0AEBkXbkSNz8+DTwBLoVALwE8ziaXuQIw6Tl/cofRzomwPvAElKeAxJ/8Ied6tP5Pc/bHKWIvXfkqe/YHh9amq0ktaRZ/sFsMWBMhwxIA/SJV+lMT3q1QyUbtxh86VfVItwVwppDNnC2gDFFuJXCLjlUkc44yqRzuQQhEUD0DrJJuV+wDYZMmY1/zxpZaEO77spn/iCbgTgy6XMreHyBy130iAy1N4uxXW0qR1x9ZL0ClAZwhLbEuApsejiNeZgWT7AMNk0qzFklhTjHufO23uOWJz+2YRJZb0biz68/rLI6Tkk6HS+GjJ3Hre9XNpR0x0V6HvVTi92kX48McDSECftxKIB/jyvdAPfheAeQBgXLAhl7zs1p3kWZq3Oo1UJ//qfxh+wXi/A9MuPFVCwAAAABJRU5ErkJggg=="/>
-    <text x="106" y="333" fill="#111827" font-size="20" font-weight="700">Firecrawl</text>
-    <rect x="220" y="312" width="330" height="28" rx="8" fill="#F1F5F9"/>
-    <rect x="220" y="312" width="277" height="28" rx="8" fill="#7DD3FC"/>
-    <text x="515" y="333" fill="#111827" font-size="18" font-weight="700">21/25</text>
-    <text x="650" y="333" fill="#0284C7" font-size="20" font-weight="700">1.3s</text>
+    <rect x="56" y="254" width="40" height="40" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <image x="65" y="263" width="22" height="22" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEUAAAD////09PTr6+vl5eXu7u6/v7+wsLBtbW3U1NS1tbXc3NydnZ3ExMR3d3f6+vqVlZVISEjLy8uoqKiHh4diYmKOjo5bW1tWVlYmJiY0NDSAgIA/Pz8YGBhoaGhNTU0fHx8LCwsbZFgyAAAB8ElEQVRYhe1V2bKrIBCkETQuQeMa9RiT///Ji4i4hJibVJ2q82C/KAw9NUzPDIQcOHDgV3EpPS+pvqYLBwpx9B3fB1jUikR+6c8XfA5+Hf9q6aL4mM/gz4sEuH7IdxEulyXQfcQvEK83POmw8EIaO+fT/ziguG12GAyc5i0/XyZARwD4+cAU0tXlfQDrI62kMyR6lW3v94TTJgApo0sIMK1T4+sF/FUGbgDvySBMqXd+wHb53SrEDAg0jU97FFvOCiW8ZTSYdGPozeauEP5cdh0HrWfHgf5Lsdscc7aaeJVOc7VwN4ICZ/3Xq+xbQuO7OcimbF+BbGUppzXonoNQX7DCVu5Gy1ch3XOgU9A/8Y18JkYrmrGRLxa+rCVVYQ7uj+5lewslVgNYJmGL4BS5oe5Keq6fjxASqfjiZTGNqBLXmTqaM8YoYBXDHeafY6RUqNtgmgdeWRleCttwGYrEXwy0e+tSFXAa3WQ1D8NCO2+2XT9CZjozOt88FbUTiNqEN9HyTZlNAJUFpI7nqbpuIGZjhFyM1X1l1jQT8gCPUZGuVLlO8/vKKpDxIYCbtDL7YJP6IRMDmwbPr4msLpmBRCaFCwt5OjKwvd5mfUjT4Dx8PduLge6+fIdGKfemwQVOvmPmePuwPN7YDxw4cOCP4x8LFhGpYZOEYQAAAABJRU5ErkJggg=="/>
+    <text x="112" y="281" fill="#111827" font-size="19" font-weight="700">Tavily</text>
+    <rect x="260" y="260" width="360" height="28" rx="8" fill="#F1F5F9"/>
+    <rect x="260" y="260" width="266" height="28" rx="8" fill="#86EFAC"/>
+    <text x="650" y="281" fill="#111827" font-size="18" font-weight="700">37/50</text>
+    <text x="790" y="281" fill="#16A34A" font-size="20" font-weight="700">2.9s</text>
 
-    <image x="70" y="366" width="26" height="26" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAYFBMVEUfQO3w8v7///+7xfqWpvf9/f/DzPphePKdrPexvPlVbvF1ifSisPils/jb4Pz2+P5EX/BmffPV2/wmRu44Vu9CXvB8j/QjQ+3L0/ttg/MtTO7i5v08We/Q1/tQavHr7v3UMFLmAAAAkElEQVQ4jd2SzQ6CQAyE21mqgMCCoCg/8v5v6QbDwWxNueKcmvZL2mlL9FfK+EvnCHDgZFMqyBUAly0uUMYtHCpff8IG11YBpPbVmu/Y35QhndAdRQj6BxrNRQAow5MoQarVV2AYecpl7n8C9JJ54U6tBxenIAbiFe0FzBZ7hrRsWouyVm0eyz638TDmyx1ab/9IBsdakyN7AAAAAElFTkSuQmCC"/>
-    <text x="106" y="388" fill="#111827" font-size="20" font-weight="700">Exa</text>
-    <rect x="220" y="367" width="330" height="28" rx="8" fill="#F1F5F9"/>
-    <rect x="220" y="367" width="211" height="28" rx="8" fill="#FCD34D"/>
-    <text x="515" y="388" fill="#111827" font-size="18" font-weight="700">16/25</text>
-    <text x="650" y="388" fill="#D97706" font-size="20" font-weight="700">1.0s</text>
+    <rect x="56" y="302" width="40" height="40" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <image x="65" y="311" width="22" height="22" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEMklEQVRYhcWXXVCUVRjHf+e8uyzI4rvDgqPxNXwbHzcK2YzaFNYFgnbn1FVTjWNidduQNXIbU0rjmGmWQobZRaVeOOMQ0Ea22ER+DBe5DMiIAirDtm3Ygu97unj5kI+FhYX6z7w37zznPP/zPOf5n+cRGRkZoBRAJvAGsB1IA1YBNkAQHRTwCBgBbgMXgaNAD4Bt3HkpcBh4ahkczoQA7IA+/hUCW4G3gV81l65nAieAp1fAeThCqUAx0KK5dL0a2PUfOX8cKUBIAuWLda6UQlmpiwYCKJdYF25RWLMmmbi4uOUgkSaB+EitDcOguKiQhlMneOvNvWiaFi2BeBtWqS0IpRROp5Oqqj08WVTME6kpeL1XaP3REw0RmyTC/CtTsXPHdrZtew6MMXSXi6qqPSS53dGkQshIrEzTJDsni927XyfG4bB+GgabNpXy0su7EGLpBRQhAUVpaQnZ2VkTqmktttl54fkyEhKcS46C5tL1moWMhBAMDQ3h83XhTkxkXWoKD0dG+Oz45zQ2nuXWrd4lOYcIIyCEYGBgkMYzZ7np8wGSUCjE9+cu4Gn7GdM0V5bABAmbzYaUE0sEmqahyYi3iI7AYrAYpVw8ASEBDTQt7O2Pj19FcnJSREQiEqFJ30LQ8VsHd/r6cDgcBINBlFIYhjFpo5TitVdf4cWdlTR82ci3350jEAiEFSuRkZ4ecf2YponbnUhRUSHd3T3cv/+AgoL1xMXFTlanEIJ9+/ayZeszjI0+xNPq4cgnx+j4/erSCBiGMRnqpKQkag7sp7KiHI+njXeq36fuYC0lJRumRcFut0+dWNN4cO8edXWHOf3V17P2nzcFUko2btzAn34/w8N+amreo3JHBUJqrNZ1YmMdxK9OwB7rxM4UAUxjSrBMRVJyMvn5eUgpZ5VsWAKmaZKWlsqhjz4gFAoxMDjI5i2bEVLS29NDbe2HhP4J0dzUgveyd9plKyt7lty8XBCCwbv91DecpvHMN9OiuTABpcjNyWHturXEOBzk5ueBUvR29/Du/gNc/qUdKSUHD308a63T6SQrM5Omph84cvQ4165dB5izasISEEBBwXrr8RkPm2manDzVgOentskcyxlCpJTii5P1NLe04vW2Ewj8Ne9zHVYHHI4YCgsLph5MIZD2GCoqynG7E8PWtxACn6+LS5eaCAb/XrBXsGH17dNio5QiIWE1mVlZgMRUimAgQH//AB0dVxkdHZ1305lRmQfKhjU02GeeYmRkhPPnL9Du9XLjRid/3PTR13cHv9+PaZpR9QCP4ZHISE8fBlxz0gMYVzohBFLK5XI8Ab/EGpfmhGDqFdTm0f4ocFtizWpR99dLgAIuSuAY0P4/EGgHPtVcuj4MXMea1VJY+RFNAVewhtNOzaXrAHeBZmAMa4J1ABqWTizXeB4EuoB6oBroRAj+BajZemNynEWXAAAAAElFTkSuQmCC"/>
+    <text x="112" y="329" fill="#111827" font-size="19" font-weight="700">Firecrawl</text>
+    <rect x="260" y="308" width="360" height="28" rx="8" fill="#F1F5F9"/>
+    <rect x="260" y="308" width="266" height="28" rx="8" fill="#7DD3FC"/>
+    <text x="650" y="329" fill="#111827" font-size="18" font-weight="700">37/50</text>
+    <text x="790" y="329" fill="#0284C7" font-size="20" font-weight="700">3.6s</text>
 
-    <image x="70" y="421" width="26" height="26" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAZlBMVEUAAAD////09PTr6+vl5eXu7u6/v7+wsLBtbW3U1NS1tbXc3NydnZ3ExMR3d3f6+vqVlZVISEjLy8uoqKiHh4diYmKOjo5bW1tWVlYmJiY0NDSAgIA/Pz8YGBhoaGhNTU0fHx8LCwsbZFgyAAAB8ElEQVRYhe1V2bKrIBCkETQuQeMa9RiT///Ji4i4hJibVJ2q82C/KAw9NUzPDIQcOHDgV3EpPS+pvqYLBwpx9B3fB1jUikR+6c8XfA5+Hf9q6aL4mM/gz4sEuH7IdxEulyXQfcQvEK83POmw8EIaO+fT/ziguG12GAyc5i0/XyZARwD4+cAU0tXlfQDrI62kMyR6lW3v94TTJgApo0sIMK1T4+sF/FUGbgDvySBMqXd+wHb53SrEDAg0jU97FFvOCiW8ZTSYdGPozeauEP5cdh0HrWfHgf5Lsdscc7aaeJVOc7VwN4ICZ/3Xq+xbQuO7OcimbF+BbGUppzXonoNQX7DCVu5Gy1ch3XOgU9A/8Y18JkYrmrGRLxa+rCVVYQ7uj+5lewslVgNYJmGL4BS5oe5Keq6fjxASqfjiZTGNqBLXmTqaM8YoYBXDHeafY6RUqNtgmgdeWRleCttwGYrEXwy0e+tSFXAa3WQ1D8NCO2+2XT9CZjozOt88FbUTiNqEN9HyTZlNAJUFpI7nqbpuIGZjhFyM1X1l1jQT8gCPUZGuVLlO8/vKKpDxIYCbtDL7YJP6IRMDmwbPr4msLpmBRCaFCwt5OjKwvd5mfUjT4Dx8PduLge6+fIdGKfemwQVOvmPmePuwPN7YDxw4cOCP4x8LFhGpYZOEYQAAAABJRU5ErkJggg=="/>
-    <text x="106" y="443" fill="#111827" font-size="20" font-weight="700">Linkup</text>
-    <rect x="220" y="422" width="330" height="28" rx="8" fill="#F1F5F9"/>
-    <rect x="220" y="422" width="211" height="28" rx="8" fill="#FDBA74"/>
-    <text x="515" y="443" fill="#111827" font-size="18" font-weight="700">16/25</text>
-    <text x="650" y="443" fill="#EA580C" font-size="20" font-weight="700">6.8s</text>
+    <rect x="56" y="350" width="40" height="40" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <image x="65" y="359" width="22" height="22" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAdVBMVEX/////TQD//fz/Vg3/Ugf/+vj/YBv/7eX/XRb/Uwj/dzz/WhP/8+3/39L/jFr/6N//kWH/y7T/tpb/18X/pHz/cjX/bCz/xqz/nHH/w6r/hVD/0Lv/oHb/waX/1MH/so//fEP/l2n/qoX/bzH/h1P/ZyT/8OkHE4YGAAABaUlEQVRIie2V2XqEIAxGDaK4DO4zOkPd2tr3f8SiuOCooLf9mjswh/AnIRrGv42WF+QiAH5yuwJQE3AQXgBCGwB7F2L0AEBkXbkSNz8+DTwBLoVALwE8ziaXuQIw6Tl/cofRzomwPvAElKeAxJ/8Ied6tP5Pc/bHKWIvXfkqe/YHh9amq0ktaRZ/sFsMWBMhwxIA/SJV+lMT3q1QyUbtxh86VfVItwVwppDNnC2gDFFuJXCLjlUkc44yqRzuQQhEUD0DrJJuV+wDYZMmY1/zxpZaEO77spn/iCbgTgy6XMreHyBy130iAy1N4uxXW0qR1x9ZL0ClAZwhLbEuApsejiNeZgWT7AMNk0qzFklhTjHufO23uOWJz+2YRJZb0biz68/rLI6Tkk6HS+GjJ3Hre9XNpR0x0V6HvVTi92kX48McDSECftxKIB/jyvdAPfheAeQBgXLAhl7zs1p3kWZq3Oo1UJ//qfxh+wXi/A9MuPFVCwAAAABJRU5ErkJggg=="/>
+    <text x="112" y="377" fill="#111827" font-size="19" font-weight="700">Linkup</text>
+    <rect x="260" y="356" width="360" height="28" rx="8" fill="#F1F5F9"/>
+    <rect x="260" y="356" width="238" height="28" rx="8" fill="#FDBA74"/>
+    <text x="650" y="377" fill="#111827" font-size="18" font-weight="700">33/50</text>
+    <text x="790" y="377" fill="#EA580C" font-size="20" font-weight="700">4.1s</text>
   </g>
 
-  <rect x="70" y="490" width="960" height="1" fill="#E5E7EB"/>
-  <text x="70" y="522" fill="#6B7280" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">Success requires usable, relevant content. Short stubs, blocked pages, and wrong-page output fail the quality gate.</text>
+  <rect x="60" y="398" width="860" height="1" fill="#E5E7EB"/>
+  <text x="60" y="421" fill="#6B7280" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14">Usable success requires relevant page content; summary times average only passing rows.</text>
 </svg>

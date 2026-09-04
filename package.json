@@ -12,21 +12,22 @@
     "dev:ui": "pnpm vite preview --outDir html"
   },
   "dependencies": {
-    "@ai-sdk/togetherai": "2.0.33",
-    "@vitest/ui": "^4.0.18",
-    "ai": "^6.0.86",
-    "autoevals": "^0.0.132",
-    "dotenv": "^17.3.1",
-    "unstorage": "^1.17.4",
-    "vitest": "^4.0.18",
-    "zod": "^4.3.6"
+    "@ai-sdk/togetherai": "3.0.44",
+    "@vitest/ui": "^4.1.11",
+    "ai": "^7.0.91",
+    "autoevals": "^0.3.0",
+    "dotenv": "^17.4.2",
+    "unstorage": "^1.17.5",
+    "vitest": "^4.1.11",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
-    "@mendable/firecrawl-js": "^4.29.0",
-    "@tavily/core": "^0.7.6",
-    "@types/node": "^25.2.3",
+    "@mendable/firecrawl-js": "^4.38.0",
+    "@tavily/core": "^0.7.8",
+    "@types/node": "^26.4.1",
     "brave-search": "^0.9.0",
-    "exa-js": "^2.15.0",
-    "linkup-sdk": "^3.2.7"
+    "exa-js": "^2.19.0",
+    "linkup-sdk": "^3.6.0",
+    "parallel-web": "^1.3.3"
   }
 }

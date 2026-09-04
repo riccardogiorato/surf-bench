@@ -1,16 +1,17 @@
 // Custom reporter class - no need to implement vitest's Reporter interface
 import * as fs from "fs";
 import * as crypto from "crypto";
-import {
-  newsTestSites,
-  academicTestSites,
-  technicalTestSites,
-  ecommerceTestSites,
-  jobListingTestSites,
-  realEstateTestSites,
-  socialMediaTestSites,
-  extraTestSites,
-} from "./src/lib/testSites.js";
+import { evaluateScrapedContent } from "./src/lib/contentQuality.js";
+import { ALL_TEST_SITES } from "./src/lib/testSites.js";
+import type { ScrapedContent } from "./src/lib/types.js";
+
+const PREFERRED_VENDOR_ORDER = [
+  "tavily",
+  "firecrawl",
+  "parallel",
+  "exa",
+  "linkup",
+];
 
 type TestMeta = {
   file: string;
@@ -27,21 +28,11 @@ type TestMeta = {
 export default class VendorTableReporter {
   allTests: Map<string, TestMeta> = new Map();
   private siteNameToUrl: Map<string, string> = new Map();
+  private didWriteReport = false;
 
   constructor() {
     // Build mapping from site names to URLs
-    const allSites = [
-      ...newsTestSites,
-      ...academicTestSites,
-      ...technicalTestSites,
-      ...ecommerceTestSites,
-      ...jobListingTestSites,
-      ...realEstateTestSites,
-      ...socialMediaTestSites,
-      ...extraTestSites,
-    ];
-
-    for (const site of allSites) {
+    for (const site of ALL_TEST_SITES) {
       this.siteNameToUrl.set(site.name, site.url);
     }
   }
@@ -63,17 +54,71 @@ export default class VendorTableReporter {
 
   private getScrapingTimeFromCache(vendor: string, url: string): number | null {
     try {
-      const filename = this.getCacheFilename(url);
-      const cachePath = `cache/${vendor}/${filename}`;
-
-      if (fs.existsSync(cachePath)) {
-        const cacheData = JSON.parse(fs.readFileSync(cachePath, "utf8"));
-        return cacheData.data?.response?.scrapingTimeMs || null;
-      }
+      const cached = this.getCachedScrape(vendor, url);
+      return cached?.response?.scrapingTimeMs || null;
     } catch (error) {
       // Cache file doesn't exist or is invalid
     }
     return null;
+  }
+
+  private getCachedScrape(vendor: string, url: string): ScrapedContent | null {
+    const filename = this.getCacheFilename(url);
+    const cachePath = `cache/${vendor}/${filename}`;
+
+    if (!fs.existsSync(cachePath)) {
+      return null;
+    }
+
+    const cacheData = JSON.parse(fs.readFileSync(cachePath, "utf8"));
+    return cacheData.data ?? null;
+  }
+
+  private getAvailableVendors(): string[] {
+    if (!fs.existsSync("cache")) return [];
+
+    const cacheVendors = fs
+      .readdirSync("cache", { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name);
+
+    return [
+      ...PREFERRED_VENDOR_ORDER.filter((vendor) =>
+        cacheVendors.includes(vendor)
+      ),
+      ...cacheVendors
+        .filter((vendor) => !PREFERRED_VENDOR_ORDER.includes(vendor))
+        .sort(),
+    ];
+  }
+
+  private getTestDataFromCache(vendors: string[]): TestMeta[] {
+    const testData: TestMeta[] = [];
+
+    for (const site of ALL_TEST_SITES) {
+      for (const vendor of vendors) {
+        const cached = this.getCachedScrape(vendor, site.url);
+        const quality = cached
+          ? evaluateScrapedContent(site, cached)
+          : undefined;
+
+        testData.push({
+          file: "cache",
+          vendor,
+          siteName: site.name,
+          testName: `should scrape ${site.name}`,
+          category: site.category ?? "other",
+          url: site.url,
+          id: `${vendor}:${site.url}`,
+          result: cached
+            ? { state: quality?.ok ? "pass" : "fail" }
+            : undefined,
+          scrapingTimeMs: cached?.response?.scrapingTimeMs ?? null,
+        });
+      }
+    }
+
+    return testData;
   }
 
   onCollected(files: any) {
@@ -160,6 +205,17 @@ export default class VendorTableReporter {
   }
 
   onFinished() {
+    this.writeReport();
+  }
+
+  onTestRunEnd() {
+    this.writeReport();
+  }
+
+  private writeReport() {
+    if (this.didWriteReport) return;
+    this.didWriteReport = true;
+
     // Read scraping times from cache files
     for (const test of this.allTests.values()) {
       if (test.url && test.vendor) {
@@ -170,9 +226,27 @@ export default class VendorTableReporter {
       }
     }
 
-    // Group by siteName (row) and vendor (column) - no categories
-    const testData = Array.from(this.allTests.values());
-    const vendors = Array.from(new Set(testData.map((t) => t.vendor))).sort();
+    // Group by siteName (row) and vendor (column) - no categories.
+    // Vitest reporter task events have changed across versions, so fall back to
+    // cache-backed results to keep this table stable after full benchmark runs.
+    const liveTestData = Array.from(this.allTests.values());
+    const testData =
+      liveTestData.length > 0
+        ? liveTestData
+        : this.getTestDataFromCache(this.getAvailableVendors());
+    const testVendors = Array.from(new Set(testData.map((t) => t.vendor)));
+    const availableVendors = this.getAvailableVendors();
+    const vendors = [
+      ...PREFERRED_VENDOR_ORDER.filter((vendor) =>
+        testVendors.includes(vendor)
+      ),
+      ...testVendors
+        .filter((vendor) => !PREFERRED_VENDOR_ORDER.includes(vendor))
+        .sort(),
+    ].filter(
+      (vendor) =>
+        availableVendors.length === 0 || availableVendors.includes(vendor)
+    );
     const siteNames = Array.from(
       new Set(testData.map((t) => t.siteName))
     ).sort();
@@ -198,9 +272,9 @@ export default class VendorTableReporter {
           // Show X for failed scrapes, with timing if available from cache
           if (test.scrapingTimeMs) {
             const scrapingTimeS = (test.scrapingTimeMs / 1000).toFixed(1);
-            row[vendor] = `✗ (${scrapingTimeS}s)`;
+            row[vendor] = `X (${scrapingTimeS}s)`;
           } else {
-            row[vendor] = "✗";
+            row[vendor] = "X";
           }
         } else {
           row[vendor] = "?";
@@ -216,11 +290,15 @@ export default class VendorTableReporter {
     }
     table.push(separatorRow);
 
-    // Add average time row
-    const avgRow: Record<string, string> = { Site: "avg time" };
+    // Add average time row for successful, quality-passing scrapes only.
+    const avgRow: Record<string, string> = { Site: "avg usable time" };
     for (const vendor of vendors) {
       const vendorTests = testData.filter(
-        (t) => t.vendor === vendor && t.scrapingTimeMs && t.scrapingTimeMs > 0
+        (t) =>
+          t.vendor === vendor &&
+          t.result?.state === "pass" &&
+          t.scrapingTimeMs &&
+          t.scrapingTimeMs > 0
       );
 
       if (vendorTests.length === 0) {
@@ -240,8 +318,8 @@ export default class VendorTableReporter {
     }
     table.push(avgRow);
 
-    // Add success percentage row
-    const successRow: Record<string, string> = { Site: "% success" };
+    // Add usable success row
+    const successRow: Record<string, string> = { Site: "usable success" };
     for (const vendor of vendors) {
       const vendorTests = testData.filter((t) => t.vendor === vendor);
       const passedTests = vendorTests.filter((t) => t.result?.state === "pass");
@@ -262,9 +340,8 @@ export default class VendorTableReporter {
 
     // Colorize table cells
     function colorize(val: string) {
-      if (val === "✓") return GREEN + val + RESET;
-      if (val === "✗") return RED + val + RESET;
-      if (/^✗ \(\d+\.\d+s\)$/.test(val)) return RED + val + RESET; // Failed with timing in red
+      if (val === "X") return RED + val + RESET;
+      if (/^X \(\d+\.\d+s\)$/.test(val)) return RED + val + RESET; // Failed with timing in red
       if (/^\d+\.\d+s$/.test(val)) return GREEN + val + RESET; // Successful timing in green
       if (/^\d+\/\d+$/.test(val)) {
         // Success rate like "2/3"
