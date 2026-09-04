@@ -85,6 +85,6 @@ Legend: **[S]** = sequential (blocks the next phase) · **[P]** = parallelizable
 
 ## Definition of done (today)
 
-`surf-bench` repo where `pnpm test` runs all three events; README shows three
+`surf-bench` repo where `bun run test` runs all three events; README shows three
 leaderboards + overall + suggested combos; `results/` holds CSV/JSON for each event
 plus a summary; scoreboard SVG in-theme; old search repo archived/deleted.
