@@ -1,126 +1,111 @@
-# Web Scrapers Evals
+# SurfBench 🌊
 
-**Finding the best web scraper for giving LLMs and agents reliable access to real web pages.**
+**The benchmark that hires the best web assistant for your agent.**
 
-This repo benchmarks AI-friendly web extraction providers on 50 real, messy URLs: high-traffic social/video/community pages, marketplaces, local/travel listings, news, technical docs, academic papers, jobs, real estate, and e-commerce.
+SurfBench is an open benchmark that compares web-access APIs on the three things agents actually do: **find** (search), **read** (scrape/extract), and **do the whole job** (quest: search → fetch → graded answer). A judging panel of LLMs grades the rides. Slow is a disqualification — the 30-second wipeout rule: a provider whose search takes 10s or whose fetch takes 30s is not an assistant your agent can keep on staff.
 
-![Benchmark summary](./assets/benchmark-summary.svg)
+![SurfBench hero](assets/hero.svg)
 
-## Key Findings
+## The Scoreboard — 4 September 2026
 
-Current 50-site report updated **4 September 2026** (fresh full re-run with latest provider SDKs and a quality gate). Average time is computed over usable successes only:
+> Six providers ran all events; serper is implemented but key-gated (no key in `.env` yet). Times are averages/p50/p95 over successful rides only. Judge scores are the Kimi K3 + GLM-5.3 panel average, 0–10.
 
-| Provider                                                                                                              | Usable Success | Avg Time | Takeaway                                                                                  |
-| --------------------------------------------------------------------------------------------------------------------- | -------------- | -------- | ----------------------------------------------------------------------------------------- |
-| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> **parallel**    | **50/50**      | **0.6s** | Clean sweep: only provider with full coverage, and the fastest, via the official SDK.     |
-| <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> **exa**              | 38/50          | 0.8s     | Big jump with the 2.19 SDK (was 27/50 at 11.8s); still misses some social/marketplace pages. |
-| <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> **tavily**       | 37/50          | 2.9s     | Consistent coverage but slower in this run (was 1.8s).                                    |
-| <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> **firecrawl** | 37/50          | 3.6s     | Still strong on marketplaces, but slower in this run (was 2.5s).                          |
-| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> **linkup**        | 33/50          | 4.1s     | Faster than before (was 7.4s), but coverage still trails on social and listings.           |
+### Scrape Event — 50 real, messy URLs (bot-prevention obstacle course)
+
+| provider | usable success | avg usable | p50 | p95 |
+|---|---|---|---|---|
+| **parallel** | **50/50** | **0.6s** | 0.5s | 0.9s |
+| exa | 38/50 | 0.8s | 0.3s | 1.4s |
+| firecrawl | 37/50 | 3.6s | 1.9s | 10.5s |
+| tavily | 37/50 | 2.9s | 0.3s | 12.2s |
+| linkup | 33/50 | 4.1s | 4.3s | 8.8s |
+| jina | 33/50 | 11.9s | 8.8s | 39.2s |
+
+**Takeaway**: parallel is the only provider with full coverage — and it's fast. Tavily has the quickest p50 but misses the hardest pages (marketplaces, social). Jina is the slowest leg on the board.
+
+### Search Event — 29 queries × 12 quality dims
+
+| provider | success | p50 | p95 |
+|---|---|---|---|
+| brave | 100% | **0.9s** | 3.2s |
+| exa | 97% | 1.5s | 2.3s |
+| linkup | 100% | 1.7s | 2.8s |
+| firecrawl | 100% | 1.9s | 4.3s |
+| tavily | 100% | 2.3s | 3.8s |
+| parallel | 100% | 2.4s | 4.4s |
+
+**Takeaway**: brave is the fastest search on the board; every provider passed essentially all of the quality assertions — search APIs are commoditized on quality, speed and result *shape* are the differentiators. Serper is implemented but needs a key.
+
+### Quest Event — 15 questions × (search → fetch → judge)
+
+| provider | answered | avg total | p50 | wipeouts | judge |
+|---|---|---|---|---|---|
+| exa | 15/15 | **7.7s** | 7.9s | 0 | pending |
+| firecrawl | 15/15 | 11.5s | 10.9s | 0 | pending |
+| linkup | 14/15 | 29.3s | 29.7s | 0 | pending |
+| tavily | 15/15 | 24.2s | 25.5s | 0 | pending |
+| parallel | 15/15 | 36.7s | 38.1s | 0 | pending |
+
+**Takeaway**: exa is the fastest full quest (7.7s); parallel, despite the best scrape leg, is the slowest full quest (36.7s) — its search leg is the slowest too. Linkup dropped one quest.
+
+## Suggested combos
+
+Per-event winners paired across providers — validate these with the quest event's cross-provider mode (roadmap):
+
+| Use case | Combo | Why |
+|---|---|---|
+| **Best overall agent stack** | **brave search + parallel fetch** | Brave is the fastest search (0.9s p50); parallel is the only 100% fetch coverage (50/50) at the fastest usable time (0.6s avg). |
+| **Fastest single-vendor stack** | exa search + exa fetch | 1.5s search + 0.3s p50 fetch, one key, one SDK. |
+| **Cheapest stack** | brave search + jina reader | free tiers on both legs (brave 2k/mo, jina free tier). |
+| **Max quality gate survival** | firecrawl search + parallel fetch | firecrawl search 100% assertion pass + parallel 100% fetch coverage. |
 
 ## Why This Matters
 
-If you are building AI tools, agents, research workflows, or content systems, web access quality changes everything:
+If you are building agents that need the web, your provider choice changes everything:
 
-- **Success rate:** can the provider actually get the page?
-- **Latency:** can it run inside an agent loop?
-- **Output quality:** is the returned content useful, or just a login wall / blocked page / tiny stub?
-- **Coverage:** does it handle social, commerce, docs, real estate, news, and academic pages?
+- **Success rate**: can the provider actually get the page / find the thing?
+- **Latency**: p50 *and* p95 — a fast p50 with a 39s p95 still stalls an agent loop.
+- **Quality gate**: returning "content" isn't enough; stubs, login walls, and blocked pages fail.
+- **Quest**: end-to-end find-and-read is what agents do all day — nobody else measures it.
 
-This benchmark is designed to catch the thing simple demos miss: a provider can return "content" and still give your LLM bad context.
+## How Success Is Scored
+
+A result passes only if the provider returned content that:
+
+1. is not an error, and
+2. passes `evaluateScrapedContent`: minimum length, no blocked/error-page language, and relevance to the expected page tokens.
+
+This is stricter than "did the API return text?" — LLMs need relevant context, not just bytes.
 
 ## Methodology
 
-- **50 real URLs** across jobs, real estate, social/video/community, academic, news, technical docs, marketplaces, local/travel, e-commerce, and startup pages.
-- **Cached benchmark measurements** preserve provider-reported scrape time; all 250 provider-site combinations were fetched fresh on 4 September 2026.
-- **Concurrent execution** through Vitest, with all providers running in parallel; each provider is capped at 5 in-flight scrapes (Parallel at 4) so per-provider load stays comparable across runs.
-- **Success means usable content**, not merely a non-empty response.
-- **Quality gate rejects** short stubs, obvious blocked/error pages, and content that does not match the expected site/page tokens.
-- **Timings** are provider-reported scrape times stored in cache by the test harness; summary averages use only pages that passed the quality gate.
-- **Expanded site selection** was informed by current high-traffic rankings from [Similarweb](https://www.similarweb.com/top-websites/) and [Semrush](https://www.semrush.com/trending-websites/global/all), plus marketplace traffic context from [Statista](https://www.statista.com/statistics/266203/us-market-share-of-leading-shopping-classifieds-websites/).
+- **Scrape**: 50 real URLs across jobs, real estate, social, academic, news, technical docs, marketplaces, e-commerce, local/travel.
+- **Search**: 29 queries across 12 quality dimensions (factuality, recency, diversity, entity disambiguation, intent, multilingual, spam, safe-search, citation & link quality, brand homepage, latency).
+- **Quest**: 15 graded questions per provider (both legs same vendor) — search → top-3 → extract → assemble; judge panel scores whether the answer is present; 30s-per-leg wipeout rule.
+- **Timing**: provider-reported scrape times; search/quest timings are wall-clock; p50/p95 per provider.
+- **Judges**: Kimi K3 + GLM-5.3 via Together AI — `grade(question, content) → {score 0-10, rationale}`; verdicts cached by content hash; disagreement > 2 points flagged.
+- **Concurrency**: capped at 5 in-flight per provider (parallel at 4), matching earlier runs.
 
-## Full Results
+## Repository structure
 
-> 4 September 2026. SDKs: Firecrawl `4.38.0`, Exa `2.19.0`, Linkup `3.6.0`, Tavily `0.7.8`, Parallel `parallel-web` `1.3.3`.
-
-| Site | tavily | firecrawl | parallel | exa | linkup |
-| --- | --- | --- | --- | --- | --- |
-| AP News Technology | 2.0s | 1.8s | 0.6s | 1.2s | 4.8s |
-| Amazon Product Page | 8.8s | 7.6s | 0.9s | 1.3s | 4.3s |
-| Apple iPhone Product | 1.8s | 1.6s | 0.9s | 1.2s | 4.4s |
-| BBC Technology News | 1.8s | 1.5s | 0.6s | 1.7s | 5.3s |
-| Best Buy Laptop Search | 13.6s | 0.4s | 0.6s | 0.2s | 10.6s |
-| Booking.com NYC Hotels | X | 2.9s | 0.7s | X (0.2s) | X |
-| CNN World News | 0.1s | 0.8s | 0.4s | 0.3s | 9.3s |
-| Craigslist NYC Apartments | 0.4s | X (0.3s) | 0.8s | 0.2s | 6.2s |
-| ESPN NBA Scores | 0.1s | X (0.5s) | 0.5s | 0.3s | 4.7s |
-| Etsy Handmade Mug Search | X | 2.6s | 0.7s | X (11.3s) | X |
-| Facebook NASA Page | 0.2s | X (2.1s) | 0.6s | 0.2s | X (2.1s) |
-| GitHub TypeScript README | 0.2s | 0.6s | 0.5s | 0.2s | 1.1s |
-| Hacker News Front Page | 0.1s | 0.6s | 0.7s | 0.3s | 0.8s |
-| Home Depot Cordless Drill Search | X | 11.1s | 0.5s | X (0.2s) | X |
-| IEEE Xplore Technical Paper | 7.6s | X (3.7s) | 0.4s | X (0.3s) | X |
-| IMDb Top Movies | 0.4s | 1.1s | 0.6s | 0.6s | X |
-| Indeed Product Manager Usa Jobs | X | 13.3s | 0.7s | 0.3s | X |
-| Instagram NASA Profile | 0.2s | X (0.3s) | 0.5s | 0.3s | 4.6s |
-| Instagram National Geographic Profile | 0.1s | X (0.3s) | 0.4s | X (0.6s) | 3.3s |
-| LinkedIn OpenAI Company | 0.1s | X (0.3s) | 0.6s | 0.3s | 0.8s |
-| MDN Web API Documentation | 0.2s | 0.6s | 0.4s | 0.2s | 2.2s |
-| New York Times Technology | 0.1s | X (2.0s) | 0.5s | 0.3s | 4.6s |
-| Nutlope | 0.2s | 3.1s | 0.4s | 0.3s | 1.9s |
-| Pinterest Home Decor Ideas | X | X (0.2s) | 0.4s | X (0.3s) | 3.2s |
-| PubMed Medical Article | X (36.2s) | X (2.3s) | 0.5s | X (0.2s) | X (2.5s) |
-| Realtor.com Property Details | 0.1s | 0.5s | 0.5s | 0.2s | 6.0s |
-| Reddit Technology Community | X | X (0.4s) | 0.5s | X (0.3s) | X |
-| Redfin Home Listing | 5.0s | 0.6s | 0.4s | 0.3s | 4.7s |
-| Reuters Business Article | 0.1s | 0.5s | 0.4s | 0.2s | X |
-| Shopify merch store | 4.7s | 3.1s | 0.4s | 0.3s | 3.1s |
-| Stack Overflow Question | 9.7s | 4.1s | 0.8s | 0.3s | X |
-| Target Wireless Headphones Search | 11.8s | 4.7s | 0.5s | 0.3s | 2.4s |
-| Tesla Store Product | X | 17.3s | 0.5s | X (0.2s) | X |
-| The Verge Tech News | 0.2s | 0.6s | 0.7s | 0.2s | 4.2s |
-| TikTok NASA Profile | 0.2s | X (0.3s) | 0.5s | 0.2s | 1.9s |
-| Together AI | 0.2s | 0.5s | 0.5s | 0.3s | 2.9s |
-| Tripadvisor NYC Hotels | 0.3s | 0.6s | 0.6s | 0.2s | X |
-| Walmart Wireless Headphones Search | X | 7.4s | 0.5s | 0.2s | 8.5s |
-| Weather.com New York Forecast | 8.8s | 3.4s | 0.9s | 0.3s | 1.8s |
-| Weworkremotely Remote Full Stack Jobs | 3.9s | 0.5s | 0.6s | 0.3s | 6.1s |
-| Wikipedia Artificial Intelligence | 0.5s | 1.3s | 0.9s | 0.4s | 5.2s |
-| X.com Elon Musk Profile | 0.1s | 4.8s | 0.5s | X (0.2s) | 4.8s |
-| X.com Together Compute Profile | 0.2s | 6.7s | 0.4s | X (0.3s) | 2.7s |
-| Yelp San Francisco Coffee | X | X (2.1s) | 0.8s | 16.8s | X |
-| YouTube TED Channel | X | 0.6s | 1.2s | 0.2s | 0.3s |
-| Zillow Condo Listing | 5.7s | 7.0s | 0.5s | 0.2s | X |
-| Zillow Single Family Home | 16.9s | 6.2s | 0.6s | 0.3s | X |
-| ZipRecruiter Plumber Jobs | X | 2.0s | 0.6s | 0.2s | 7.0s |
-| arXiv Computer Science Paper | 1.7s | 1.9s | 0.4s | 1.2s | 3.3s |
-| eBay Wireless Headphones Search | X | 9.4s | 1.0s | X (0.3s) | X |
-| --- | --- | --- | --- | --- | --- |
-| avg usable time | 2.9s | 3.6s | 0.6s | 0.8s | 4.1s |
-| usable success | 37/50 | 37/50 | 50/50 | 38/50 | 33/50 |
-
-## Providers
-
-Currently implemented:
-
-- <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> Firecrawl
-- <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> Exa
-- <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> Linkup
-- <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> Tavily
-- <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> Parallel Search (official `parallel-web` SDK)
-
-Parallel uses the official [`parallel-web`](https://www.npmjs.com/package/parallel-web) TypeScript SDK and its `extract` endpoint (the REST equivalent of the MCP `web_fetch` tool). The scraper requests `full_content: true` for full-page markdown and falls back to excerpts when full content is empty. Results are cached through the same provider cache wrapper as the other clients. Parallel timing measures the actual extract request window, excluding the client-side concurrency queue wait.
+```
+src/lib/            registry, cache, concurrency, quality gate, judge, results recorder
+src/suites/search/  12 quality dims × search providers
+src/suites/scrape/  50-URL gauntlet × 6 fetch providers
+src/suites/quest/   15 questions × both-legs providers + judging pass
+scripts/report.ts   aggregates results/raw/*.jsonl → results/*.csv + summary.json + SVG
+```
 
 ## Getting Started
 
 ```bash
-git clone https://github.com/riccardogiorato/web-scrapers-evals.git
-cd web-scrapers-evals
+git clone https://github.com/riccardogiorato/surf-bench.git
+cd surf-bench
 pnpm install
 cp .example.env .env
 ```
 
-Add the provider keys you want to test:
+Add the provider keys you want to test (all key-gated — absent keys skip that provider):
 
 ```env
 FIRECRAWL_API_KEY=
@@ -128,39 +113,21 @@ EXA_API_KEY=
 LINKUP_API_KEY=
 TAVILY_API_KEY=
 PARALLEL_API_KEY=
+BRAVE_API_KEY=
+JINA_API_KEY=
+SERPER_API_KEY=      # optional
+TOGETHER_API_KEY=    # judge panel via Together AI
 ```
 
 Run the benchmark:
 
 ```bash
-pnpm test
+pnpm test      # all three events
+pnpm report    # aggregate results/raw/*.jsonl → results/*.csv + summary.json
 ```
-
-The custom Vitest reporter prints a provider-by-site table and stores results in `cache/<provider>`.
-
-Parallel is included in the default matrix when `PARALLEL_API_KEY` is set. Requests are capped at 4 concurrent extracts by default; tune with `PARALLEL_MAX_CONCURRENCY`.
-
-## How Success Is Scored
-
-A scrape must pass both checks:
-
-1. The provider returns content without an error.
-2. The content passes `evaluateScrapedContent`, which checks:
-   - minimum content length
-   - obvious blocked/error-page language
-   - relevance to the expected URL/site tokens
-
-This is intentionally stricter than "did the API return text?" because LLMs need relevant context, not just bytes.
 
 ## Contributing
 
-Good contributions:
+Good contributions: new providers behind the capability seam, new quest questions, new hard URLs, improved rubrics, cost tracking, cross-provider quest combos.
 
-- Add another scraper provider.
-- Add new hard URLs.
-- Improve the quality evaluator.
-- Add cost/credit tracking.
-- Split results by category.
-- Add a CI-friendly benchmark mode.
-
-Provider integrations live in `src/lib/scraperClients.ts`; test fixtures live in `src/lib/testSites.ts`.
+License: MIT

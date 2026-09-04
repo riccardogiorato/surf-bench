@@ -1,8 +1,8 @@
 import crypto from "crypto";
-import Parallel from "parallel-web";
+import type Parallel from "parallel-web";
 import { createConcurrencyLimiter } from "./concurrency.js";
+import { parallelClientFactory } from "./apiClients.js";
 
-const PARALLEL_API_KEY = process.env.PARALLEL_API_KEY;
 const DEFAULT_PARALLEL_MAX_CONCURRENCY = 4;
 const parsedMaxConcurrency = Number.parseInt(
   process.env.PARALLEL_MAX_CONCURRENCY ??
@@ -15,18 +15,12 @@ const PARALLEL_MAX_CONCURRENCY =
     : DEFAULT_PARALLEL_MAX_CONCURRENCY;
 const PARALLEL_SESSION_ID =
   process.env.PARALLEL_SESSION_ID ??
-  `web-scrapers-evals-${crypto.randomUUID()}`;
+  `surf-bench-${crypto.randomUUID()}`;
 
 // The Parallel SDK constructor throws when PARALLEL_API_KEY is missing, so the
 // client is created lazily; the scraper is only registered when the key is set.
-let parallelClient: Parallel | null = null;
-
-function getParallelClient(): Parallel {
-  if (!parallelClient) {
-    parallelClient = new Parallel({ apiKey: PARALLEL_API_KEY });
-  }
-
-  return parallelClient;
+function getParallelClient(): ReturnType<typeof parallelClientFactory> {
+  return parallelClientFactory();
 }
 
 const runWithConcurrencyLimit = createConcurrencyLimiter(

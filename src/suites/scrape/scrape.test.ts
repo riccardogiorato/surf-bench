@@ -1,15 +1,16 @@
 import { describe, it, expect } from "vitest";
-import type { TestSite } from "../lib/types.js";
-import { evaluateScrapedContent } from "../lib/contentQuality.js";
-import { scraperClients } from "../lib/scraperClients.js";
-import { ALL_TEST_SITES } from "../lib/testSites.js";
+import type { TestSite } from "../../lib/types.js";
+import { evaluateScrapedContent } from "../../lib/contentQuality.js";
+import { scraperClients } from "../../lib/scraperClients.js";
+import { ALL_TEST_SITES } from "../../lib/testSites.js";
+import { recordScrapeRun } from "../../lib/results.js";
 
 const SCRAPE_TIMEOUT_MS = 90000;
 const TEST_TIMEOUT_MS = 900000;
 
 // All vendor suites share one concurrent pool so providers run in parallel;
-// per-provider load is capped inside each scraper implementation.
-describe.concurrent("Web Scraper Evaluation", () => {
+// per-provider load was capped at 5 in-flight per provider inside each scraper.
+describe.concurrent("Scrape Event", () => {
   // Run all vendor-site combinations in parallel
   scraperClients.forEach(({ name, scrape }) => {
     describe(`${name} vendor`, () => {
@@ -21,6 +22,12 @@ describe.concurrent("Web Scraper Evaluation", () => {
             const result = await scrape(testSite.url, SCRAPE_TIMEOUT_MS);
             const endTime = Date.now();
             const totalTime = endTime - startTime;
+            await recordScrapeRun({
+              provider: name,
+              site: testSite,
+              result,
+              wallMs: totalTime,
+            });
 
             // Check that scraping was successful
             expect(result).toBeDefined();

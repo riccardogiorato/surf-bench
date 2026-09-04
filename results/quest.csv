@@ -1,0 +1,6 @@
+provider,quests,answered,success,total_s,p50_s,wipeouts,judge_score
+firecrawl,15,15,100%,11.5s,10.9s,0,-
+exa,15,15,100%,7.7s,7.9s,0,-
+tavily,15,15,100%,24.2s,25.5s,0,-
+parallel,15,15,100%,36.7s,38.1s,0,-
+linkup,15,14,93%,29.3s,29.7s,0,-

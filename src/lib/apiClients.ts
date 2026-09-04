@@ -4,6 +4,7 @@ import Firecrawl from "@mendable/firecrawl-js";
 import { Exa } from "exa-js";
 import { BraveSearch } from "brave-search";
 import { tavily } from "@tavily/core";
+import Parallel from "parallel-web";
 import "dotenv/config";
 
 export const firecrawlClient = new Firecrawl({
@@ -27,3 +28,17 @@ export const braveSearchClient = new BraveSearch(
 export const tavilyClient = tavily({
   apiKey: process.env.TAVILY_API_KEY ?? "",
 });
+
+// The Parallel SDK constructor throws when PARALLEL_API_KEY is missing, so the
+// client is created lazily; adapters are only registered when the key is set.
+let parallelClient: Parallel | null = null;
+
+export function parallelClientFactory(): Parallel {
+  if (!parallelClient) {
+    parallelClient = new Parallel({ apiKey: process.env.PARALLEL_API_KEY });
+  }
+  return parallelClient;
+}
+
+// Serper is key-gated like every other provider (no SDK, plain REST).
+export const serperKey = process.env.SERPER_API_KEY ?? "";

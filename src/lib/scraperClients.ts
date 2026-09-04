@@ -4,10 +4,12 @@ import {
   exaClient,
   linkupClient,
   tavilyClient,
+  parallelClientFactory,
 } from "./apiClients.js";
 import { createConcurrencyLimiter } from "./concurrency.js";
 import { withCache } from "./cache/withCache.js";
 import { fetchParallelContent } from "./parallelClient.js";
+import { jinaScraper, shouldRunJina } from "./jinaClient.js";
 
 // Cap each provider at 5 in-flight scrapes so vendors can run fully in
 // parallel without changing the per-provider load of earlier benchmark runs
@@ -340,6 +342,15 @@ export const scraperClients: ScraperClient[] = [
           name: "parallel",
           scrape: parallelScraper,
           healthCheck: checkParallel,
+        },
+      ]
+    : []),
+  ...(shouldRunJina
+    ? [
+        {
+          name: "jina",
+          scrape: jinaScraper,
+          healthCheck: async () => true,
         },
       ]
     : []),

@@ -1,0 +1,161 @@
+{
+  "generatedAt": "2026-09-04T11:06:42.742Z",
+  "scrape": [
+    {
+      "provider": "parallel",
+      "attempts": 50,
+      "passed": 50,
+      "success": "100%",
+      "avg_usable_s": "0.6s",
+      "p50_s": "0.5s",
+      "p95_s": "0.9s"
+    },
+    {
+      "provider": "exa",
+      "attempts": 50,
+      "passed": 38,
+      "success": "76%",
+      "avg_usable_s": "0.8s",
+      "p50_s": "0.3s",
+      "p95_s": "1.4s"
+    },
+    {
+      "provider": "firecrawl",
+      "attempts": 50,
+      "passed": 37,
+      "success": "74%",
+      "avg_usable_s": "3.6s",
+      "p50_s": "1.9s",
+      "p95_s": "11.5s"
+    },
+    {
+      "provider": "tavily",
+      "attempts": 50,
+      "passed": 37,
+      "success": "74%",
+      "avg_usable_s": "2.9s",
+      "p50_s": "0.3s",
+      "p95_s": "12.2s"
+    },
+    {
+      "provider": "linkup",
+      "attempts": 50,
+      "passed": 33,
+      "success": "66%",
+      "avg_usable_s": "4.1s",
+      "p50_s": "4.3s",
+      "p95_s": "8.8s"
+    },
+    {
+      "provider": "jina",
+      "attempts": 50,
+      "passed": 33,
+      "success": "66%",
+      "avg_usable_s": "11.9s",
+      "p50_s": "8.8s",
+      "p95_s": "39.2s"
+    }
+  ],
+  "search": [
+    {
+      "provider": "brave",
+      "queries": 29,
+      "ok": 29,
+      "success": "100%",
+      "p50_s": "0.9s",
+      "p95_s": "3.2s"
+    },
+    {
+      "provider": "firecrawl",
+      "queries": 29,
+      "ok": 29,
+      "success": "100%",
+      "p50_s": "1.9s",
+      "p95_s": "4.3s"
+    },
+    {
+      "provider": "linkup",
+      "queries": 29,
+      "ok": 29,
+      "success": "100%",
+      "p50_s": "1.7s",
+      "p95_s": "2.8s"
+    },
+    {
+      "provider": "tavily",
+      "queries": 29,
+      "ok": 29,
+      "success": "100%",
+      "p50_s": "2.3s",
+      "p95_s": "3.8s"
+    },
+    {
+      "provider": "parallel",
+      "queries": 29,
+      "ok": 29,
+      "success": "100%",
+      "p50_s": "2.4s",
+      "p95_s": "4.4s"
+    },
+    {
+      "provider": "exa",
+      "queries": 29,
+      "ok": 28,
+      "success": "97%",
+      "p50_s": "1.5s",
+      "p95_s": "2.3s"
+    }
+  ],
+  "quest": [
+    {
+      "provider": "firecrawl",
+      "quests": 15,
+      "answered": 15,
+      "success": "100%",
+      "total_s": "11.5s",
+      "p50_s": "10.9s",
+      "wipeouts": 0,
+      "judge_score": "-"
+    },
+    {
+      "provider": "exa",
+      "quests": 15,
+      "answered": 15,
+      "success": "100%",
+      "total_s": "7.7s",
+      "p50_s": "7.9s",
+      "wipeouts": 0,
+      "judge_score": "-"
+    },
+    {
+      "provider": "tavily",
+      "quests": 15,
+      "answered": 15,
+      "success": "100%",
+      "total_s": "24.2s",
+      "p50_s": "25.5s",
+      "wipeouts": 0,
+      "judge_score": "-"
+    },
+    {
+      "provider": "parallel",
+      "quests": 15,
+      "answered": 15,
+      "success": "100%",
+      "total_s": "36.7s",
+      "p50_s": "38.1s",
+      "wipeouts": 0,
+      "judge_score": "-"
+    },
+    {
+      "provider": "linkup",
+      "quests": 15,
+      "answered": 14,
+      "success": "93%",
+      "total_s": "29.3s",
+      "p50_s": "29.7s",
+      "wipeouts": 0,
+      "judge_score": "-"
+    }
+  ]
+}

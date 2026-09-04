@@ -1,0 +1,52 @@
+[
+  {
+    "provider": "firecrawl",
+    "quests": 15,
+    "answered": 15,
+    "success": "100%",
+    "total_s": "11.5s",
+    "p50_s": "10.9s",
+    "wipeouts": 0,
+    "judge_score": "-"
+  },
+  {
+    "provider": "exa",
+    "quests": 15,
+    "answered": 15,
+    "success": "100%",
+    "total_s": "7.7s",
+    "p50_s": "7.9s",
+    "wipeouts": 0,
+    "judge_score": "-"
+  },
+  {
+    "provider": "tavily",
+    "quests": 15,
+    "answered": 15,
+    "success": "100%",
+    "total_s": "24.2s",
+    "p50_s": "25.5s",
+    "wipeouts": 0,
+    "judge_score": "-"
+  },
+  {
+    "provider": "parallel",
+    "quests": 15,
+    "answered": 15,
+    "success": "100%",
+    "total_s": "36.7s",
+    "p50_s": "38.1s",
+    "wipeouts": 0,
+    "judge_score": "-"
+  },
+  {
+    "provider": "linkup",
+    "quests": 15,
+    "answered": 14,
+    "success": "93%",
+    "total_s": "29.3s",
+    "p50_s": "29.7s",
+    "wipeouts": 0,
+    "judge_score": "-"
+  }
+]

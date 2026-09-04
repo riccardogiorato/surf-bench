@@ -11,6 +11,7 @@ const PREFERRED_VENDOR_ORDER = [
   "parallel",
   "exa",
   "linkup",
+  "jina",
 ];
 
 type TestMeta = {

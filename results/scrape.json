@@ -1,0 +1,56 @@
+[
+  {
+    "provider": "parallel",
+    "attempts": 50,
+    "passed": 50,
+    "success": "100%",
+    "avg_usable_s": "0.6s",
+    "p50_s": "0.5s",
+    "p95_s": "0.9s"
+  },
+  {
+    "provider": "exa",
+    "attempts": 50,
+    "passed": 38,
+    "success": "76%",
+    "avg_usable_s": "0.8s",
+    "p50_s": "0.3s",
+    "p95_s": "1.4s"
+  },
+  {
+    "provider": "firecrawl",
+    "attempts": 50,
+    "passed": 37,
+    "success": "74%",
+    "avg_usable_s": "3.6s",
+    "p50_s": "1.9s",
+    "p95_s": "11.5s"
+  },
+  {
+    "provider": "tavily",
+    "attempts": 50,
+    "passed": 37,
+    "success": "74%",
+    "avg_usable_s": "2.9s",
+    "p50_s": "0.3s",
+    "p95_s": "12.2s"
+  },
+  {
+    "provider": "linkup",
+    "attempts": 50,
+    "passed": 33,
+    "success": "66%",
+    "avg_usable_s": "4.1s",
+    "p50_s": "4.3s",
+    "p95_s": "8.8s"
+  },
+  {
+    "provider": "jina",
+    "attempts": 50,
+    "passed": 33,
+    "success": "66%",
+    "avg_usable_s": "11.9s",
+    "p50_s": "8.8s",
+    "p95_s": "39.2s"
+  }
+]
