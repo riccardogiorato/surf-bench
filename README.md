@@ -12,6 +12,8 @@ SurfBench is an open benchmark that compares web-access APIs on the three things
 
 ### Overall Agent-Ready Leaderboard
 
+![Overall agent-ready leaderboard](assets/benchmark-summary.svg)
+
 Composite across all three events: scrape score (success × speed), search score (success × speed), quest score (answered% × 60 + judge score × 4). Details in `results/overall.csv`.
 
 | provider | agent-ready | scrape | search | quest |
