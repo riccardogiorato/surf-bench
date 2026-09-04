@@ -18,7 +18,7 @@ SurfBench compares web-access APIs on the three things agents actually do: **sea
 
 | leg | exa | parallel |
 |---|---|---|
-| 1,000 searches | $7 ([search](https://exa.ai/pricing)) | $5 ([search](https://docs.parallel.ai/getting-started/pricing); $1 with turbo/fast mode) |
+| 1,000 searches | $7 ([search](https://exa.ai/pricing)) | $5 ([search basic/advanced](https://docs.parallel.ai/getting-started/pricing); $1 with turbo/fast mode) |
 | 1,000 scraped URLs | $1 ([contents](https://exa.ai/pricing)) | $1 ([extract](https://parallel.ai/products/extract)) |
 | **total / 1k+1k** | **$8** | **$6** ($2 with turbo search) |
 
