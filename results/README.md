@@ -44,9 +44,9 @@ By category: 5 social, 4 ecommerce, 2 academic, 1 other — exa's misses concent
 |---|---|---|---|---|---|
 | <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> **exa** | 15/15 | **7.7s** | 7.9s | 0 | **7.4** |
 | <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> firecrawl | 15/15 | 11.5s | 10.9s | 0 | 5.5 |
-| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 14/15 | 29.3s | 29.7s | 0 | pending |
+| <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 14/15 | 29.3s | 29.7s | 0 | 3.8 |
 | <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> tavily | 15/15 | 24.2s | 25.5s | 0 | 5.2 |
-| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> parallel | 15/15 | 36.7s | 38.1s | 0 | pending |
+| <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> parallel | 15/15 | 36.7s | 38.1s | 0 | 3.6 |
 
 **Takeaway**: exa is the fastest full quest (7.7s) with the highest judge score; parallel, despite the best scrape leg, is the slowest full quest (36.7s) — its search leg is the slowest. Linkup dropped one quest.
 
@@ -74,7 +74,7 @@ This is stricter than "did the API return text?" — LLMs need relevant context,
 - **Search**: 29 queries across 12 quality dimensions (factuality, recency, diversity, entity disambiguation, intent, multilingual, spam, safe-search, citation & link quality, brand homepage, latency). Assertions are deterministic (expected domains/tokens), no LLM judging.
 - **Quest**: 15 graded questions per provider (both legs same vendor) — search → top-3 → extract → assemble; judge panel scores whether the answer is present; 30s-per-leg wipeout rule.
 - **Timing**: provider-reported scrape times; search/quest timings are wall-clock; p50/p95 per provider.
-- **Judges**: Kimi K3 + GLM-5.3 via Together AI — `grade(question, content) → {score 0-10, rationale}`; verdicts cached by content hash; disagreement > 2 points flagged (10 of 56 graded rides flagged so far).
+- **Judges**: Kimi K3 + GLM-5.3 via Together AI — `grade(question, content) → {score 0-10, rationale}`; verdicts cached by content hash; disagreement > 2 points flagged (10 of 74 graded rides flagged).
 - **Concurrency**: capped at 5 in-flight per provider (parallel at 4), matching earlier runs.
 
 ## Data files
