@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T12:04:32.374Z",
+  "generatedAt": "2026-09-04T12:25:14.387Z",
   "scrape": [
     {
       "provider": "parallel",
@@ -151,7 +151,7 @@
       "total_s": "36.7s",
       "p50_s": "38.1s",
       "wipeouts": 0,
-      "judge_score": "4.8"
+      "judge_score": "4.3"
     },
     {
       "provider": "linkup",
@@ -161,7 +161,7 @@
       "total_s": "29.3s",
       "p50_s": "29.7s",
       "wipeouts": 0,
-      "judge_score": "4.6"
+      "judge_score": "4.3"
     }
   ],
   "overall": [
@@ -170,7 +170,7 @@
       "agent_ready": "64",
       "scrape": "50/50 @ 0.6s",
       "search": "100% @ 2.4s p50",
-      "quest": "15/15 @ 36.7s · judge 4.8"
+      "quest": "15/15 @ 36.7s · judge 4.3"
     },
     {
       "provider": "exa",
@@ -198,7 +198,7 @@
       "agent_ready": "35",
       "scrape": "33/50 @ 4.1s",
       "search": "100% @ 1.7s p50",
-      "quest": "14/15 @ 29.3s · judge 4.6"
+      "quest": "14/15 @ 29.3s · judge 4.3"
     },
     {
       "provider": "brave",

@@ -276,43 +276,50 @@ function main() {
 
 // Overall agent-ready leaderboard across all three events, drawn as the Y2K
 // scoreboard window with embedded provider favicons (base64 data URIs).
+// Overall agent-ready leaderboard across all three events, drawn edge-to-edge
+// (no dithered margin) with embedded provider favicons and large readable text.
 function writeScoreboardSvg(rows: Row[]) {
-  const W = 1500;
-  const H = rows.length * 46 + 150;
+  const W = 1600;
+  const rowH = 64;
+  const H = rows.length * rowH + 148;
   const esc = (s: string | number) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const parts: string[] = [];
+
+  // fixed column positions — nothing overflows
+  const colLogo = 24;       // logo x
+  const colName = 100;      // provider name x
+  const cols: Array<[string, number]> = [
+    ["agent-ready", 470],
+    ["scrape", 700],
+    ["search", 990],
+    ["quest", 1150],
+  ];
+
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="SurfBench overall leaderboard">`);
-  parts.push(`<defs><pattern id="dither" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="#008080"/><rect x="1" y="1" width="1" height="1" fill="#007a7a"/></pattern></defs>`);
-  parts.push(`<rect width="${W}" height="${H}" fill="url(#dither)"/>`);
-  parts.push(`<rect x="30" y="30" width="${W - 60}" height="40" fill="#000080"/>`);
-  parts.push(`<text x="50" y="56" font-family="Verdana,Arial,sans-serif" font-size="20" font-weight="bold" fill="#fff">SurfBench — Overall Agent-Ready Leaderboard</text>`);
-  parts.push(`<rect x="30" y="70" width="${W - 60}" height="${H - 100}" fill="#c0c0c0"/>`);
-
-  const cols = rows.length ? Object.keys(rows[0]) : ["provider"];
-  const bodyX = 92;
-  const firstColW = 210;
-  const restW = W - 160 - firstColW;
-  const restCols = Math.max(cols.length - 1, 1);
-  const restW2 = W - 160 - firstColW;
-  const restCols2 = restCols;
-  const colX = (i: number) => (i === 0 ? bodyX : bodyX + firstColW + (i - 1) * (restW / Math.max(cols.length - 2, 1)));
-
-  cols.forEach((c, i) => {
-    parts.push(`<text x="${colX(i)}" y="105" font-family="Verdana,Arial,sans-serif" font-size="15" font-weight="bold" fill="#111">${esc(c)}</text>`);
+  parts.push(`<rect width="${W}" height="${H}" fill="#c0c0c0"/>`);
+  // titlebar
+  parts.push(`<rect width="${W}" height="64" fill="#000080"/>`);
+  parts.push(`<text x="28" y="43" font-family="Verdana,Arial,sans-serif" font-size="26" font-weight="bold" fill="#ffffff">SurfBench — Overall Agent-Ready Leaderboard</text>`);
+  // header row
+  parts.push(`<rect y="64" width="${W}" height="52" fill="#c0c0c0"/>`);
+  parts.push(`<text x="${colName}" y="102" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">provider</text>`);
+  cols.forEach(([label, x]) => {
+    parts.push(`<text x="${x}" y="102" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">${esc(label)}</text>`);
   });
 
   rows.forEach((r, ri) => {
-    const y = 148 + ri * 46;
-    parts.push(`<rect x="50" y="${y - 22}" width="${W - 100}" height="40" fill="${ri % 2 ? "#ffffff" : "#f4f2ea"}"/>`);
+    const y = 128 + ri * rowH + rowH / 2;
+    const stripe = ri % 2 ? "#ffffff" : "#f4f2ea";
+    parts.push(`<rect y="${128 + ri * rowH}" width="${W}" height="${rowH}" fill="${stripe}"/>`);
     const uri = faviconDataUri(String(r.provider));
     if (uri) {
-      parts.push(`<image x="58" y="${y - 15}" width="24" height="24" href="${uri}"/>`);
+      parts.push(`<image x="${colLogo}" y="${y - 17}" width="34" height="34" href="${uri}"/>`);
     }
-    cols.forEach((c, ci) => {
-      const val = esc(r[c] ?? "");
-      const isProvider = ci === 0;
-      parts.push(`<text x="${colX(ci) + (isProvider ? 32 : 0)}" y="${y + 5}" font-family="Verdana,Arial,sans-serif" font-size="${isProvider ? 15 : 13}" ${isProvider ? 'font-weight="bold"' : ""} fill="#111">${val}</text>`);
-    });
+    parts.push(`<text x="${colName}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r.provider)}</text>`);
+    parts.push(`<text x="${cols[0][1]}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">${esc(r.agent_ready)}</text>`);
+    parts.push(`<text x="${cols[1][1]}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">${esc(r.scrape)}</text>`);
+    parts.push(`<text x="${cols[2][1]}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">${esc(r.search)}</text>`);
+    parts.push(`<text x="${cols[3][1]}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="20" fill="#111">${esc(r.quest)}</text>`);
   });
 
   parts.push(`</svg>`);
