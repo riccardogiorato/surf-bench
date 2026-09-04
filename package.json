@@ -15,7 +15,6 @@
     "judge": "bun run scripts/judge-quest.ts"
   },
   "dependencies": {
-    "@vitest/ui": "^4.1.11",
     "dotenv": "^17.4.2",
     "vitest": "^4.1.11"
   },

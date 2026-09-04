@@ -27,7 +27,7 @@
     "total_s": "24.2s",
     "p50_s": "25.5s",
     "wipeouts": 0,
-    "judge_score": "5.3"
+    "judge_score": "5.2"
   },
   {
     "provider": "parallel",
@@ -37,7 +37,7 @@
     "total_s": "36.7s",
     "p50_s": "38.1s",
     "wipeouts": 0,
-    "judge_score": "-"
+    "judge_score": "4.8"
   },
   {
     "provider": "linkup",
@@ -47,6 +47,6 @@
     "total_s": "29.3s",
     "p50_s": "29.7s",
     "wipeouts": 0,
-    "judge_score": "4.9"
+    "judge_score": "4.6"
   }
 ]
