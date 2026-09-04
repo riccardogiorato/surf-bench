@@ -10,17 +10,21 @@ SurfBench compares web-access APIs on the three things agents actually do: **sea
 
 ![Overall agent-ready leaderboard](assets/benchmark-summary.svg)
 
-| rank | provider | agent-ready (0–100) | scrape — fetch 50 URLs | search — find 29 queries | quest — search→fetch→judge (15 questions) |
-|---|---|---|---|---|---|---|
-| 🥇 | <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> **parallel** | **74** | 50/50 @ 0.6s | 28/29 @ 2.8s | 15/15 @ 36.7s · judge 7.1 |
-| 🥈 | <img src="https://www.google.com/s2/favicons?domain=exa.ai&sz=32" width="16" height="16" alt=""> **exa** | 66 | 38/50 @ 0.8s | 28/29 @ 1.6s | 15/15 @ 7.7s · judge 8.0 |
-|  | <img src="https://www.google.com/s2/favicons?domain=linkup.so&sz=32" width="16" height="16" alt=""> linkup | 44 | 33/50 @ 4.1s | 20/29 @ 1.7s | 14/15 @ 29.3s · judge 6.9 |
-| 🥉 | <img src="https://www.google.com/s2/favicons?domain=firecrawl.dev&sz=32" width="16" height="16" alt=""> firecrawl | 48 | 37/50 @ 3.6s | 27/29 @ 2.2s | 15/15 @ 11.5s · judge 7.0 |
-|  | <img src="https://www.google.com/s2/favicons?domain=tavily.com&sz=32" width="16" height="16" alt=""> tavily | 45 | 37/50 @ 2.9s | 25/29 @ 2.3s | 15/15 @ 24.2s · judge 6.7 |
-|  | <img src="https://www.google.com/s2/favicons?domain=brave.com&sz=32" width="16" height="16" alt=""> brave | 31 | – | 27/29 @ 1.2s | – |
-|  | <img src="https://www.google.com/s2/favicons?domain=jina.ai&sz=32" width="16" height="16" alt=""> jina | 6 | 33/50 @ 11.9s | – | – |
+## Recommendation
 
-*The two strongest providers overall: **parallel** owns pure fetching (only 100% coverage at 0.6s avg; it renders the bot-guarded pages the others fail) and **exa** owns search quality + the fastest full quest with the best judge score (8.0). Practical picks: pair an exa/brave search leg with a parallel fetch leg, or use exa when you need speed and parallel when you need coverage. Full per-event leaderboards, methodology, and judge details: [results/README.md](results/README.md).*
+**The best overall solution is pairing an exa or parallel search leg with parallel's extraction.** Parallel is the only provider that scraped all 50 hard URLs — it renders the bot-protected pages (marketplaces, social, X.com) where every other provider fails, at 0.6s average. For the search leg, exa and parallel tie on quality (28/29) while exa is ~2× faster; brave is the fastest raw search (1.2s avg) if you want to mix providers. Judge panel (Kimi K3 + GLM-5.3) scores parallel's extracted content 7.1/10 and exa's quest pipeline 8.0/10 — both comfortably usable for agents.
+
+**Pricing at 1,000 searches + 1,000 scraped URLs** (pay-as-you-go list prices, September 2026):
+
+| leg | exa | parallel |
+|---|---|---|
+| 1,000 searches | $7 ([search, up to 10 results with contents](https://exa.ai/pricing)) | $5 ([search basic/advanced](https://docs.parallel.ai/getting-started/pricing); $1 with turbo/fast mode) |
+| 1,000 scraped URLs | $1 ([contents](https://exa.ai/pricing)) | $1 ([extract](https://parallel.ai/products/extract)) |
+| **total / 1k+1k** | **$8** | **$6** ($2 with turbo search) |
+
+Both give free credits to start (exa $20 + $10/mo; parallel 5,000 requests/mo free + $5/mo). Prices are list rates — confirm on the vendors' pricing pages before committing.
+
+Full per-event leaderboards, methodology, and judge details: [results/README.md](results/README.md).
 
 ## Run it yourself
 
