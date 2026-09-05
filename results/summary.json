@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T07:21:58.125Z",
+  "generatedAt": "2026-09-05T08:37:09.305Z",
   "scrape": [
     {
       "provider": "parallel",
@@ -127,6 +127,26 @@
       "p95_s": "3.7s"
     },
     {
+      "provider": "exa-fast",
+      "queries": 29,
+      "ok": 29,
+      "assertions": 28,
+      "success": "100%",
+      "avg_s": "0.5s",
+      "p50_s": "0.3s",
+      "p95_s": "1.1s"
+    },
+    {
+      "provider": "parallel-turbo",
+      "queries": 29,
+      "ok": 29,
+      "assertions": 24,
+      "success": "100%",
+      "avg_s": "0.8s",
+      "p50_s": "0.7s",
+      "p95_s": "1.2s"
+    },
+    {
       "provider": "exa",
       "queries": 29,
       "ok": 28,
@@ -208,6 +228,12 @@
       "quest_score": "88",
       "scrape": "50/50 @ 0.6s",
       "search": "28/29 @ 2.8s",
+      "search_speed": "2.8s",
+      "search_success": "28/29",
+      "search_turbo": "24/29 @ 0.8s",
+      "search_turbo_speed": "0.8s",
+      "search_turbo_success": "24/29",
+      "search_turbo_score": "95",
       "quest": "15/15 @ 36.7s · judge 7.1"
     },
     {
@@ -218,6 +244,12 @@
       "quest_score": "92",
       "scrape": "38/50 @ 0.8s",
       "search": "28/29 @ 1.6s",
+      "search_speed": "1.6s",
+      "search_success": "28/29",
+      "search_turbo": "28/29 @ 0.5s",
+      "search_turbo_speed": "0.5s",
+      "search_turbo_success": "28/29",
+      "search_turbo_score": "257",
       "quest": "15/15 @ 7.7s · judge 8.0"
     },
     {
@@ -228,6 +260,12 @@
       "quest_score": "93",
       "scrape": "36/50 @ 1.7s",
       "search": "27/29 @ 1.6s",
+      "search_speed": "1.6s",
+      "search_success": "27/29",
+      "search_turbo": "",
+      "search_turbo_speed": "",
+      "search_turbo_success": "",
+      "search_turbo_score": "-",
       "quest": "15/15 @ 10.3s · judge 8.3"
     },
     {
@@ -238,6 +276,12 @@
       "quest_score": "88",
       "scrape": "37/50 @ 3.6s",
       "search": "27/29 @ 2.2s",
+      "search_speed": "2.2s",
+      "search_success": "27/29",
+      "search_turbo": "",
+      "search_turbo_speed": "",
+      "search_turbo_success": "",
+      "search_turbo_score": "-",
       "quest": "15/15 @ 11.5s · judge 7.0"
     },
     {
@@ -248,6 +292,12 @@
       "quest_score": "87",
       "scrape": "37/50 @ 2.9s",
       "search": "25/29 @ 2.3s",
+      "search_speed": "2.3s",
+      "search_success": "25/29",
+      "search_turbo": "",
+      "search_turbo_speed": "",
+      "search_turbo_success": "",
+      "search_turbo_score": "-",
       "quest": "15/15 @ 24.2s · judge 6.7"
     },
     {
@@ -258,6 +308,12 @@
       "quest_score": "84",
       "scrape": "33/50 @ 4.1s",
       "search": "20/29 @ 1.7s",
+      "search_speed": "1.7s",
+      "search_success": "20/29",
+      "search_turbo": "",
+      "search_turbo_speed": "",
+      "search_turbo_success": "",
+      "search_turbo_score": "-",
       "quest": "14/15 @ 29.3s · judge 7.0"
     },
     {
@@ -268,6 +324,12 @@
       "quest_score": "0",
       "scrape": "-",
       "search": "27/29 @ 1.2s",
+      "search_speed": "1.2s",
+      "search_success": "27/29",
+      "search_turbo": "",
+      "search_turbo_speed": "",
+      "search_turbo_success": "",
+      "search_turbo_score": "-",
       "quest": "-"
     },
     {
@@ -278,6 +340,12 @@
       "quest_score": "0",
       "scrape": "33/50 @ 11.9s",
       "search": "-",
+      "search_speed": "-",
+      "search_success": "",
+      "search_turbo": "",
+      "search_turbo_speed": "",
+      "search_turbo_success": "",
+      "search_turbo_score": "-",
       "quest": "-"
     }
   ]

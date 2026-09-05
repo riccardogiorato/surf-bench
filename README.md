@@ -18,9 +18,9 @@ SurfBench compares web-access APIs on the three things agents actually do: **sea
 
 | leg | exa | parallel | keenable |
 |---|---|---|---|
-| 1,000 searches | $7 ([search](https://exa.ai/pricing)) | $5 ([search basic/advanced](https://docs.parallel.ai/getting-started/pricing); $1 with turbo/fast mode) | free ([100k requests/mo](https://docs.keenable.ai/credits), 1 credit per search) |
-| 1,000 scraped URLs | $1 ([contents](https://exa.ai/pricing)) | $1 ([extract](https://parallel.ai/products/extract)) | free (1 credit per fetch) |
-| **total / 1k+1k** | **$8** | **$6** ($2 with turbo search) | **$0 within the free tier** |
+| 1,000 searches | $7 ([search](https://exa.ai/pricing)) | $5 ([search basic/advanced](https://docs.parallel.ai/getting-started/pricing); $1 with turbo/fast mode) | $4 ([pay as you go](https://keenable.ai/pricing); $1 at 100 RPS+ dedicated tier) |
+| 1,000 scraped URLs | $1 ([contents](https://exa.ai/pricing)) | $1 ([extract](https://parallel.ai/products/extract)) | $4 per 1,000 fetches (1 credit each) |
+| **total / 1k+1k** | **$8** | **$6** ($2 with turbo search) | **$8** ($0 within the 100k free requests/mo) |
 
 Both give free credits to start. Prices are list rates — confirm on the vendors' pricing pages before committing.
 

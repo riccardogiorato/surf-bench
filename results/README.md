@@ -40,6 +40,15 @@ By category: 5 social, 4 ecommerce, 2 academic, 1 other — exa's misses concent
 
 **Takeaway**: each cell counts deterministic quality assertions passed out of 29 queries (12 dims: factuality, recency, diversity, entity disambiguation, intent, multilingual, spam, safe-search, citation, link quality, brand homepage, latency — e.g. "does `Apple` return apple.com"). Every provider API-returned results for ~all queries; the differences are in result *quality*. exa leads (28/29); brave is the fastest (0.8s p50); keenable debuts at 27/29 with the second-best p50 (1.5s), missing only citation quality and the `Jaguar` intent disambiguation; linkup trails badly (20/29 — 9 misses across entity disambiguation, factuality, safe-search). Serper is implemented but key-gated (no key yet).
 
+**Search turbo** (the "fastest mode" column in the overall SVG — same 29 queries × 12 dims, run with `SURFBENCH_TURBO=1`, one test at a time so rate-limited tiers record raw API latency; other providers keep their default search):
+
+| provider | turbo config | assertions | p50 | default (p50 / avg) |
+|---|---|---|---|---|
+| parallel | search `mode: "turbo"` ($1/1k tier) | 24/29 | **0.7s** | 2.4s / 2.8s |
+| exa | search `type: "fast"` | 28/29 | **0.34s** | 1.6s / 1.6s |
+
+Turbo's trade-offs are visible: parallel-turbo drops 4 assertions (brand-homepage Tesla, citation COVID, entity Apple fruit, intent Jaguar) for a ~4× latency win; exa-fast keeps quality and is ~4× faster than its default (the fast tier trips exa's org-wide 10 req/s cap under concurrency, so it must run serialized — a single fast search is ~0.3-0.6s, the fastest search measured on the board).
+
 ## Quest Event — 15 questions × (search → fetch → judge)
 
 | provider | answered | avg total | p50 | wipeouts | judge |
@@ -52,6 +61,17 @@ By category: 5 social, 4 ecommerce, 2 academic, 1 other — exa's misses concent
 | <img src="https://www.google.com/s2/favicons?domain=parallel.ai&sz=32" width="16" height="16" alt=""> parallel | 15/15 | 36.7s | 38.1s | 0 | 7.1 |
 
 **Takeaway**: exa is the fastest full quest (7.7s); keenable takes the top judge score (8.3) at 10.3s — its search leg finds pages its own index can serve instantly, so the whole loop stays fast. parallel, despite the best scrape leg, is the slowest full quest (36.7s) — its search leg is the slowest. Keenable's one low score is q9 (2.0 — its top-3 results didn't cover the answer); one keenable verdict was flagged (judges disagreed by >2). Linkup dropped one quest.
+
+## Side-Event — Quest · Super Fast ("agentic sprint")
+
+The same 15 questions through each provider's fastest-mode configuration, same judge panel, recorded separately (`raw/quest-turbo.jsonl`) so the default-config leaderboard above stays untouched. Run via `bun run scripts/quest-turbo.ts`.
+
+| config | turbo settings | answered | avg total | p50 | judge | default (quest event) |
+|---|---|---|---|---|---|---|
+| exa-express | search `type: "fast"` + contents `livecrawl: "never"` (index-only) | 15/15 | **0.9s** | 0.8s | **8.1** | 15/15 · 7.7s · judge 8.0 |
+| parallel-turbo | search `mode: "turbo"` + same full-content extract | 15/15 | 3.7s* | 1.4s | 6.9 | 15/15 · 36.7s · judge 7.1 |
+
+**Takeaway**: in super-fast mode the full search→fetch→judge loop drops to ~1s for exa (8× faster than its default, same judge quality — its search results come from its own index, so index-only fetching loses nothing) and 3.7s for parallel (10× faster than its 36.7s default; one >30s wipeout skews the average, p50 is 1.4s). parallel-turbo's judge dips to 6.9 — turbo search returns lighter results for harder questions (q6/q11/q12/q14/q15 at 2.0–5.0). The agentic-experience headline: **exa-express answers a full search→fetch→judge quest in ~0.9s with no quality loss**.
 
 ## Suggested combos
 
@@ -80,7 +100,7 @@ This is stricter than "did the API return text?" — LLMs need relevant context,
 - **Timing**: provider-reported scrape times; search/quest timings are wall-clock; p50/p95 per provider.
 - **Judges**: Kimi K3 + GLM-5.3 via Together AI — `grade(question, content) → {score 0-10, rationale}`; verdicts cached by content hash; disagreement > 2 points flagged; a failed judge call never counts as a 0-quality vote.
 - **Concurrency**: capped at 5 in-flight per provider (parallel at 4), matching earlier runs.
-- **Keenable** (added 5 September): REST client for search + fetch. Its fetch serves Keenable's indexed copy by default and errors on non-indexed URLs, so the scraper falls back to `live=true` (fetch from source) — mirroring the index-first/live-fallback setup of exa (`livecrawl: "fallback"`) and firecrawl (`maxAge`). Keenable rate-limits to 10 requests/second per organization, so all its calls go through one client-side paced gate (~9 req/s, 4 in flight) with 429 backoff; its timings include that pacing. Search mode is server-decided per call (came back `pro`). Pricing: 1 credit = 1 search or 1 fetch, 100,000 free requests/month (credit packages are bought in the console, no public list price).
+- **Keenable** (added 5 September): REST client for search + fetch. Its fetch serves Keenable's indexed copy by default and errors on non-indexed URLs, so the scraper falls back to `live=true` (fetch from source) — mirroring the index-first/live-fallback setup of exa (`livecrawl: "fallback"`) and firecrawl (`maxAge`). Keenable rate-limits to 10 requests/second per organization, so all its calls go through one client-side paced gate (~9 req/s, 4 in flight) with 429 backoff; its timings include that pacing. Search mode is server-decided per call (came back `pro`). Pricing: 1 credit = 1 search or 1 fetch; 100,000 free requests/month, then $4/1k requests pay-as-you-go ($1/1k at the 100 RPS+ dedicated tier) — see [keenable.ai/pricing](https://keenable.ai/pricing).
 
 ## Data integrity note
 

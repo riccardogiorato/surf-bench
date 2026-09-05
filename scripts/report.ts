@@ -103,7 +103,7 @@ function searchRows(): Row[] {
       agg.ok++;
       if (typeof r.latencyMs === "number") agg.latencies.push(r.latencyMs);
     }
-    if (r.assertOk === true) agg.asserted++;
+    if (r.assertOk === (true as unknown)) agg.asserted++;
   }
   const rows: Row[] = [];
   for (const [provider, agg] of byProvider) {
@@ -164,6 +164,14 @@ function questRows(): Row[] {
 //   scrape: success% x (fastest avg / provider avg), speed floored at 0.25
 //   search: success% x (fastest p50 / provider p50), speed floored at 0.25
 //   quest:  answered% x 60 + judge/10 x 40 (judge = answer quality)
+// The composite always uses DEFAULT search configs; super-fast search runs
+// (recorded as exa-fast / parallel-turbo) surface in a separate "search turbo"
+// column without touching any score.
+const TURBO_PARENT: Record<string, string> = {
+  "exa-fast": "exa",
+  "parallel-turbo": "parallel",
+};
+
 function overallLeaderboard(
   scrape: Row[],
   search: Row[],
@@ -173,36 +181,53 @@ function overallLeaderboard(
     ...scrape.filter((r) => parseS(r.avg_usable_s) > 0).map((r) => parseS(r.avg_usable_s)),
   );
   const bestSearchP50 = Math.min(
-    ...search.filter((r) => parseS(r.p50_s) > 0).map((r) => parseS(r.p50_s)),
+    ...search
+      // default-config rows only — turbo variants don't shift the baseline
+      .filter((r) => !TURBO_PARENT[String(r.provider)] && parseS(r.p50_s) > 0)
+      .map((r) => parseS(r.p50_s)),
   );
   const bestQuestS = Math.min(
     ...quest.filter((r) => parseS(r.total_s) > 0).map((r) => parseS(r.total_s)),
   );
 
+  // super-fast search rows fold into their parent provider
+  const turboByParent = new Map<string, Row>();
+  for (const r of search) {
+    const parent = TURBO_PARENT[String(r.provider)];
+    if (parent) turboByParent.set(parent, r);
+  }
+
   const providers = new Set<string>([
     ...scrape.map((r) => String(r.provider)),
     ...search.map((r) => String(r.provider)),
     ...quest.map((r) => String(r.provider)),
-  ]);
+  ].filter((p) => !TURBO_PARENT[p]));
 
   const rows: Row[] = [];
   for (const p of providers) {
     const s = scrape.find((r) => r.provider === p);
     const se = search.find((r) => r.provider === p);
     const q = quest.find((r) => r.provider === p);
+    const turbo = turboByParent.get(p);
 
-    const scrapeScore = s && s.attempts > 0
+    const scrapeScore = s && Number(s.attempts) > 0
       ? (Number(s.passed) / Number(s.attempts)) * 100 *
         Math.max(0.25, bestAvgS / Math.max(parseS(s.avg_usable_s), 0.01))
       : 0;
-    const searchScore = se && se.queries > 0
+    const searchScore = se && Number(se.queries) > 0
       ? (Number(se.assertions) / Number(se.queries)) * 100 *
         Math.max(0.25, bestSearchP50 / Math.max(parseS(se.p50_s), 0.01))
       : 0;
-    const questScore = q && q.quests > 0
+    const questScore = q && Number(q.quests) > 0
       ? (Number(q.answered) / Number(q.quests)) * 60 +
         (parseNum(q.judge_score) / 10) * 40
       : 0;
+
+    // same formula as the default search score, on the turbo row
+    const turboScore = turbo && Number(turbo.queries) > 0
+      ? (Number(turbo.assertions) / Number(turbo.queries)) * 100 *
+        Math.max(0.25, bestSearchP50 / Math.max(parseS(turbo.p50_s), 0.01))
+      : null;
 
     const overall = (scrapeScore + searchScore + questScore) / 3;
     rows.push({
@@ -213,6 +238,15 @@ function overallLeaderboard(
       quest_score: questScore.toFixed(0),
       scrape: s ? `${s.passed}/${s.attempts} @ ${s.avg_usable_s}` : "-",
       search: se ? `${se.assertions}/${se.queries} @ ${se.avg_s}` : "-",
+      // search columns lead with speed in the SVG; the count sits below
+      search_speed: se ? String(se.avg_s) : "-",
+      search_success: se ? `${se.assertions}/${se.queries}` : "",
+      search_turbo: turbo
+        ? `${turbo.assertions}/${turbo.queries} @ ${turbo.avg_s}`
+        : "",
+      search_turbo_speed: turbo ? String(turbo.avg_s) : "",
+      search_turbo_success: turbo ? `${turbo.assertions}/${turbo.queries}` : "",
+      search_turbo_score: turboScore === null ? "-" : turboScore.toFixed(0),
       quest: q ? `${q.answered}/${q.quests} @ ${q.total_s} · judge ${q.judge_score}` : "-",
     });
   }
@@ -273,7 +307,7 @@ function main() {
 // Overall agent-ready leaderboard SVG: tier medals, per-event scores 0-100
 // with a "max" reference row, quest labeled as the search→fetch pipeline.
 function writeScoreboardSvg(rows: Row[]) {
-  const W = 1600;
+  const W = 1720;
   const rowH = 76;
   const H = rows.length * rowH + 148;
   const esc = (s: string | number) =>
@@ -285,9 +319,10 @@ function writeScoreboardSvg(rows: Row[]) {
   const medalX = 36;
   const cols: Array<[string, string, number]> = [
     ["agent-ready", "composite 0–100", 640],
-    ["scrape", "fetch 50 URLs", 870],
-    ["search", "find 29 queries", 1100],
-    ["quest", "search→fetch→judge", 1330],
+    ["scrape", "fetch 50 URLs", 850],
+    ["search", "find 29 queries", 1060],
+    ["search turbo", "fastest mode", 1270],
+    ["quest", "search→fetch→judge", 1480],
   ];
   // tier medal by final rank
   const medals = ["🥇", "🥈", "🥉"];
@@ -318,14 +353,24 @@ function writeScoreboardSvg(rows: Row[]) {
     parts.push(`<text x="${colName}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r.provider)}</text>`);
     parts.push(`<text x="${cols[0][2]}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">${esc(r.agent_ready)}</text>`);
     parts.push(`<text x="${cols[0][2] + 70}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="14" fill="#666">/100</text>`);
-    const cells: Array<[string, string, number]> = [
+    // score columns keep the 0–100 number; search columns lead with speed and
+// keep the successful/total count below
+const scoreCells: Array<[string, string, number]> = [
       ["scrape_score", "scrape", cols[1][2]],
-      ["search_score", "search", cols[2][2]],
-      ["quest_score", "quest", cols[3][2]],
+      ["quest_score", "quest", cols[4][2]],
     ];
-    cells.forEach(([scoreKey, detailKey, x]) => {
+    const speedCells: Array<[string, string, number]> = [
+      ["search_speed", "search_success", cols[2][2]],
+      ["search_turbo_speed", "search_turbo_success", cols[3][2]],
+    ];
+    scoreCells.forEach(([scoreKey, detailKey, x]) => {
       parts.push(`<text x="${x}" y="${y - 2}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r[scoreKey] ?? "-")}</text>`);
       parts.push(`<text x="${x}" y="${y + 20}" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">${esc(r[detailKey] ?? "")}</text>`);
+    });
+    speedCells.forEach(([speedKey, successKey, x]) => {
+      const speed = String(r[speedKey] ?? "").trim();
+      parts.push(`<text x="${x}" y="${y - 2}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(speed || "-")}</text>`);
+      parts.push(`<text x="${x}" y="${y + 20}" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">${esc(String(r[successKey] ?? ""))}</text>`);
     });
   });
 

@@ -69,8 +69,8 @@ export async function recordSearchRun(input: {
   });
 }
 
-export async function recordQuestRun(result: QuestResult) {
-  await appendRecord("quest", result.provider, {
+export async function recordQuestRun(result: QuestResult, file = "quest") {
+  await appendRecord(file, result.provider, {
     ...result,
     content: result.content ? redact(result.content) : undefined,
   });

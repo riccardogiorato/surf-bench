@@ -24,6 +24,8 @@ npx tsx scripts/hero.ts   # regenerate assets/hero.svg
 - Judge panel: Kimi K3 + GLM-5.3 via Together AI REST (case-sensitive model slugs `moonshotai/Kimi-K3`, `zai-org/GLM-5.3`). Together rate-limits aggressively — judge calls are throttled (4 in flight) with backoff; verdicts cached by content hash; judge-error verdicts are never cached.
 - Wipeout rule: >30s per leg = DNF.
 - Keenable is org-rate-limited to 10 req/s: all its search + fetch calls share the paced gate in `keenableClient.ts` (~9 req/s, 429 backoff); its timings include that pacing. To run a single provider's suite, blank the other keys on the command line (`EXA_API_KEY= ... bunx vitest run src/suites`) — SDK clients construct lazily so absent keys never throw.
+- `SURFBENCH_TURBO=1` swaps exa → `exa-fast` (search `type:"fast"`, serialized + rate-limit backoff) and parallel → `parallel-turbo` (search `mode:"turbo"`) for the search event only, recorded under those names. Never run two exa-flavored suites concurrently — the org cap is shared.
+- `bun run scripts/quest-turbo.ts` — quest side-event in super-fast configs → `results/raw/quest-turbo.jsonl`.
 - Records dedupe by (provider, case) keeping the LAST line in the jsonl.
 - The Y2K theme: retro windows, bevels, Silkscreen pixel accents. Design doc lives locally at `docs/surfbench-design.html` (gitignored on purpose).
 - Type-check with `npx tsc --noEmit` before committing.

@@ -105,6 +105,51 @@ const parallelSearch = defineSearchProvider("parallel", async (query, numResults
 
 const keenableSearch = defineSearchProvider("keenable", keenableSearchResults);
 
+// Super-fast variants for the "search turbo" leaderboard column, recorded
+// under their own provider names. Gated on SURFBENCH_TURBO so default runs
+// never see them: set SURFBENCH_TURBO=1 (plus the provider keys) to include
+// exa's type:"fast" and parallel's mode:"turbo" in the search event. The exa
+// variant is serialized (1 in flight) with backoff-retry on the org's 10 req/s
+// cap — the fast tier trips it even at low client-side concurrency.
+const exaFastLimited = createConcurrencyLimiter(1);
+
+async function exaFastCall(query: string, numResults: number) {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      return await exaFastLimited(() =>
+        exaClientFactory().search(query, { numResults, type: "fast" }),
+      );
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      if (attempt === 3 || !/rate limit/i.test(msg)) throw e;
+      await new Promise((r) =>
+        setTimeout(r, 2000 * (attempt + 1) * (0.5 + Math.random())),
+      );
+    }
+  }
+  throw new Error("exa-fast rate limited");
+}
+
+const exaFastSearch = defineSearchProvider("exa-fast", async (query, numResults) => {
+  const response = await exaFastCall(query, numResults);
+  return (response.results ?? []).map((item: any) => ({
+    title: item.title || "",
+    url: item.url || "",
+  }));
+});
+
+const parallelTurboSearch = defineSearchProvider("parallel-turbo", async (query, numResults) => {
+  const response = await parallelClientFactory().search({
+    search_queries: [query],
+    mode: "turbo",
+    advanced_settings: { max_results: numResults },
+  });
+  return (response.results ?? []).map((item: any) => ({
+    title: item.title || "",
+    url: item.url || "",
+  }));
+});
+
 // Serper (Google SERP via google.serper.dev) — plain REST, no SDK.
 const serperSearchImpl: SearchFunction = async (query, numResults = 5) => {
   const startTime = Date.now();
@@ -152,13 +197,34 @@ export interface SearchClient {
 
 const gated: (SearchClient | null)[] = [
   gateOnKey(process.env.FIRECRAWL_API_KEY, "firecrawl", firecrawlSearch),
-  gateOnKey(process.env.EXA_API_KEY, "exa", exaSearch),
+  // SURFBENCH_TURBO swaps exa/parallel for their super-fast variants below —
+  // the org rate limit is shared, so the two never run side by side.
+  gateOnKey(
+    process.env.SURFBENCH_TURBO ? undefined : process.env.EXA_API_KEY,
+    "exa",
+    exaSearch,
+  ),
   gateOnKey(process.env.LINKUP_API_KEY, "linkup", linkupSearch),
   gateOnKey(process.env.TAVILY_API_KEY, "tavily", tavilySearch),
   gateOnKey(process.env.BRAVE_API_KEY, "brave", braveSearch),
-  gateOnKey(process.env.PARALLEL_API_KEY, "parallel", parallelSearch),
+  gateOnKey(
+    process.env.SURFBENCH_TURBO ? undefined : process.env.PARALLEL_API_KEY,
+    "parallel",
+    parallelSearch,
+  ),
   gateOnKey(process.env.SERPER_API_KEY, "serper", serperSearch),
   gateOnKey(process.env.KEENABLE_API_KEY, "keenable", keenableSearch),
+  // search-turbo variants (only when SURFBENCH_TURBO is set)
+  gateOnKey(
+    process.env.SURFBENCH_TURBO ? process.env.EXA_API_KEY : undefined,
+    "exa-fast",
+    exaFastSearch,
+  ),
+  gateOnKey(
+    process.env.SURFBENCH_TURBO ? process.env.PARALLEL_API_KEY : undefined,
+    "parallel-turbo",
+    parallelTurboSearch,
+  ),
 ];
 
 export const searchClients: SearchClient[] = gated.filter(
