@@ -15,6 +15,7 @@ const PROVIDER_DOMAINS: Record<string, string> = {
   jina: "jina.ai",
   brave: "brave.com",
   serper: "serper.dev",
+  keenable: "keenable.ai",
 };
 
 export function faviconDataUri(provider: string): string {

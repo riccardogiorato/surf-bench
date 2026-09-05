@@ -1,11 +1,12 @@
 import {
-  firecrawlClient,
-  exaClient,
-  braveSearchClient,
-  linkupClient,
-  tavilyClient,
+  firecrawlClientFactory,
+  exaClientFactory,
+  braveSearchClientFactory,
+  linkupClientFactory,
+  tavilyClientFactory,
   parallelClientFactory,
 } from "./apiClients.js";
+import { keenableSearchResults } from "./keenableClient.js";
 import { SearchFunction, SearchResponse, SearchResult } from "./types.js";
 import { createConcurrencyLimiter } from "./concurrency.js";
 import { withSearchCache } from "./cache/withSearchCache.js";
@@ -48,7 +49,7 @@ function defineSearchProvider(
 // ---- provider adapters: only the API call + mapping ----
 
 const firecrawlSearch = defineSearchProvider("firecrawl", async (query, numResults) => {
-  const response = await firecrawlClient.search(query, { limit: numResults });
+  const response = await firecrawlClientFactory().search(query, { limit: numResults });
   return (response.web ?? []).map((item: any) => ({
     title: item.title || item.metadata?.title || "",
     url: item.url || "",
@@ -56,7 +57,7 @@ const firecrawlSearch = defineSearchProvider("firecrawl", async (query, numResul
 });
 
 const exaSearch = defineSearchProvider("exa", async (query, numResults) => {
-  const response = await exaClient.search(query, { numResults });
+  const response = await exaClientFactory().search(query, { numResults });
   return (response.results ?? []).map((item: any) => ({
     title: item.title || "",
     url: item.url || "",
@@ -64,7 +65,7 @@ const exaSearch = defineSearchProvider("exa", async (query, numResults) => {
 });
 
 const linkupSearch = defineSearchProvider("linkup", async (query, numResults) => {
-  const response = await linkupClient.search({
+  const response = await linkupClientFactory().search({
     query,
     depth: "standard",
     outputType: "searchResults",
@@ -75,7 +76,7 @@ const linkupSearch = defineSearchProvider("linkup", async (query, numResults) =>
 });
 
 const braveSearch = defineSearchProvider("brave", async (query, numResults) => {
-  const response = await braveSearchClient.webSearch(query, {
+  const response = await braveSearchClientFactory().webSearch(query, {
     count: numResults,
   });
   return (response.web?.results ?? [])
@@ -84,7 +85,7 @@ const braveSearch = defineSearchProvider("brave", async (query, numResults) => {
 });
 
 const tavilySearch = defineSearchProvider("tavily", async (query, numResults) => {
-  const response = await tavilyClient.search(query, { maxResults: numResults });
+  const response = await tavilyClientFactory().search(query, { maxResults: numResults });
   return (response.results ?? []).map((item: any) => ({
     title: item.title || "",
     url: item.url || "",
@@ -101,6 +102,8 @@ const parallelSearch = defineSearchProvider("parallel", async (query, numResults
     url: item.url || "",
   }));
 });
+
+const keenableSearch = defineSearchProvider("keenable", keenableSearchResults);
 
 // Serper (Google SERP via google.serper.dev) — plain REST, no SDK.
 const serperSearchImpl: SearchFunction = async (query, numResults = 5) => {
@@ -155,6 +158,7 @@ const gated: (SearchClient | null)[] = [
   gateOnKey(process.env.BRAVE_API_KEY, "brave", braveSearch),
   gateOnKey(process.env.PARALLEL_API_KEY, "parallel", parallelSearch),
   gateOnKey(process.env.SERPER_API_KEY, "serper", serperSearch),
+  gateOnKey(process.env.KEENABLE_API_KEY, "keenable", keenableSearch),
 ];
 
 export const searchClients: SearchClient[] = gated.filter(

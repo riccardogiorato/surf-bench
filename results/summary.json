@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T16:13:48.214Z",
+  "generatedAt": "2026-09-05T07:21:58.125Z",
   "scrape": [
     {
       "provider": "parallel",
@@ -36,6 +36,15 @@
       "avg_usable_s": "2.9s",
       "p50_s": "0.3s",
       "p95_s": "12.2s"
+    },
+    {
+      "provider": "keenable",
+      "attempts": 50,
+      "passed": 36,
+      "success": "72%",
+      "avg_usable_s": "1.7s",
+      "p50_s": "1.4s",
+      "p95_s": "5.1s"
     },
     {
       "provider": "linkup",
@@ -108,6 +117,16 @@
       "p95_s": "4.4s"
     },
     {
+      "provider": "keenable",
+      "queries": 29,
+      "ok": 29,
+      "assertions": 27,
+      "success": "100%",
+      "avg_s": "1.6s",
+      "p50_s": "1.5s",
+      "p95_s": "3.7s"
+    },
+    {
       "provider": "exa",
       "queries": 29,
       "ok": 28,
@@ -160,6 +179,16 @@
       "judge_score": "7.1"
     },
     {
+      "provider": "keenable",
+      "quests": 15,
+      "answered": 15,
+      "success": "100%",
+      "total_s": "10.3s",
+      "p50_s": "11.4s",
+      "wipeouts": 0,
+      "judge_score": "8.3"
+    },
+    {
       "provider": "linkup",
       "quests": 15,
       "answered": 14,
@@ -167,7 +196,7 @@
       "total_s": "29.3s",
       "p50_s": "29.7s",
       "wipeouts": 0,
-      "judge_score": "6.9"
+      "judge_score": "7.0"
     }
   ],
   "overall": [
@@ -190,6 +219,16 @@
       "scrape": "38/50 @ 0.8s",
       "search": "28/29 @ 1.6s",
       "quest": "15/15 @ 7.7s · judge 8.0"
+    },
+    {
+      "provider": "keenable",
+      "agent_ready": "56",
+      "scrape_score": "25",
+      "search_score": "50",
+      "quest_score": "93",
+      "scrape": "36/50 @ 1.7s",
+      "search": "27/29 @ 1.6s",
+      "quest": "15/15 @ 10.3s · judge 8.3"
     },
     {
       "provider": "firecrawl",
@@ -219,7 +258,7 @@
       "quest_score": "84",
       "scrape": "33/50 @ 4.1s",
       "search": "20/29 @ 1.7s",
-      "quest": "14/15 @ 29.3s · judge 6.9"
+      "quest": "14/15 @ 29.3s · judge 7.0"
     },
     {
       "provider": "brave",

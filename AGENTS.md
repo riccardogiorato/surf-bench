@@ -13,7 +13,7 @@ npx tsx scripts/hero.ts   # regenerate assets/hero.svg
 
 ## Structure
 
-- `src/lib/` — shared core: clients (`searchClients.ts`, `scraperClients.ts`, `jinaClient.ts`, `parallelClient.ts`), cache, concurrency limiter, quality gate (`contentQuality.ts`), judge panel (`judge/judge.ts`), results recorder (`results.ts`)
+- `src/lib/` — shared core: clients (`searchClients.ts`, `scraperClients.ts`, `jinaClient.ts`, `parallelClient.ts`, `keenableClient.ts`), cache, concurrency limiter, quality gate (`contentQuality.ts`), judge panel (`judge/judge.ts`), results recorder (`results.ts`)
 - `src/suites/{search,scrape,quest}/` — the three events. Suites import clients through the lib seam only; never an SDK directly.
 - `scripts/` — `report.ts` (aggregation + leaderboard SVG), `hero.ts` (README hero), `favicons.ts` (shared favicon data-URI helper)
 - `results/` — committed: per-event CSV/JSON + `summary.json` + `overall.csv`. `results/raw/` is gitignored (full page content; NEVER commit it — scraped pages can contain other people's leaked secrets; content is redacted at record time but keep it out of git regardless).
@@ -23,6 +23,7 @@ npx tsx scripts/hero.ts   # regenerate assets/hero.svg
 - All providers are key-gated: absent `*_API_KEY` in `.env` → provider skipped, no errors.
 - Judge panel: Kimi K3 + GLM-5.3 via Together AI REST (case-sensitive model slugs `moonshotai/Kimi-K3`, `zai-org/GLM-5.3`). Together rate-limits aggressively — judge calls are throttled (4 in flight) with backoff; verdicts cached by content hash; judge-error verdicts are never cached.
 - Wipeout rule: >30s per leg = DNF.
+- Keenable is org-rate-limited to 10 req/s: all its search + fetch calls share the paced gate in `keenableClient.ts` (~9 req/s, 429 backoff); its timings include that pacing. To run a single provider's suite, blank the other keys on the command line (`EXA_API_KEY= ... bunx vitest run src/suites`) — SDK clients construct lazily so absent keys never throw.
 - Records dedupe by (provider, case) keeping the LAST line in the jsonl.
 - The Y2K theme: retro windows, bevels, Silkscreen pixel accents. Design doc lives locally at `docs/surfbench-design.html` (gitignored on purpose).
 - Type-check with `npx tsc --noEmit` before committing.

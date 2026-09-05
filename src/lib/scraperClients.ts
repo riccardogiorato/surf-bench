@@ -1,15 +1,16 @@
 import { ScraperFunction, ScrapedContent } from "./types.js";
 import {
-  firecrawlClient,
-  exaClient,
-  linkupClient,
-  tavilyClient,
+  firecrawlClientFactory,
+  exaClientFactory,
+  linkupClientFactory,
+  tavilyClientFactory,
   parallelClientFactory,
 } from "./apiClients.js";
 import { createConcurrencyLimiter } from "./concurrency.js";
 import { withCache } from "./cache/withCache.js";
 import { fetchParallelContent } from "./parallelClient.js";
 import { jinaScraper, shouldRunJina } from "./jinaClient.js";
+import { keenableScraperImpl, shouldRunKeenable } from "./keenableClient.js";
 
 // Cap each provider at 5 in-flight scrapes so vendors can run fully in
 // parallel without changing the per-provider load of earlier benchmark runs
@@ -38,7 +39,7 @@ const firecrawlScraperImpl: ScraperFunction = async (
   const startTime = Date.now();
 
   try {
-    const response = await firecrawlClient.scrape(url, {
+    const response = await firecrawlClientFactory().scrape(url, {
       formats: ["markdown"],
       maxAge: CACHE_TIME_FIRECRAWL,
       timeout: timeout,
@@ -79,7 +80,7 @@ const exaScraperImpl: ScraperFunction = async (
 
   try {
     // Note: Exa doesn't support timeout parameter in getContents
-    const response = await exaClient.getContents([url], {
+    const response = await exaClientFactory().getContents([url], {
       text: true,
       livecrawl: "fallback",
       livecrawlTimeout: timeout,
@@ -129,7 +130,7 @@ const linkupScraperImpl: ScraperFunction = async (
   const startTime = Date.now();
 
   try {
-    const response = await linkupClient.fetch({
+    const response = await linkupClientFactory().fetch({
       url,
       renderJs: true, // Execute JavaScript before extracting content
     });
@@ -192,7 +193,7 @@ const tavilyScraperImpl: ScraperFunction = async (
   const startTime = Date.now();
 
   try {
-    const response = await tavilyClient.extract([url], {
+    const response = await tavilyClientFactory().extract([url], {
       extractDepth: "advanced",
       format: "markdown",
       timeout: Math.ceil(timeout / 1000),
@@ -236,7 +237,7 @@ const tavilyScraperImpl: ScraperFunction = async (
 // Health check functions
 async function checkFirecrawl(): Promise<boolean> {
   try {
-    const result = await firecrawlClient.scrape("https://www.firecrawl.dev/", {
+    const result = await firecrawlClientFactory().scrape("https://www.firecrawl.dev/", {
       formats: ["markdown"],
       maxAge: CACHE_TIME_FIRECRAWL,
     });
@@ -249,7 +250,7 @@ async function checkFirecrawl(): Promise<boolean> {
 
 async function checkExa(): Promise<boolean> {
   try {
-    const result = await exaClient.getContents(["https://exa.ai/"], {
+    const result = await exaClientFactory().getContents(["https://exa.ai/"], {
       text: true,
     });
     return !!result?.results && result.results.length > 0;
@@ -260,7 +261,7 @@ async function checkExa(): Promise<boolean> {
 
 async function checkLinkup(): Promise<boolean> {
   try {
-    const result = await linkupClient.fetch({
+    const result = await linkupClientFactory().fetch({
       url: "https://linkup.so/",
       renderJs: true,
     });
@@ -281,11 +282,20 @@ async function checkParallel(): Promise<boolean> {
 
 async function checkTavily(): Promise<boolean> {
   try {
-    const result = await tavilyClient.extract(["https://tavily.com/"], {
+    const result = await tavilyClientFactory().extract(["https://tavily.com/"], {
       extractDepth: "basic",
       format: "markdown",
     });
     return (result.results?.[0]?.rawContent?.length ?? 0) > 0;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function checkKeenable(): Promise<boolean> {
+  try {
+    const result = await keenableScraperImpl("https://keenable.ai/");
+    return (result.response?.content?.length ?? 0) > 0;
   } catch (error) {
     return false;
   }
@@ -309,6 +319,10 @@ const parallelScraper = withCache("parallel", parallelScraperImpl);
 const tavilyScraper = withCache(
   "tavily",
   limitVendorConcurrency(tavilyScraperImpl),
+);
+const keenableScraper = withCache(
+  "keenable",
+  limitVendorConcurrency(keenableScraperImpl),
 );
 
 // The official Parallel REST API requires an API key
@@ -351,6 +365,15 @@ export const scraperClients: ScraperClient[] = [
           name: "jina",
           scrape: jinaScraper,
           healthCheck: async () => true,
+        },
+      ]
+    : []),
+  ...(shouldRunKeenable
+    ? [
+        {
+          name: "keenable",
+          scrape: keenableScraper,
+          healthCheck: checkKeenable,
         },
       ]
     : []),

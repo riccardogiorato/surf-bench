@@ -22,6 +22,7 @@
     "@mendable/firecrawl-js": "^4.38.0",
     "@tavily/core": "^0.7.8",
     "@types/node": "^26.4.1",
+    "@vitest/ui": "^4.1.11",
     "brave-search": "^0.9.0",
     "exa-js": "^2.19.0",
     "linkup-sdk": "^3.6.0",
