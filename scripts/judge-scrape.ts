@@ -1,18 +1,21 @@
 import fs from "fs";
 import path from "path";
 import { gradeWithRubric, SCRAPE_SUBSTANCE_RUBRIC } from "../src/lib/judge/judge.js";
+import { SCRAPE_RUBRIC_ID } from "../src/lib/judge/rubrics.js";
 import { NON_SCORING, type ErrorClass } from "../src/lib/errorClass.js";
+import { ALL_TEST_SITES } from "../src/lib/testSites.js";
 
 // Grades the scrape event's quality axis offline from results/raw/scrape.jsonl,
 // so the 50-URL gauntlet never has to be re-run against every vendor just to
 // re-score it. Verdicts are cached by content hash, making this resumable.
 //
-// Fairness rule: every provider is graded on the SAME subset of sites. Quality
-// is sampled rather than exhaustive (350 records x 2 judges is a lot of calls),
-// and a sample is only comparable if it is the same sample for everyone, so the
-// subset is chosen deterministically from the sorted site list — never at
-// random, and never per-provider.
-const SAMPLE_STRIDE = Number(process.env.SURFBENCH_SCRAPE_STRIDE ?? 3);
+// Every record is graded: the verdict decides both quality and pass/fail, so a
+// sample would leave most of the reliability axis without a verdict. Only
+// sites in the current gauntlet are graded — records for retired sites linger
+// in the jsonl and must not be scored.
+const CURRENT_SITES = new Set(ALL_TEST_SITES.map((s) => s.name));
+const GRADING_CHARS = 13000;
+const RECORD_WORKERS = 4;
 
 interface ScrapeRec {
   provider: string;
@@ -41,15 +44,12 @@ async function main() {
     latest.set(`${rec.provider}|${rec.site}`, rec);
   }
 
-  const allSites = [...new Set([...latest.values()].map((r) => r.site))].sort();
-  const sampled = new Set(allSites.filter((_, i) => i % SAMPLE_STRIDE === 0));
-  console.log(
-    `sites: ${allSites.length}, sampled: ${sampled.size} (stride ${SAMPLE_STRIDE}) — identical set for every provider`,
-  );
-
   const pending = [...latest.values()].filter((r) => {
-    if (!sampled.has(r.site)) return false;
-    if (r.judgeScore !== undefined) return false;
+    if (!CURRENT_SITES.has(r.site)) return false;
+    // A single-judge verdict (the other call errored) is re-graded for a full panel.
+    const partial = Array.isArray(r.judgeVerdicts) &&
+      r.judgeVerdicts.some((v: { rationale?: string }) => String(v?.rationale ?? "").startsWith("judge error"));
+    if (r.judgeScore !== undefined && r.judgeRubric === SCRAPE_RUBRIC_ID && !partial) return false;
     // Quota / rate-limit cases never got a fair answer; grading them would
     // record a quality verdict on the harness's own failure.
     if (r.errorClass && NON_SCORING.has(r.errorClass)) return false;
@@ -57,20 +57,30 @@ async function main() {
   });
   console.log(`records to grade: ${pending.length}`);
 
-  const graded: ScrapeRec[] = [];
-  for (const rec of pending) {
+  // Records dedupe by (provider, site) keeping the last line, so appending each
+  // graded copy as it lands is enough for the report to pick it up, and an
+  // interrupted pass keeps everything graded so far.
+  let graded = 0;
+  const record = (rec: ScrapeRec) => {
+    fs.appendFileSync(RAW, JSON.stringify(rec) + "\n");
+    graded++;
+  };
+
+  const gradeOne = async (rec: ScrapeRec) => {
     // A blocked page or hard error is a real 0 for this event: getting past the
     // wall is precisely what the scrape gauntlet measures.
     if (!rec.content || rec.content.trim().length === 0) {
-      graded.push({ ...rec, judgeScore: 0, judgeVerdicts: [{ judge: "deterministic", score: 0, rationale: rec.reason ?? "no content returned" }] });
-      continue;
+      record({ ...rec, judgeScore: 0, judgeRubric: SCRAPE_RUBRIC_ID, judgeVerdicts: [{ judge: "deterministic", score: 0, rationale: rec.reason ?? "no content returned" }] });
+      return;
     }
     const prompt = [
       `TARGET PAGE: ${rec.site}`,
       `URL: ${rec.url}`,
       "",
-      `EXTRACTED CONTENT:`,
-      rec.content.slice(0, 12000),
+      typeof rec.chars === "number" && rec.chars > rec.content.length
+        ? `EXTRACTED CONTENT (benchmark excerpt of a ${rec.chars}-char extraction: the opening, then the first prose region; "[… N chars omitted by the benchmark …]" marks our cuts, not the scraper's — but text the scraper buried behind N chars of other material is still diluted):`
+        : `EXTRACTED CONTENT:`,
+      rec.content.slice(0, GRADING_CHARS),
       "",
       'Score this extraction. Respond ONLY with JSON {"score": number, "rationale": string}.',
     ].join("\n");
@@ -82,24 +92,24 @@ async function main() {
       );
       if (Number.isNaN(average)) {
         console.error(`${rec.provider} / ${rec.site}: all judges errored — left ungraded`);
-        continue;
+        return;
       }
-      graded.push({ ...rec, judgeScore: average, judgeVerdicts: verdicts, judgeFlagged: flagged });
-      console.log(`${rec.provider} / ${rec.site}: ${average.toFixed(1)}${flagged ? " (flagged)" : ""}`);
+      record({ ...rec, judgeScore: average, judgeRubric: SCRAPE_RUBRIC_ID, judgeVerdicts: verdicts, judgeFlagged: flagged });
+      console.log(`[${graded}/${pending.length}] ${rec.provider} / ${rec.site}: ${average.toFixed(1)}${flagged ? " (flagged)" : ""}`);
     } catch (e) {
       console.error(`${rec.provider} / ${rec.site}: FAILED ${e instanceof Error ? e.message.slice(0, 90) : e}`);
     }
-  }
+  };
 
-  // Records dedupe by (provider, site) keeping the last line, so appending the
-  // graded copies is enough for the report to pick them up.
-  if (graded.length) {
-    fs.appendFileSync(
-      RAW,
-      graded.map((r) => JSON.stringify(r)).join("\n") + "\n",
-    );
-  }
-  console.log(`scrape judge pass complete — ${graded.length} graded`);
+  // The judge module caps calls in flight; this only keeps that cap saturated.
+  const queue = [...pending];
+  await Promise.all(
+    Array.from({ length: RECORD_WORKERS }, async () => {
+      for (let rec = queue.shift(); rec; rec = queue.shift()) await gradeOne(rec);
+    }),
+  );
+
+  console.log(`scrape judge pass complete — ${graded} graded`);
 }
 
 main().catch((e) => {

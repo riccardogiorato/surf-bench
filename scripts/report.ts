@@ -2,11 +2,13 @@ import fs from "fs";
 import path from "path";
 import { faviconDataUri } from "./favicons.js";
 import { NON_SCORING, classifyError, type ErrorClass } from "../src/lib/errorClass.js";
-import { SUBSTANCE_PASS } from "../src/lib/scrapeSubstance.js";
+import { SCRAPE_RUBRIC_ID } from "../src/lib/judge/rubrics.js";
+import { ALL_TEST_SITES } from "../src/lib/testSites.js";
 import {
   composite,
   quantile,
   scoreEvent,
+  scrapePassed,
   speedScore,
   MIN_COVERAGE,
   WEIGHTS,
@@ -91,9 +93,12 @@ function push(agg: ProviderEvent, key: string, value: number) {
 }
 
 // ---------- scrape ----------
+const CURRENT_SITES = new Set(ALL_TEST_SITES.map((s) => s.name));
+
 function collectScrape(): Map<string, ProviderEvent> {
   const by = new Map<string, ProviderEvent>();
   for (const r of readJsonl("scrape")) {
+    if (!CURRENT_SITES.has(String(r.site))) continue;
     const p = String(r.provider);
     if (!by.has(p)) by.set(p, emptyEvent());
     const agg = by.get(p)!;
@@ -102,19 +107,34 @@ function collectScrape(): Map<string, ProviderEvent> {
       agg.nonScoring++;
       continue;
     }
-    // "Passed" now means: the old quality gate accepted it AND it cleared the
-    // deterministic shell floor. A nav tree from the right domain no longer
-    // counts as a successful scrape.
     const substance = typeof r.substanceScore === "number" ? r.substanceScore : null;
-    const ok = Boolean(r.ok) && (substance === null || substance >= SUBSTANCE_PASS);
-    if (ok) {
+    if (substance !== null) push(agg, "substance", substance);
+    // Without a verdict under the current rubric there is no pass/fail claim.
+    // Excluding it keeps a judge outage from reading as a scrape failure; the
+    // audit blocks publishing while any remain.
+    const verdict =
+      r.judgeRubric === SCRAPE_RUBRIC_ID && typeof r.judgeScore === "number" ? r.judgeScore : null;
+    if (verdict === null) {
+      agg.nonScoring++;
+      push(agg, "ungraded", 1);
+      continue;
+    }
+    agg.judgeScores.push(verdict);
+    if (scrapePassed(verdict)) {
       agg.passed++;
       if (typeof r.scrapingTimeMs === "number" && r.scrapingTimeMs > 0) {
         agg.times.push(r.scrapingTimeMs);
       }
     }
-    if (typeof r.judgeScore === "number") agg.judgeScores.push(r.judgeScore);
-    if (substance !== null) push(agg, "substance", substance);
+  }
+  // Coverage is measured against the full gauntlet, not the records present: a
+  // run that never reached the hard sites must not score 100% on the easy ones.
+  for (const agg of by.values()) {
+    const notRun = CURRENT_SITES.size - agg.total;
+    if (notRun <= 0) continue;
+    agg.total += notRun;
+    agg.nonScoring += notRun;
+    for (let i = 0; i < notRun; i++) push(agg, "notRun", 1);
   }
   return by;
 }
@@ -133,7 +153,13 @@ function scrapeRows(by: Map<string, ProviderEvent>): Row[] {
       quality: pct(s.quality),
       substance_avg: agg.extra.substance ? mean(agg.extra.substance).toFixed(2) : "-",
       p50_s: fmtS(s.p50Ms),
-      note: s.reason ?? "",
+      note: [
+        s.reason,
+        agg.extra.notRun ? `${agg.extra.notRun.length} sites not run` : "",
+        agg.extra.ungraded ? `${agg.extra.ungraded.length} ungraded` : "",
+      ]
+        .filter(Boolean)
+        .join("; "),
     });
   }
   return rows.sort((a, b) => Number(b.passed) - Number(a.passed));

@@ -35,7 +35,9 @@ async function paced<T>(fn: () => Promise<T>): Promise<T> {
 
 // A 429 is retried through the paced gate with jittered backoff instead of
 // failing the case — retries that bypassed the gate fired in lockstep and
-// re-429'd each other. One deadline spans all attempts so retries can't
+// re-429'd each other. Callers must not wrap this in paced() themselves: a
+// held outer slot waiting on an inner one deadlocks the gate once 4 calls are
+// in flight. One deadline spans all attempts so retries can't
 // extend past the caller's budget; persistent 429s surface as an error.
 const MAX_ATTEMPTS = 4;
 
@@ -65,19 +67,17 @@ export async function keenableSearchResults(
   query: string,
   numResults: number,
 ): Promise<SearchResult[]> {
-  const response = await paced(() =>
-    request(
-      `${BASE}/search`,
-      {
-        method: "POST",
-        headers: {
-          "X-API-Key": KEENABLE_API_KEY,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query, max_results: numResults }),
+  const response = await request(
+    `${BASE}/search`,
+    {
+      method: "POST",
+      headers: {
+        "X-API-Key": KEENABLE_API_KEY,
+        "Content-Type": "application/json",
       },
-      30000,
-    ),
+      body: JSON.stringify({ query, max_results: numResults }),
+    },
+    30000,
   );
   if (!response.ok) {
     throw new Error(`Keenable HTTP ${response.status}`);
@@ -96,12 +96,10 @@ async function fetchOnce(
   timeoutMs: number,
   deadline: number,
 ): Promise<{ title: string; content: string }> {
-  const response = await paced(() =>
-    request(
-      `${BASE}/fetch?url=${encodeURIComponent(url)}${live ? "&live=true" : ""}`,
-      { headers: { "X-API-Key": KEENABLE_API_KEY } },
-      Math.max(1000, Math.min(timeoutMs, deadline - Date.now())),
-    ),
+  const response = await request(
+    `${BASE}/fetch?url=${encodeURIComponent(url)}${live ? "&live=true" : ""}`,
+    { headers: { "X-API-Key": KEENABLE_API_KEY } },
+    Math.max(1000, Math.min(timeoutMs, deadline - Date.now())),
   );
   if (!response.ok) {
     throw new Error(`Keenable HTTP ${response.status}`);

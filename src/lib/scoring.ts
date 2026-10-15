@@ -101,6 +101,17 @@ export function scoreEvent(input: EventInput): EventScore {
   };
 }
 
+// A scrape passes when the judge panel finds at least partial main content
+// (the rubric's 4-6 band). Pass/fail is graded on the same verdict that feeds
+// quality: the deterministic gates it replaced (substring tokens, a prose-volume
+// floor) failed complete list pages and passed footer-only extractions.
+// Ungraded records have no verdict and are never counted as passes.
+export const SCRAPE_PASS_SCORE = 4;
+
+export function scrapePassed(judgeScore: number | null | undefined): boolean {
+  return typeof judgeScore === "number" && judgeScore >= SCRAPE_PASS_SCORE;
+}
+
 // Speed is relative: the fastest provider in a field anchors 100. Floored so a
 // slow provider still earns something for being correct, and capped so a fast
 // provider cannot buy the board with speed alone.

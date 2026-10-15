@@ -49,16 +49,25 @@ speed 0.15**. Quality comes from the judge panel; it is never a string match.
 - **Search quality** is the `answerability` dim: the ranked result set is graded
   by the panel. The legacy 12 substring/domain dims are retained as cheap
   breakage diagnostics only and no longer feed any score.
-- **Scrape**: `substanceScore` (`scrapeSubstance.ts`) is a deterministic SHELL
-  DETECTOR, not a quality grade — calibration showed it tracks prose volume, so
-  a concise correct extraction scored 2.59 while a long error page scored 9.13.
-  It is used as a low floor; the judge carries quality.
+- **Scrape**: `judge:scrape` grades EVERY record (no sampling), and that one
+  verdict drives both axes: pass = judge ≥ `SCRAPE_PASS_SCORE` (4, the rubric's
+  partial-content band), quality = mean verdict. Empty/error content is a
+  deterministic 0. Verdicts are stamped with `SCRAPE_RUBRIC_ID`; stale or missing
+  ones are excluded from scoring and block the audit. The deterministic gates
+  are diagnostics only: `ok` (token match + error-page phrases) and
+  `substanceScore` (prose volume — failed complete list pages like IMDb at judge
+  9.5, passed a YouTube footer at judge 1). Records for sites no longer in
+  `testSites.ts` are ignored, and a site with no record counts against
+  coverage (a run that skipped the hard sites must not score 100% on the rest).
+  Stored content is `scrapeExcerpt()` — opening + first prose cluster with
+  marked cuts — not a head slice, which graded nav-first extractions on their
+  menus alone.
 - `expectTokens` in `questCases.ts` is a diagnostic, never a gate.
 - Rubrics live in `judge/rubrics.ts` and are sent as the system message. They
   also salt the verdict cache, so editing one re-grades from scratch. (They used
   to only salt the cache, leaving judges scoring on an undefined 0–10 scale.)
 - Always `bun run audit` before publishing; it exits non-zero on blocking issues.
-- Keenable is org-rate-limited to 10 req/s: all its search + fetch calls share the paced gate in `keenableClient.ts` (~9 req/s, 429 backoff); its timings include that pacing. To run a single provider's suite, blank the other keys on the command line (`EXA_API_KEY= ... bunx vitest run src/suites`) — SDK clients construct lazily so absent keys never throw.
+- Keenable is org-rate-limited to 10 req/s: all its search + fetch calls share the paced gate in `keenableClient.ts` (~9 req/s, 429 backoff); its timings include that pacing. Only `request()` may enter the gate — nesting `paced()` deadlocked every run with >4 concurrent fetches. To run a single provider's suite, blank the other keys on the command line (`EXA_API_KEY= ... bunx vitest run src/suites`) — SDK clients construct lazily so absent keys never throw.
 - `SURFBENCH_TURBO=1` swaps exa → `exa-fast` (search `type:"fast"`, serialized + rate-limit backoff) and parallel → `parallel-turbo` (search `mode:"turbo"`) for the search event only, recorded under those names. Never run two exa-flavored suites concurrently — the org cap is shared.
 - `bun run scripts/quest-turbo.ts` — quest side-event in super-fast configs → `results/raw/quest-turbo.jsonl`.
 - Records dedupe by (provider, case) keeping the LAST line in the jsonl.

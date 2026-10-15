@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { composite, scoreEvent, speedScore, MIN_COVERAGE } from "./scoring.js";
+import {
+  composite,
+  scoreEvent,
+  scrapePassed,
+  speedScore,
+  MIN_COVERAGE,
+  SCRAPE_PASS_SCORE,
+} from "./scoring.js";
 
 const base = { total: 0, nonScoring: 0, passed: 0, judgeScores: [], times: [] };
 
@@ -38,6 +45,17 @@ describe("scoreEvent", () => {
     const s = scoreEvent({ ...base, total: 10, passed: 10 });
     expect(s.reliability).toBe(100);
     expect(s.quality).toBeNull();
+  });
+});
+
+describe("scrapePassed", () => {
+  it("passes at the rubric's partial-content band and never without a verdict", () => {
+    expect(scrapePassed(SCRAPE_PASS_SCORE)).toBe(true);
+    expect(scrapePassed(9.5)).toBe(true);
+    expect(scrapePassed(3.5)).toBe(false); // footer links, teaser stubs
+    expect(scrapePassed(0)).toBe(false);
+    expect(scrapePassed(undefined)).toBe(false);
+    expect(scrapePassed(null)).toBe(false);
   });
 });
 

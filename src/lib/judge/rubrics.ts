@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+
 // Grading rubrics for the judge panel. Each rubric is sent as the system
 // message AND salts the verdict cache key, so changing a rubric's text
 // invalidates every verdict graded under the old wording.
@@ -20,4 +22,11 @@ export const SEARCH_RESULTS_RUBRIC =
 // Separates real page body from shells: a scraper that returns a cookie
 // banner plus a nav tree should not pass the scrape event.
 export const SCRAPE_SUBSTANCE_RUBRIC =
-  "You are a strict judge of web page extraction quality. Given the TARGET PAGE description and the EXTRACTED CONTENT a scraper returned, score 0-10 how usable this extraction is as the page's actual content. 10 = the main body of the expected page, cleanly extracted. 7-9 = the main content is present with some navigation or boilerplate mixed in. 4-6 = partial content, heavily diluted by menus, footers, cookie notices or related links. 1-3 = almost entirely boilerplate, navigation, or a different page than requested. 0 = a block page, captcha, login wall, consent interstitial, or an error. Character count is irrelevant: judge only whether the page's substantive content is there.";
+  "You are a strict judge of web page extraction quality. Given the TARGET PAGE description and the EXTRACTED CONTENT a scraper returned, score 0-10 how usable this extraction is as the page's actual content. 10 = the main body of the expected page, cleanly extracted. 7-9 = the main content is present with some navigation or boilerplate mixed in. 4-6 = partial content: only a fraction of the main body (e.g. an article cut off after its opening paragraphs, a product page missing its price and details), or content heavily diluted by menus, footers, cookie notices or related links. 1-3 = almost entirely boilerplate, navigation, a teaser or metadata stub, or a different page than requested. 0 = a block page, captcha, login wall, consent interstitial, or an error. Lists, tables and data (listings, box scores, forecasts, rankings) are substantive content when they are what the page is for. Length is not quality: a short page extracted completely deserves a high score, and padding earns nothing. Judge only whether the page's substantive content is there, and how much of it.";
+
+// Stamped on each graded scrape record so verdicts from an older wording are
+// recognised as stale instead of being scored under the new pass threshold.
+export const SCRAPE_RUBRIC_ID = createHash("sha256")
+  .update(SCRAPE_SUBSTANCE_RUBRIC)
+  .digest("hex")
+  .slice(0, 12);

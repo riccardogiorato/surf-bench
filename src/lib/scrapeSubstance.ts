@@ -10,9 +10,10 @@
 // scored 2.59, while a long Yahoo error page scored 9.13. Structured pages
 // (version tables, spec sheets) legitimately have no paragraphs at all.
 //
-// So this is deliberately used as a LOW FLOOR for obvious shells, never as the
-// quality score. Answer quality is the judge panel's job, because only a
-// model can tell "the page body" from "a lot of text".
+// So this is a DIAGNOSTIC only (audit cross-check, CSV column); it feeds no
+// score. It also failed complete list pages such as IMDb's top 250. Pass/fail
+// and quality are the judge panel's job, because only a model can tell "the
+// page body" from "a lot of text".
 export interface SubstanceMetrics {
   chars: number;
   proseRatio: number; // share of characters living in real paragraphs
@@ -108,8 +109,3 @@ export function substanceMetrics(content: string): SubstanceMetrics {
     substanceScore: Number(Math.max(0, Math.min(10, score)).toFixed(2)),
   };
 }
-
-// Floor for "this is a shell, not a page". Set low on purpose: calibration
-// showed useful concise extractions sitting near 2.6, so anything stricter
-// would fail good scrapes. Quality above this floor is the judge's call.
-export const SUBSTANCE_PASS = 2.0;

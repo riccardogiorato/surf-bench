@@ -10,7 +10,7 @@ export { QUEST_RUBRIC, SEARCH_RESULTS_RUBRIC, SCRAPE_SUBSTANCE_RUBRIC } from "./
 
 // The judging panel: two models via Together AI REST, scores averaged.
 // Together rate limits are dynamic and aggressive, so calls are throttled to
-// 2 in flight and retried with exponential backoff.
+// 4 in flight and retried with exponential backoff.
 const PANEL = [
   // Both judges run reasoning_effort "low" — Kimi K3 with the chat-template
   // kwarg still spent its whole budget thinking and returned empty content.
@@ -70,8 +70,8 @@ async function writeVerdictsToCache(key: string, verdicts: Verdict[]) {
   }
 }
 
-// Throttle: 2 judge calls in flight; per-call timeout; exponential backoff.
-const runThrottled = createConcurrencyLimiter(2);
+// Throttle: 4 judge calls in flight; per-call timeout; exponential backoff.
+const runThrottled = createConcurrencyLimiter(4);
 
 async function askJudge(
   panelName: string,

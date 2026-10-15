@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { NON_SCORING, classifyError, type ErrorClass } from "../src/lib/errorClass.js";
-import { MIN_COVERAGE } from "../src/lib/scoring.js";
+import { MIN_COVERAGE, scrapePassed } from "../src/lib/scoring.js";
+import { SCRAPE_RUBRIC_ID } from "../src/lib/judge/rubrics.js";
+import { ALL_TEST_SITES } from "../src/lib/testSites.js";
 
 // Integrity audit for a results set.
 //
@@ -39,7 +41,8 @@ function section(title: string) {
   console.log(`\n=== ${title} ===`);
 }
 
-const scrape = read("scrape", (r) => `${r.provider}|${r.site}`);
+const currentSites = new Set(ALL_TEST_SITES.map((s) => s.name));
+const scrape = read("scrape", (r) => `${r.provider}|${r.site}`).filter((r) => currentSites.has(r.site));
 const search = read("search", (r) => `${r.provider}|${r.dim}|${r.query}`);
 const quest = read("quest", (r) => `${r.provider}|${r.questId}`);
 
@@ -61,6 +64,16 @@ for (const [event, recs] of [["scrape", scrape], ["search", search], ["quest", q
       classifyError(r.error ?? r.reason ?? null);
     if (cls) agg.classes.set(cls, (agg.classes.get(cls) ?? 0) + 1);
     if (cls && NON_SCORING.has(cls)) agg.excluded++;
+  }
+  // Scrape coverage is against the full gauntlet, matching the report.
+  if (event === "scrape") {
+    for (const agg of byProvider.values()) {
+      const notRun = currentSites.size - agg.total;
+      if (notRun <= 0) continue;
+      agg.total += notRun;
+      agg.excluded += notRun;
+      agg.classes.set("not_run", notRun);
+    }
   }
   for (const [p, agg] of [...byProvider].sort()) {
     const coverage = agg.total ? (agg.total - agg.excluded) / agg.total : 0;
@@ -145,6 +158,32 @@ if (bothScored.length === 0) {
       `  gap ${gap.toFixed(1)}  ${String(r.provider).padEnd(10)} substance=${r.substanceScore} judge=${r.judgeScore}  ${r.site}`,
     );
   }
+}
+
+// The scrape verdict decides pass/fail, so an ungraded or stale-rubric record
+// is a hole in the reliability axis, not a minor gap in quality.
+section("scrape grading completeness");
+const scorableScrape = scrape.filter((r) => {
+  const cls = (r.errorClass as ErrorClass | null) ?? classifyError(r.error ?? r.reason ?? null);
+  return !(cls && NON_SCORING.has(cls));
+});
+const ungraded = scorableScrape.filter(
+  (r) => r.judgeRubric !== SCRAPE_RUBRIC_ID || typeof r.judgeScore !== "number",
+);
+console.log(`scorable records: ${scorableScrape.length}, graded under current rubric: ${scorableScrape.length - ungraded.length}`);
+if (ungraded.length) {
+  problems.push(`scrape: ${ungraded.length} scorable record(s) lack a current verdict — run \`bun run judge:scrape\``);
+}
+// The retired deterministic gate (token match + no error-page phrase) is kept
+// as a tripwire: where it disagrees with the panel, one of them is wrong.
+const gateDisagree = scorableScrape.filter(
+  (r) => r.judgeRubric === SCRAPE_RUBRIC_ID && Boolean(r.ok) !== scrapePassed(r.judgeScore),
+);
+console.log(`old content gate vs judge pass disagreements: ${gateDisagree.length}`);
+for (const r of gateDisagree.slice(0, 15)) {
+  console.log(
+    `  gate=${r.ok ? "pass" : "fail"} judge=${Number(r.judgeScore).toFixed(1)}  ${String(r.provider).padEnd(10)} ${r.site}`,
+  );
 }
 
 // ---------- 4. structural sanity ----------

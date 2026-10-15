@@ -9,6 +9,7 @@ import type {
 import { evaluateScrapedContent } from "./contentQuality.js";
 import { classifyError } from "./errorClass.js";
 import { substanceMetrics } from "./scrapeSubstance.js";
+import { scrapeExcerpt } from "./scrapeExcerpt.js";
 import { structuralMetrics } from "./searchQuality.js";
 
 // Raw run records land in results/raw/*.jsonl — one line per provider×case.
@@ -74,9 +75,10 @@ export async function recordScrapeRun(input: {
     boilerplateHits: substance.boilerplateHits,
     chars: substance.chars,
     title: input.result.response?.title ?? null,
-    // Capped: the judge only reads the first 12k, and an uncapped page body
-    // made single jsonl lines large enough to tear under concurrent appends.
-    content: content ? redact(content).slice(0, 14000) : undefined,
+    // Bounded: an uncapped page body made single jsonl lines large enough to
+    // tear under concurrent appends. See scrapeExcerpt.ts for why it is not a
+    // head slice.
+    content: content ? scrapeExcerpt(redact(content)) : undefined,
   });
 }
 
