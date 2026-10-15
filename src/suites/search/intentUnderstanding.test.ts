@@ -11,7 +11,9 @@ defineSearchDim(
     { query: "Nasa sls", expected: "nasa.gov" },
   ],
   (results, testCase) => {
-    expect(results[0]?.url).toContain(testCase.expected);
+    // Case-insensitive: a URL path segment like /wiki/Jaguar is a correct
+    // match for "jaguar" and was failing providers on capitalization alone.
+    expect(results[0]?.url.toLowerCase()).toContain(testCase.expected.toLowerCase());
   },
   3,
 );

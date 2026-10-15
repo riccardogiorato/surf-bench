@@ -1,15 +1,30 @@
 import fs from "fs";
 import path from "path";
 import { faviconDataUri } from "./favicons.js";
+import { NON_SCORING, classifyError, type ErrorClass } from "../src/lib/errorClass.js";
+import { SUBSTANCE_PASS } from "../src/lib/scrapeSubstance.js";
+import {
+  composite,
+  quantile,
+  scoreEvent,
+  speedScore,
+  MIN_COVERAGE,
+  WEIGHTS,
+  type EventScore,
+} from "../src/lib/scoring.js";
 
 // Aggregates results/raw/{scrape,search,quest}.jsonl into
 // results/{scrape,search,quest}.csv + results/summary.json + the scoreboard SVG.
 // Records are deduped by their case key, keeping the latest.
+//
+// Scores follow src/lib/scoring.ts: three axes (quality / reliability / speed),
+// cases that never got a fair answer are excluded, and an event without enough
+// scored cases reports "insufficient data" instead of a zero.
 
 const RAW_DIR = path.join("results", "raw");
 const OUT_DIR = "results";
 
-type Row = Record<string, string | number>;
+type Row = Record<string, string | number | boolean | null>;
 
 function readJsonl(name: string): Row[] {
   const file = path.join(RAW_DIR, `${name}.jsonl`);
@@ -30,301 +45,357 @@ function dedupeKey(event: string, rec: Row): string {
   return `${rec.provider}|${rec.questId}`;
 }
 
-// ---------- stats ----------
-function quantile(sorted: number[], q: number): number {
-  if (sorted.length === 0) return 0;
-  const pos = (sorted.length - 1) * q;
-  const lo = Math.floor(pos);
-  const hi = Math.ceil(pos);
-  return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
-}
-
-function stats(values: number[]): { p50: number; p95: number; avg: number } {
-  const s = values.filter((v) => v > 0).sort((a, b) => a - b);
-  return {
-    p50: quantile(s, 0.5),
-    p95: quantile(s, 0.95),
-    avg: s.length ? s.reduce((a, b) => a + b, 0) / s.length : 0,
-  };
+// Records written before the error taxonomy existed have no errorClass, so
+// fall back to classifying their stored error text. Without this, a run
+// captured by an older harness silently scores a dead billing key as a zero.
+function isNonScoringRec(rec: Row): boolean {
+  const cls = (rec.errorClass as ErrorClass | null | undefined) ??
+    classifyError(
+      (rec.error as string | null) ?? (rec.reason as string | null) ?? null,
+    );
+  return cls != null && NON_SCORING.has(cls);
 }
 
 function fmtS(ms: number): string {
   return ms > 0 ? `${(ms / 1000).toFixed(1)}s` : "-";
 }
 
+function pct(v: number | null): string {
+  return v === null ? "n/a" : `${Math.round(v)}%`;
+}
+
+function mean(values: number[]): number {
+  return values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+}
+
+// Capability dims are the legacy substring/domain assertions. They are kept as
+// diagnostics because they catch hard breakage cheaply, but they no longer
+// feed the quality axis: a keyword in a URL never proved result quality.
+const CAPABILITY_DIMS_EXCLUDED = new Set(["answerability"]);
+
+interface ProviderEvent {
+  total: number;
+  nonScoring: number;
+  passed: number;
+  judgeScores: number[];
+  times: number[];
+  extra: Record<string, number[]>;
+}
+
+function emptyEvent(): ProviderEvent {
+  return { total: 0, nonScoring: 0, passed: 0, judgeScores: [], times: [], extra: {} };
+}
+
+function push(agg: ProviderEvent, key: string, value: number) {
+  (agg.extra[key] ??= []).push(value);
+}
+
 // ---------- scrape ----------
-function scrapeRows(): Row[] {
-  const records = readJsonl("scrape");
-  const byProvider = new Map<string, {
-    attempts: number; passed: number; times: number[];
-  }>();
-  for (const r of records) {
-    if (!byProvider.has(r.provider as string)) {
-      byProvider.set(r.provider as string, { attempts: 0, passed: 0, times: [] });
+function collectScrape(): Map<string, ProviderEvent> {
+  const by = new Map<string, ProviderEvent>();
+  for (const r of readJsonl("scrape")) {
+    const p = String(r.provider);
+    if (!by.has(p)) by.set(p, emptyEvent());
+    const agg = by.get(p)!;
+    agg.total++;
+    if (isNonScoringRec(r)) {
+      agg.nonScoring++;
+      continue;
     }
-    const agg = byProvider.get(r.provider as string)!;
-    agg.attempts++;
-    if (r.ok) {
+    // "Passed" now means: the old quality gate accepted it AND it cleared the
+    // deterministic shell floor. A nav tree from the right domain no longer
+    // counts as a successful scrape.
+    const substance = typeof r.substanceScore === "number" ? r.substanceScore : null;
+    const ok = Boolean(r.ok) && (substance === null || substance >= SUBSTANCE_PASS);
+    if (ok) {
       agg.passed++;
       if (typeof r.scrapingTimeMs === "number" && r.scrapingTimeMs > 0) {
         agg.times.push(r.scrapingTimeMs);
       }
     }
+    if (typeof r.judgeScore === "number") agg.judgeScores.push(r.judgeScore);
+    if (substance !== null) push(agg, "substance", substance);
   }
+  return by;
+}
+
+function scrapeRows(by: Map<string, ProviderEvent>): Row[] {
   const rows: Row[] = [];
-  for (const [provider, agg] of byProvider) {
-    const st = stats(agg.times);
+  for (const [provider, agg] of by) {
+    const s = scoreEvent(agg);
     rows.push({
       provider,
-      attempts: agg.attempts,
+      attempts: agg.total,
+      scored: s.scored,
+      excluded: agg.nonScoring,
       passed: agg.passed,
-      success: `${Math.round((agg.passed / agg.attempts) * 100)}%`,
-      avg_usable_s: fmtS(st.avg),
-      p50_s: fmtS(st.p50),
-      p95_s: fmtS(st.p95),
+      reliability: pct(s.reliability),
+      quality: pct(s.quality),
+      substance_avg: agg.extra.substance ? mean(agg.extra.substance).toFixed(2) : "-",
+      p50_s: fmtS(s.p50Ms),
+      note: s.reason ?? "",
     });
   }
-  return rows.sort((a, b) => (b.passed as number) - (a.passed as number));
+  return rows.sort((a, b) => Number(b.passed) - Number(a.passed));
 }
 
 // ---------- search ----------
-function searchRows(): Row[] {
-  const records = readJsonl("search");
-  const byProvider = new Map<string, {
-    attempts: number; ok: number; asserted: number; latencies: number[];
-  }>();
-  for (const r of records) {
-    if (!byProvider.has(r.provider as string)) {
-      byProvider.set(r.provider as string, { attempts: 0, ok: 0, asserted: 0, latencies: [] });
+function collectSearch(): {
+  quality: Map<string, ProviderEvent>;
+  capability: Map<string, { pass: number; total: number }>;
+} {
+  const quality = new Map<string, ProviderEvent>();
+  const capability = new Map<string, { pass: number; total: number }>();
+
+  for (const r of readJsonl("search")) {
+    const p = String(r.provider);
+    const dim = String(r.dim);
+
+    if (!quality.has(p)) quality.set(p, emptyEvent());
+    const agg = quality.get(p)!;
+
+    if (CAPABILITY_DIMS_EXCLUDED.has(dim)) {
+      agg.total++;
+      if (isNonScoringRec(r)) {
+        agg.nonScoring++;
+        continue;
+      }
+      if (!r.error && Number(r.numResults) > 0) agg.passed++;
+      if (typeof r.judgeScore === "number") agg.judgeScores.push(r.judgeScore);
+      if (typeof r.latencyMs === "number" && r.latencyMs > 0 && !r.error) {
+        agg.times.push(r.latencyMs);
+      }
+      continue;
     }
-    const agg = byProvider.get(r.provider as string)!;
-    agg.attempts++;
-    if (!r.error) {
-      agg.ok++;
-      if (typeof r.latencyMs === "number") agg.latencies.push(r.latencyMs);
+
+    // legacy capability dims: diagnostics only
+    if (!capability.has(p)) capability.set(p, { pass: 0, total: 0 });
+    const cap = capability.get(p)!;
+    if (isNonScoringRec(r)) continue;
+    cap.total++;
+    if (r.assertOk === true) cap.pass++;
+    // latency still counts from capability dims so speed has a real sample
+    if (typeof r.latencyMs === "number" && r.latencyMs > 0 && !r.error) {
+      agg.times.push(r.latencyMs);
     }
-    if (r.assertOk === (true as unknown)) agg.asserted++;
   }
+  return { quality, capability };
+}
+
+function searchRows(
+  quality: Map<string, ProviderEvent>,
+  capability: Map<string, { pass: number; total: number }>,
+): Row[] {
   const rows: Row[] = [];
-  for (const [provider, agg] of byProvider) {
-    const st = stats(agg.latencies);
+  for (const [provider, agg] of quality) {
+    const s = scoreEvent(agg);
+    const cap = capability.get(provider);
     rows.push({
       provider,
-      queries: agg.attempts,
-      ok: agg.ok,
-      assertions: agg.asserted,
-      success: `${Math.round((agg.ok / agg.attempts) * 100)}%`,
-      avg_s: fmtS(st.avg),
-      p50_s: fmtS(st.p50),
-      p95_s: fmtS(st.p95),
+      answerability_cases: agg.total,
+      scored: s.scored,
+      excluded: agg.nonScoring,
+      reliability: pct(s.reliability),
+      quality: pct(s.quality),
+      judge_avg: agg.judgeScores.length ? mean(agg.judgeScores).toFixed(1) : "-",
+      capability: cap && cap.total ? `${cap.pass}/${cap.total}` : "-",
+      p50_s: fmtS(s.p50Ms),
+      note: s.reason ?? "",
     });
   }
-  return rows.sort((a, b) => (b.ok as number) - (a.ok as number));
+  return rows.sort((a, b) => Number(b.judge_avg) - Number(a.judge_avg));
 }
 
 // ---------- quest ----------
-function questRows(): Row[] {
-  const records = readJsonl("quest");
-  const byProvider = new Map<string, {
-    quests: number; answered: number; totalMs: number[]; judgeScores: number[]; wipeouts: number;
-  }>();
-  for (const r of records) {
-    if (!byProvider.has(r.provider as string)) {
-      byProvider.set(r.provider as string, { quests: 0, answered: 0, totalMs: [], judgeScores: [], wipeouts: 0 });
+function collectQuest(): Map<string, ProviderEvent> {
+  const by = new Map<string, ProviderEvent>();
+  for (const r of readJsonl("quest")) {
+    const p = String(r.provider);
+    if (!by.has(p)) by.set(p, emptyEvent());
+    const agg = by.get(p)!;
+    agg.total++;
+    if (isNonScoringRec(r)) {
+      agg.nonScoring++;
+      continue;
     }
-    const agg = byProvider.get(r.provider as string)!;
-    agg.quests++;
-    if (!r.error) agg.answered++;
-    if (r.wipeout) agg.wipeouts++;
+    if (!r.error) agg.passed++;
+    if (r.wipeout) push(agg, "wipeouts", 1);
     if (typeof r.judgeAverage === "number") agg.judgeScores.push(r.judgeAverage);
-    if (typeof r.totalMs === "number" && r.totalMs > 0) agg.totalMs.push(r.totalMs);
+    if (typeof r.totalMs === "number" && r.totalMs > 0) agg.times.push(r.totalMs);
   }
-  const rows: Row[] = [];
-  for (const [provider, agg] of byProvider) {
-    const st = stats(agg.totalMs);
-    const judgeAvg = agg.judgeScores.length
-      ? agg.judgeScores.reduce((a, b) => a + b, 0) / agg.judgeScores.length
-      : 0;
-    rows.push({
-      provider,
-      quests: agg.quests,
-      answered: agg.answered,
-      success: agg.quests ? `${Math.round((agg.answered / agg.quests) * 100)}%` : "-",
-      total_s: fmtS(st.avg),
-      p50_s: fmtS(st.p50),
-      wipeouts: agg.wipeouts,
-      judge_score: judgeAvg ? judgeAvg.toFixed(1) : "-",
-    });
-  }
-  return rows.sort((a, b) => (b.answered as number) - (a.answered as number));
+  return by;
 }
 
-// ---------- overall agent-ready composite ----------
-// Explainable composite per event (0-100), then averaged:
-//   scrape: success% x (fastest avg / provider avg), speed floored at 0.25
-//   search: success% x (fastest p50 / provider p50), speed floored at 0.25
-//   quest:  answered% x 60 + judge/10 x 40 (judge = answer quality)
-// The composite always uses DEFAULT search configs; super-fast search runs
-// (recorded as exa-fast / parallel-turbo) surface in a separate "search turbo"
-// column without touching any score.
+function questRows(by: Map<string, ProviderEvent>): Row[] {
+  const rows: Row[] = [];
+  for (const [provider, agg] of by) {
+    const s = scoreEvent(agg);
+    rows.push({
+      provider,
+      quests: agg.total,
+      scored: s.scored,
+      excluded: agg.nonScoring,
+      delivered: agg.passed,
+      reliability: pct(s.reliability),
+      quality: pct(s.quality),
+      judge_avg: agg.judgeScores.length ? mean(agg.judgeScores).toFixed(1) : "-",
+      wipeouts: agg.extra.wipeouts?.length ?? 0,
+      p50_s: fmtS(s.p50Ms),
+      note: s.reason ?? "",
+    });
+  }
+  return rows.sort((a, b) => Number(b.judge_avg) - Number(a.judge_avg));
+}
+
+// ---------- overall ----------
 const TURBO_PARENT: Record<string, string> = {
   "exa-fast": "exa",
   "parallel-turbo": "parallel",
 };
 
 function overallLeaderboard(
-  scrape: Row[],
-  search: Row[],
-  quest: Row[],
+  scrape: Map<string, ProviderEvent>,
+  search: Map<string, ProviderEvent>,
+  quest: Map<string, ProviderEvent>,
 ): Row[] {
-  const bestAvgS = Math.min(
-    ...scrape.filter((r) => parseS(r.avg_usable_s) > 0).map((r) => parseS(r.avg_usable_s)),
-  );
-  const bestSearchP50 = Math.min(
-    ...search
-      // default-config rows only — turbo variants don't shift the baseline
-      .filter((r) => !TURBO_PARENT[String(r.provider)] && parseS(r.p50_s) > 0)
-      .map((r) => parseS(r.p50_s)),
-  );
-  const bestQuestS = Math.min(
-    ...quest.filter((r) => parseS(r.total_s) > 0).map((r) => parseS(r.total_s)),
+  const providers = new Set(
+    [...scrape.keys(), ...search.keys(), ...quest.keys()].filter(
+      (p) => !TURBO_PARENT[p],
+    ),
   );
 
-  // super-fast search rows fold into their parent provider
-  const turboByParent = new Map<string, Row>();
-  for (const r of search) {
-    const parent = TURBO_PARENT[String(r.provider)];
-    if (parent) turboByParent.set(parent, r);
+  const scored = new Map<string, { scrape: EventScore; search: EventScore; quest: EventScore }>();
+  for (const p of providers) {
+    scored.set(p, {
+      scrape: scoreEvent(scrape.get(p) ?? emptyEvent()),
+      search: scoreEvent(search.get(p) ?? emptyEvent()),
+      quest: scoreEvent(quest.get(p) ?? emptyEvent()),
+    });
   }
 
-  const providers = new Set<string>([
-    ...scrape.map((r) => String(r.provider)),
-    ...search.map((r) => String(r.provider)),
-    ...quest.map((r) => String(r.provider)),
-  ].filter((p) => !TURBO_PARENT[p]));
+  // Speed anchors come only from providers with a usable sample, so a provider
+  // that failed every case cannot define "fastest" with its error latency.
+  const best = (pick: (s: { scrape: EventScore; search: EventScore; quest: EventScore }) => EventScore) =>
+    Math.min(
+      ...[...scored.values()]
+        .map((s) => pick(s).p50Ms)
+        .filter((v) => v > 0),
+      Number.POSITIVE_INFINITY,
+    );
+  const bestScrape = best((s) => s.scrape);
+  const bestSearch = best((s) => s.search);
+  const bestQuest = best((s) => s.quest);
 
   const rows: Row[] = [];
   for (const p of providers) {
-    const s = scrape.find((r) => r.provider === p);
-    const se = search.find((r) => r.provider === p);
-    const q = quest.find((r) => r.provider === p);
-    const turbo = turboByParent.get(p);
+    const s = scored.get(p)!;
+    const c = composite({
+      reliability: [s.scrape.reliability, s.search.reliability, s.quest.reliability],
+      quality: [s.scrape.quality, s.search.quality, s.quest.quality],
+      speed: [
+        speedScore(s.scrape.p50Ms, bestScrape),
+        speedScore(s.search.p50Ms, bestSearch),
+        speedScore(s.quest.p50Ms, bestQuest),
+      ],
+    });
 
-    const scrapeScore = s && Number(s.attempts) > 0
-      ? (Number(s.passed) / Number(s.attempts)) * 100 *
-        Math.max(0.25, bestAvgS / Math.max(parseS(s.avg_usable_s), 0.01))
-      : 0;
-    const searchScore = se && Number(se.queries) > 0
-      ? (Number(se.assertions) / Number(se.queries)) * 100 *
-        Math.max(0.25, bestSearchP50 / Math.max(parseS(se.p50_s), 0.01))
-      : 0;
-    const questScore = q && Number(q.quests) > 0
-      ? (Number(q.answered) / Number(q.quests)) * 60 +
-        (parseNum(q.judge_score) / 10) * 40
-      : 0;
+    const missing: string[] = [];
+    if (s.scrape.insufficient) missing.push(`scrape: ${s.scrape.reason}`);
+    if (s.search.insufficient) missing.push(`search: ${s.search.reason}`);
+    if (s.quest.insufficient) missing.push(`quest: ${s.quest.reason}`);
+    if (c.withheld) missing.push(c.withheld);
 
-    // same formula as the default search score, on the turbo row
-    const turboScore = turbo && Number(turbo.queries) > 0
-      ? (Number(turbo.assertions) / Number(turbo.queries)) * 100 *
-        Math.max(0.25, bestSearchP50 / Math.max(parseS(turbo.p50_s), 0.01))
-      : null;
-
-    const overall = (scrapeScore + searchScore + questScore) / 3;
     rows.push({
       provider: p,
-      agent_ready: overall.toFixed(0),
-      scrape_score: scrapeScore.toFixed(0),
-      search_score: searchScore.toFixed(0),
-      quest_score: questScore.toFixed(0),
-      scrape: s ? `${s.passed}/${s.attempts} @ ${s.avg_usable_s}` : "-",
-      search: se ? `${se.assertions}/${se.queries} @ ${se.avg_s}` : "-",
-      // search columns lead with speed in the SVG; the count sits below
-      search_speed: se ? String(se.avg_s) : "-",
-      search_success: se ? `${se.assertions}/${se.queries}` : "",
-      search_turbo: turbo
-        ? `${turbo.assertions}/${turbo.queries} @ ${turbo.avg_s}`
-        : "",
-      search_turbo_speed: turbo ? String(turbo.avg_s) : "",
-      search_turbo_success: turbo ? `${turbo.assertions}/${turbo.queries}` : "",
-      search_turbo_score: turboScore === null ? "-" : turboScore.toFixed(0),
-      quest: q ? `${q.answered}/${q.quests} @ ${q.total_s} · judge ${q.judge_score}` : "-",
+      agent_ready: c.overall === null ? "n/a" : c.overall.toFixed(0),
+      quality: c.quality === null ? "n/a" : c.quality.toFixed(0),
+      reliability: c.reliability === null ? "n/a" : c.reliability.toFixed(0),
+      speed: c.speed === null ? "n/a" : c.speed.toFixed(0),
+      scrape_reliability: pct(s.scrape.reliability),
+      search_quality: pct(s.search.quality),
+      quest_quality: pct(s.quest.quality),
+      data_note: missing.join("; "),
     });
   }
-  return rows.sort((a, b) => Number(b.agent_ready) - Number(a.agent_ready));
-}
-
-function parseS(s: string | number): number {
-  if (typeof s === "number") return s;
-  const m = /^([\d.]+)s$/.exec(String(s));
-  return m ? Number(m[1]) : 0;
-}
-
-// plain number parse for judge scores ("7.4" etc. — parseS only reads time strings)
-function parseNum(s: string | number): number {
-  const n = typeof s === "number" ? s : Number.parseFloat(String(s));
-  return Number.isFinite(n) ? n : 0;
+  return rows.sort((a, b) => {
+    const av = a.agent_ready === "n/a" ? -1 : Number(a.agent_ready);
+    const bv = b.agent_ready === "n/a" ? -1 : Number(b.agent_ready);
+    return bv - av;
+  });
 }
 
 // ---------- output ----------
-
 function markdownTable(name: string, rows: Row[]): string {
   if (rows.length === 0) return `_no ${name} results yet_`;
   const cols = Object.keys(rows[0]);
-  const lines = [
+  return [
     `| ${cols.join(" | ")} |`,
     `| ${cols.map(() => "---").join(" | ")} |`,
-    ...rows.map((r) => `| ${cols.map((c) => r[c]).join(" | ")} |`),
-  ];
-  return lines.join("\n");
+    ...rows.map((r) => `| ${cols.map((c) => r[c] ?? "").join(" | ")} |`),
+  ].join("\n");
 }
 
 function main() {
-  const scrape = scrapeRows();
-  const search = searchRows();
-  const quest = questRows();
+  const scrapeAgg = collectScrape();
+  const { quality: searchAgg, capability } = collectSearch();
+  const questAgg = collectQuest();
+
+  const scrape = scrapeRows(scrapeAgg);
+  const search = searchRows(searchAgg, capability);
+  const quest = questRows(questAgg);
+  const overall = overallLeaderboard(scrapeAgg, searchAgg, questAgg);
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   console.log("== Scrape =="); console.log(markdownTable("scrape", scrape));
-  console.log("== Search =="); console.log(markdownTable("search", search));
-  console.log("== Quest =="); console.log(markdownTable("quest", quest));
-
-  const overall = overallLeaderboard(scrape, search, quest);
-  console.log("== Overall agent-ready =="); console.log(markdownTable("overall", overall));
+  console.log("\n== Search =="); console.log(markdownTable("search", search));
+  console.log("\n== Quest =="); console.log(markdownTable("quest", quest));
+  console.log("\n== Overall agent-ready =="); console.log(markdownTable("overall", overall));
+  console.log(
+    `\nweights: quality ${WEIGHTS.quality}, reliability ${WEIGHTS.reliability}, speed ${WEIGHTS.speed} | min coverage ${MIN_COVERAGE}`,
+  );
 
   fs.writeFileSync(
     path.join(OUT_DIR, "summary.json"),
-    JSON.stringify({ generatedAt: new Date().toISOString(), scrape, search, quest, overall }, null, 2) + "\n"
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        weights: WEIGHTS,
+        minCoverage: MIN_COVERAGE,
+        scrape,
+        search,
+        quest,
+        overall,
+      },
+      null,
+      2,
+    ) + "\n",
   );
 
   writeScoreboardSvg(overall);
 }
 
-// Overall agent-ready leaderboard across all three events, drawn as the Y2K
-// scoreboard window with embedded provider favicons (base64 data URIs).
-// Overall agent-ready leaderboard across all three events, drawn edge-to-edge
-// (no dithered margin) with embedded provider favicons and large readable text.
-// Overall agent-ready leaderboard SVG: tier medals, per-event scores 0-100
-// with a "max" reference row, quest labeled as the search→fetch pipeline.
+// Overall agent-ready leaderboard SVG: composite plus the three axes, with an
+// explicit "n/a" state so a provider with no scorable data is never rendered
+// as a zero.
 function writeScoreboardSvg(rows: Row[]) {
   const W = 1720;
   const rowH = 76;
   const H = rows.length * rowH + 148;
-  const esc = (s: string | number) =>
-    String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const esc = (s: string | number | boolean | null | undefined) =>
+    String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const parts: string[] = [];
 
   const colLogo = 90;
   const colName = 150;
   const medalX = 36;
   const cols: Array<[string, string, number]> = [
-    ["agent-ready", "composite 0–100", 640],
-    ["scrape", "fetch 50 URLs", 850],
-    ["search", "find 29 queries", 1060],
-    ["search turbo", "fastest mode", 1270],
-    ["quest", "search→fetch→judge", 1480],
+    ["agent-ready", `composite 0–100`, 620],
+    ["quality", "judge panel", 850],
+    ["reliability", "usable output", 1060],
+    ["speed", "vs fastest", 1270],
+    ["scrape", "fetch reliability", 1470],
   ];
-  // tier medal by final rank
   const medals = ["🥇", "🥈", "🥉"];
 
   parts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="SurfBench overall leaderboard">`);
@@ -332,7 +403,6 @@ function writeScoreboardSvg(rows: Row[]) {
   parts.push(`<rect width="${W}" height="64" fill="#000080"/>`);
   parts.push(`<text x="28" y="43" font-family="Verdana,Arial,sans-serif" font-size="26" font-weight="bold" fill="#ffffff">SurfBench — Overall Agent-Ready Leaderboard</text>`);
 
-  // header row
   parts.push(`<rect y="64" width="${W}" height="52" fill="#c0c0c0"/>`);
   parts.push(`<text x="${medalX}" y="90" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">rank</text>`);
   parts.push(`<text x="${colName}" y="90" font-family="Verdana,Arial,sans-serif" font-size="22" font-weight="bold" fill="#111">provider</text>`);
@@ -349,29 +419,25 @@ function writeScoreboardSvg(rows: Row[]) {
     if (uri) {
       parts.push(`<image x="${colLogo}" y="${y - 17}" width="34" height="34" href="${uri}"/>`);
     }
-    parts.push(`<text x="${medalX}" y="${y + 10}" font-family="Verdana,Arial,sans-serif" font-size="24">${medals[ri] ?? ""}</text>`);
+    const unscored = r.agent_ready === "n/a";
+    parts.push(`<text x="${medalX}" y="${y + 10}" font-family="Verdana,Arial,sans-serif" font-size="24">${unscored ? "" : (medals[ri] ?? "")}</text>`);
     parts.push(`<text x="${colName}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r.provider)}</text>`);
-    parts.push(`<text x="${cols[0][2]}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="#000080">${esc(r.agent_ready)}</text>`);
-    parts.push(`<text x="${cols[0][2] + 70}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="14" fill="#666">/100</text>`);
-    // score columns keep the 0–100 number; search columns lead with speed and
-// keep the successful/total count below
-const scoreCells: Array<[string, string, number]> = [
-      ["scrape_score", "scrape", cols[1][2]],
-      ["quest_score", "quest", cols[4][2]],
+    parts.push(`<text x="${cols[0][2]}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="${unscored ? "#888" : "#000080"}">${esc(r.agent_ready)}</text>`);
+    if (!unscored) {
+      parts.push(`<text x="${cols[0][2] + 70}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="14" fill="#666">/100</text>`);
+    }
+    const cells: Array<[string, number]> = [
+      ["quality", cols[1][2]],
+      ["reliability", cols[2][2]],
+      ["speed", cols[3][2]],
+      ["scrape_reliability", cols[4][2]],
     ];
-    const speedCells: Array<[string, string, number]> = [
-      ["search_speed", "search_success", cols[2][2]],
-      ["search_turbo_speed", "search_turbo_success", cols[3][2]],
-    ];
-    scoreCells.forEach(([scoreKey, detailKey, x]) => {
-      parts.push(`<text x="${x}" y="${y - 2}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r[scoreKey] ?? "-")}</text>`);
-      parts.push(`<text x="${x}" y="${y + 20}" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">${esc(r[detailKey] ?? "")}</text>`);
+    cells.forEach(([key, x]) => {
+      parts.push(`<text x="${x}" y="${y - 2}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r[key] ?? "-")}</text>`);
     });
-    speedCells.forEach(([speedKey, successKey, x]) => {
-      const speed = String(r[speedKey] ?? "").trim();
-      parts.push(`<text x="${x}" y="${y - 2}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(speed || "-")}</text>`);
-      parts.push(`<text x="${x}" y="${y + 20}" font-family="Verdana,Arial,sans-serif" font-size="13" fill="#666">${esc(String(r[successKey] ?? ""))}</text>`);
-    });
+    if (r.data_note) {
+      parts.push(`<text x="${cols[1][2]}" y="${y + 22}" font-family="Verdana,Arial,sans-serif" font-size="12" fill="#a00">${esc(String(r.data_note).slice(0, 90))}</text>`);
+    }
   });
 
   parts.push(`</svg>`);

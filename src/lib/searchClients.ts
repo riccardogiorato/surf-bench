@@ -13,37 +13,104 @@ import { withSearchCache } from "./cache/withSearchCache.js";
 
 // Cap each provider at 5 in-flight searches, matching the scrape suite's
 // per-provider limit so events can run concurrently without hammering vendors.
+// One limiter PER PROVIDER, not shared: a single shared instance would let a
+// busy provider's queue starve every other provider's slots for no rate-limit
+// reason.
 const VENDOR_MAX_CONCURRENCY = 5;
-const runLimited = createConcurrencyLimiter(VENDOR_MAX_CONCURRENCY);
+const providerLimiters = new Map<string, ReturnType<typeof createConcurrencyLimiter>>();
+function limiterFor(vendor: string) {
+  if (!providerLimiters.has(vendor)) {
+    providerLimiters.set(vendor, createConcurrencyLimiter(VENDOR_MAX_CONCURRENCY));
+  }
+  return providerLimiters.get(vendor)!;
+}
+
+// Exa's org cap is 10 requests/second (see RATE_LIMIT_ATTEMPTS below for the
+// reactive side of this). Concurrency alone does not prevent bursts: 5
+// in-flight calls that each resolve in under 500ms can still issue well over
+// 10 req/s. This paces request STARTS at a fixed minimum spacing, the same
+// pattern keenableClient.ts uses for its 10 req/s org cap, so the harness
+// mostly never needs the retry path at all instead of leaning on it.
+//
+// This singleton only coordinates calls across the whole search event because
+// vitest.config.ts runs the suite single-threaded with isolate:false — without
+// that, each of the search event's 13 separate test files (12 dims +
+// answerability) would get its own independent copy of exaNextStart and could
+// still burst past the cap by firing from different files at once.
+const EXA_MIN_SPACING_MS = 130; // ~7.7 req/s, under the 10/s cap with headroom
+let exaNextStart = 0;
+async function exaPaced<T>(fn: () => Promise<T>): Promise<T> {
+  return limiterFor("exa")(async () => {
+    const now = Date.now();
+    const start = Math.max(now, exaNextStart);
+    exaNextStart = start + EXA_MIN_SPACING_MS;
+    if (start > now) await new Promise((r) => setTimeout(r, start - now));
+    return fn();
+  });
+}
 
 // One wrapper for every provider: timing, result mapping, error capture,
 // concurrency limit and cache live here; each adapter only defines how to
 // call its API and map the response to {title, url} results.
+// Retries on the provider's own per-second cap. Without this the harness's
+// concurrency becomes the thing being measured: a baseline run scored exa
+// 16/29 on search, but 11 of its 13 failures were "Rate limit exceeded: 10
+// requests per second" — the org cap, tripped by this harness, recorded as if
+// exa had returned bad results. Only the exa-fast variant had backoff before.
+// Retry time is excluded from the reported latency so a provider is not also
+// punished on speed for the harness's pacing.
+const RATE_LIMIT_ATTEMPTS = 4;
+
+function isRateLimit(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error ?? "");
+  return /rate.?limit|\b429\b|too many requests|requests per second/i.test(msg);
+}
+
 function defineSearchProvider(
   vendor: string,
   fetchResults: (
     query: string,
     numResults: number,
   ) => Promise<SearchResult[]>,
+  // Optional dedicated pacer for providers with a known per-second org cap
+  // (currently only exa). Falls back to the plain per-provider concurrency
+  // limiter for everyone else.
+  pace: <T>(fn: () => Promise<T>) => Promise<T> = (fn) => limiterFor(vendor)(fn),
 ): SearchFunction {
   const impl: SearchFunction = async (query, numResults = 5) => {
+    let rateLimitWaitMs = 0;
     const startTime = Date.now();
-    try {
-      const results = (await fetchResults(query, numResults)).filter(
-        (r) => r.url,
-      );
-      return { results, latencyMs: Date.now() - startTime };
-    } catch (error) {
-      return {
-        results: [],
-        latencyMs: Date.now() - startTime,
-        error: error instanceof Error ? error.message : "unknown error",
-      };
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const results = (await fetchResults(query, numResults)).filter(
+          (r) => r.url,
+        );
+        return {
+          results,
+          latencyMs: Date.now() - startTime - rateLimitWaitMs,
+        };
+      } catch (error) {
+        if (isRateLimit(error) && attempt < RATE_LIMIT_ATTEMPTS - 1) {
+          const backoff = 1500 * 2 ** attempt * (0.5 + Math.random());
+          rateLimitWaitMs += backoff;
+          await new Promise((r) => setTimeout(r, backoff));
+          continue;
+        }
+        return {
+          results: [],
+          latencyMs: Date.now() - startTime - rateLimitWaitMs,
+          error: error instanceof Error ? error.message : "unknown error",
+        };
+      }
     }
   };
-  return withSearchCache(vendor, (q, n) =>
-    runLimited(() => impl(q, n)),
-  );
+  return withSearchCache(vendor, (q, n) => pace(() => impl(q, n)));
+}
+
+// Parallel returns excerpts as an array of strings rather than one snippet.
+function excerptText(item: any): string {
+  if (Array.isArray(item.excerpts)) return item.excerpts.join(" ").trim();
+  return item.excerpt || item.content || "";
 }
 
 // ---- provider adapters: only the API call + mapping ----
@@ -53,16 +120,25 @@ const firecrawlSearch = defineSearchProvider("firecrawl", async (query, numResul
   return (response.web ?? []).map((item: any) => ({
     title: item.title || item.metadata?.title || "",
     url: item.url || "",
+    snippet: item.description || item.snippet || "",
   }));
 });
 
-const exaSearch = defineSearchProvider("exa", async (query, numResults) => {
-  const response = await exaClientFactory().search(query, { numResults });
-  return (response.results ?? []).map((item: any) => ({
-    title: item.title || "",
-    url: item.url || "",
-  }));
-});
+const exaSearch = defineSearchProvider(
+  "exa",
+  async (query, numResults) => {
+    const response = await exaClientFactory().search(query, { numResults });
+    return (response.results ?? []).map((item: any) => ({
+      title: item.title || "",
+      url: item.url || "",
+      // exa's plain search returns no text unless contents are requested, which
+      // would change its latency profile. Graders judge source selection from
+      // title+url when a snippet is absent rather than penalising the provider.
+      snippet: item.text || item.snippet || "",
+    }));
+  },
+  exaPaced,
+);
 
 const linkupSearch = defineSearchProvider("linkup", async (query, numResults) => {
   const response = await linkupClientFactory().search({
@@ -72,7 +148,11 @@ const linkupSearch = defineSearchProvider("linkup", async (query, numResults) =>
   });
   return (response.results ?? [])
     .slice(0, numResults)
-    .map((item: any) => ({ title: item.name || "", url: item.url || "" }));
+    .map((item: any) => ({
+      title: item.name || "",
+      url: item.url || "",
+      snippet: item.content || "",
+    }));
 });
 
 const braveSearch = defineSearchProvider("brave", async (query, numResults) => {
@@ -81,7 +161,11 @@ const braveSearch = defineSearchProvider("brave", async (query, numResults) => {
   });
   return (response.web?.results ?? [])
     .slice(0, numResults)
-    .map((item: any) => ({ title: item.title || "", url: item.url || "" }));
+    .map((item: any) => ({
+      title: item.title || "",
+      url: item.url || "",
+      snippet: item.description || "",
+    }));
 });
 
 const tavilySearch = defineSearchProvider("tavily", async (query, numResults) => {
@@ -89,6 +173,7 @@ const tavilySearch = defineSearchProvider("tavily", async (query, numResults) =>
   return (response.results ?? []).map((item: any) => ({
     title: item.title || "",
     url: item.url || "",
+    snippet: item.content || "",
   }));
 });
 
@@ -100,6 +185,7 @@ const parallelSearch = defineSearchProvider("parallel", async (query, numResults
   return (response.results ?? []).map((item: any) => ({
     title: item.title || "",
     url: item.url || "",
+    snippet: excerptText(item),
   }));
 });
 
@@ -135,6 +221,7 @@ const exaFastSearch = defineSearchProvider("exa-fast", async (query, numResults)
   return (response.results ?? []).map((item: any) => ({
     title: item.title || "",
     url: item.url || "",
+    snippet: item.text || item.snippet || "",
   }));
 });
 
@@ -147,6 +234,7 @@ const parallelTurboSearch = defineSearchProvider("parallel-turbo", async (query,
   return (response.results ?? []).map((item: any) => ({
     title: item.title || "",
     url: item.url || "",
+    snippet: excerptText(item),
   }));
 });
 
@@ -168,7 +256,11 @@ const serperSearchImpl: SearchFunction = async (query, numResults = 5) => {
     const data = await response.json();
     const results = (data.organic ?? [])
       .slice(0, numResults)
-      .map((item: any) => ({ title: item.title || "", url: item.link || "" }));
+      .map((item: any) => ({
+        title: item.title || "",
+        url: item.link || "",
+        snippet: item.snippet || "",
+      }));
     return { results, latencyMs: Date.now() - startTime };
   } catch (error) {
     return {
@@ -179,7 +271,7 @@ const serperSearchImpl: SearchFunction = async (query, numResults = 5) => {
   }
 };
 const serperSearch = withSearchCache("serper", (q, n) =>
-  runLimited(() => serperSearchImpl(q, n)),
+  limiterFor("serper")(() => serperSearchImpl(q, n)),
 );
 
 function gateOnKey(

@@ -53,12 +53,19 @@ export function withSearchCache(
 
     const result = await fn(query, numResults);
 
-    try {
-      await ensureDir(vendorDir);
-      const cacheEntry: CacheEntry = { data: result, timestamp: Date.now() };
-      await fs.writeFile(filePath, JSON.stringify(cacheEntry, null, 2));
-    } catch {
-      // Ignore cache write errors
+    // An error (rate limit, quota, timeout...) is not a result worth caching
+    // for 24h: it previously meant one bad run against a provider's per-second
+    // cap stayed "rate limited" in every re-run for a full day, regardless of
+    // retry/pacing fixes made after the fact. Same rule the judge cache uses:
+    // never persist a failure as if it were data.
+    if (!result.error) {
+      try {
+        await ensureDir(vendorDir);
+        const cacheEntry: CacheEntry = { data: result, timestamp: Date.now() };
+        await fs.writeFile(filePath, JSON.stringify(cacheEntry, null, 2));
+      } catch {
+        // Ignore cache write errors
+      }
     }
 
     return result;

@@ -3,7 +3,10 @@ import fs from "fs/promises";
 import path from "path";
 import { createConcurrencyLimiter } from "../concurrency.js";
 import type { Verdict } from "../types.js";
+import { QUEST_RUBRIC } from "./rubrics.js";
 import "dotenv/config";
+
+export { QUEST_RUBRIC, SEARCH_RESULTS_RUBRIC, SCRAPE_SUBSTANCE_RUBRIC } from "./rubrics.js";
 
 // The judging panel: two models via Together AI REST, scores averaged.
 // Together rate limits are dynamic and aggressive, so calls are throttled to
@@ -29,6 +32,9 @@ const MAX_ATTEMPTS = 5;
 const MAX_OUTPUT_TOKENS = 8192; // headroom: Kimi K3's thinking must fit alongside the JSON reply
 
 const JUDGE_ERROR_PREFIX = "judge error:";
+
+// Raised for billing/auth failures, which no amount of retrying will fix.
+export class FatalJudgeError extends Error {}
 
 interface JudgeCacheEntry {
   verdicts: Verdict[];
@@ -64,20 +70,16 @@ async function writeVerdictsToCache(key: string, verdicts: Verdict[]) {
   }
 }
 
-const QUEST_RUBRIC =
-  "You are a strict but fair judge at a web-benchmark contest. Given a QUESTION and CONTENT fetched from the web, score 0-10 whether the content contains a usable answer to the question. 10 = the answer is present, specific and quotable. 7-9 = answer is present but partial. 4-6 = only partially relevant. 1-3 = mostly irrelevant. 0 = nothing usable (blocked page, login wall, boilerplate).";
-
 // Throttle: 2 judge calls in flight; per-call timeout; exponential backoff.
 const runThrottled = createConcurrencyLimiter(2);
 
 async function askJudge(
   panelName: string,
   model: string,
-  question: string,
-  artifact: string,
+  rubric: string,
+  prompt: string,
 ): Promise<Verdict> {
   return runThrottled(async () => {
-    const prompt = `QUESTION: ${question}\n\nCONTENT:\n${artifact.slice(0, 12000)}\n\nScore this content 0-10 for answering the question. Respond ONLY with JSON {"score": number, "rationale": string}.`;
     let lastError: unknown;
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       try {
@@ -89,7 +91,12 @@ async function askJudge(
           },
           body: JSON.stringify({
             model,
-            messages: [{ role: "user", content: prompt }],
+            messages: [
+              // The rubric defines the 0-10 scale. It used to only salt the
+              // cache key, which left judges scoring on an undefined scale.
+              { role: "system", content: rubric },
+              { role: "user", content: prompt },
+            ],
             max_tokens: MAX_OUTPUT_TOKENS,
             temperature: 0,
             ...PANEL.find((p) => p.model === model)?.extra,
@@ -97,7 +104,17 @@ async function askJudge(
           signal: AbortSignal.timeout(CALL_TIMEOUT_MS),
         });
         if (!response.ok) {
-          throw new Error(`Together HTTP ${response.status}`);
+          const body = await response.text().catch(() => "");
+          // Credit/auth failures are not transient. Retrying one five times
+          // with exponential backoff burns ~93s per call and then reports a
+          // judge error anyway, which is what made a dead Together key look
+          // like 71 hung tests instead of one clear billing problem.
+          if (response.status === 402 || response.status === 401 || response.status === 403) {
+            throw new FatalJudgeError(
+              `Together HTTP ${response.status}: ${body.slice(0, 160)}`,
+            );
+          }
+          throw new Error(`Together HTTP ${response.status}: ${body.slice(0, 120)}`);
         }
         const data = await response.json();
         const text: string = data.choices?.[0]?.message?.content ?? "";
@@ -110,6 +127,7 @@ async function askJudge(
           judge: panelName,
         };
       } catch (e) {
+        if (e instanceof FatalJudgeError) throw e;
         lastError = e;
         await new Promise((r) => setTimeout(r, 3000 * 2 ** attempt));
       }
@@ -118,11 +136,13 @@ async function askJudge(
   });
 }
 
-export async function grade(
-  question: string,
-  artifact: string,
+// Grades one prompt against one rubric with the full panel. Verdicts are
+// cached by hash(rubric + prompt), so a rubric edit re-grades from scratch.
+export async function gradeWithRubric(
+  rubric: string,
+  prompt: string,
 ): Promise<{ verdicts: Verdict[]; average: number; flagged: boolean }> {
-  const key = hashArtifact(artifact, QUEST_RUBRIC);
+  const key = hashArtifact(prompt, rubric);
   const cached = await readVerdictsFromCache(key);
   if (cached) {
     const average = cached.reduce((s, v) => s + v.score, 0) / cached.length;
@@ -132,7 +152,7 @@ export async function grade(
   const verdicts = await Promise.all(
     PANEL.map(async (p) => {
       try {
-        return await askJudge(p.name, p.model, question, artifact);
+        return await askJudge(p.name, p.model, rubric, prompt);
       } catch (e) {
         return {
           score: 0,
@@ -159,4 +179,38 @@ export async function grade(
     await writeVerdictsToCache(key, verdicts);
   }
   return { verdicts, average, flagged };
+}
+
+// Cheap liveness check for the panel. Grading passes call this first so a dead
+// or unfunded Together key reports one clear line instead of grinding through
+// hundreds of cases that can only fail.
+export async function judgePanelPreflight(): Promise<{ ok: boolean; reason?: string }> {
+  if (!process.env.TOGETHER_API_KEY) {
+    return { ok: false, reason: "TOGETHER_API_KEY is not set" };
+  }
+  try {
+    await askJudge(
+      PANEL[0].name,
+      PANEL[0].model,
+      "You are a judge. Reply with JSON only.",
+      'Reply ONLY with JSON {"score": 5, "rationale": "preflight"}.',
+    );
+    return { ok: true };
+  } catch (e) {
+    return {
+      ok: false,
+      reason: e instanceof Error ? e.message.slice(0, 200) : "unknown judge failure",
+    };
+  }
+}
+
+// Quest grading: "does this fetched content answer the question".
+export async function grade(
+  question: string,
+  artifact: string,
+): Promise<{ verdicts: Verdict[]; average: number; flagged: boolean }> {
+  return gradeWithRubric(
+    QUEST_RUBRIC,
+    `QUESTION: ${question}\n\nCONTENT:\n${artifact.slice(0, 12000)}\n\nScore this content for answering the question. Respond ONLY with JSON {"score": number, "rationale": string}.`,
+  );
 }

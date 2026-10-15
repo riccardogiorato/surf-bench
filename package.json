@@ -12,7 +12,10 @@
     "dev:ui": "bunx vite preview --outDir html",
     "report": "bun run scripts/report.ts",
     "hero": "bun run scripts/hero.ts",
-    "judge": "bun run scripts/judge-quest.ts"
+    "judge": "bun run scripts/judge-quest.ts",
+    "judge:search": "bun run scripts/judge-search.ts",
+    "judge:scrape": "bun run scripts/judge-scrape.ts",
+    "audit": "bun run scripts/audit.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

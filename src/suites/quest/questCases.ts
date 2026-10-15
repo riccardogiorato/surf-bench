@@ -1,9 +1,13 @@
 import type { QuestCase } from "../../lib/types.js";
 
 // Quest questions: find it, read it, bring back the answer.
-// expectTokens: lowercase tokens the assembled content should contain to be
-// considered on-target (used for the deterministic gate; the judge panel adds
-// the quality score on top).
+//
+// expectTokens are a RECORDED DIAGNOSTIC, not a gate. The old comment claimed
+// they drove a deterministic gate; nothing ever read them, and they should not
+// be wired up now: token presence is the same substring test that made the
+// search event uninformative. Whether the content answers the question is the
+// judge panel's call. These tokens survive only as a cheap, model-free
+// cross-check when a verdict looks wrong.
 export const QUEST_CASES: QuestCase[] = [
   {
     id: "q1",

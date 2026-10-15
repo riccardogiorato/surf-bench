@@ -48,19 +48,24 @@ function urlToFilename(url: string): string {
       
       // Fetch fresh data
       const result = await fn(url, timeout);
-      
-      // Save to cache
-      try {
-        await ensureDir(vendorDir);
-        const cacheEntry: CacheEntry = {
-          data: result,
-          timestamp: Date.now()
-        };
-        await fs.writeFile(filePath, JSON.stringify(cacheEntry, null, 2));
-      } catch (error) {
-        console.warn(`Failed to cache result for ${url}:`, error);
+
+      // Don't cache a failure for 24h: a transient rate limit or timeout would
+      // otherwise read as a permanent scrape failure for this URL until the
+      // TTL expires, regardless of any retry/pacing fix made afterward. Same
+      // rule the search cache and judge cache use for errors.
+      if (!result.error) {
+        try {
+          await ensureDir(vendorDir);
+          const cacheEntry: CacheEntry = {
+            data: result,
+            timestamp: Date.now()
+          };
+          await fs.writeFile(filePath, JSON.stringify(cacheEntry, null, 2));
+        } catch (error) {
+          console.warn(`Failed to cache result for ${url}:`, error);
+        }
       }
-      
+
       return result;
     };
   }

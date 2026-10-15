@@ -26,6 +26,11 @@ export interface TestSite {
 export interface SearchResult {
   title: string;
   url: string;
+  // Provider-supplied snippet/excerpt, when the API returns one for free.
+  // Needed so result sets can be graded on content, not just string matching.
+  // Not every provider ships one, so graders must treat it as optional and
+  // must not reward length (see searchQuality.ts).
+  snippet?: string;
 }
 
 export interface SearchResponse {
@@ -43,7 +48,7 @@ export type SearchFunction = (
 export interface QuestCase {
   id: string;
   question: string;
-  // tokens the final content should contain to be considered on-target
+  // Diagnostic only — never a pass/fail gate. See questCases.ts.
   expectTokens: string[];
 }
 

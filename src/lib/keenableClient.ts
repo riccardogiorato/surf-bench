@@ -86,6 +86,7 @@ export async function keenableSearchResults(
   return (data.results ?? []).map((item: any) => ({
     title: item.title || "",
     url: item.url || "",
+    snippet: item.snippet || item.description || item.content || "",
   }));
 }
 
