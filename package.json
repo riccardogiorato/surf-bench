@@ -19,14 +19,14 @@
     "vitest": "^4.1.11"
   },
   "devDependencies": {
-    "@mendable/firecrawl-js": "^4.38.0",
-    "@tavily/core": "^0.7.8",
-    "@types/node": "^26.4.1",
+    "@mendable/firecrawl-js": "^4.46.0",
+    "@tavily/core": "^0.7.14",
+    "@types/node": "^26.6.5",
     "@vitest/ui": "^4.1.11",
     "brave-search": "^0.9.0",
-    "exa-js": "^2.19.0",
-    "linkup-sdk": "^3.6.0",
-    "parallel-web": "^1.3.3",
+    "exa-js": "^2.25.0",
+    "linkup-sdk": "^3.7.1",
+    "parallel-web": "^1.3.5",
     "typescript": "^7.0.2"
   }
 }
