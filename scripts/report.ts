@@ -461,9 +461,6 @@ function writeScoreboardSvg(rows: Row[]) {
     cells.forEach(([key, x]) => {
       parts.push(`<text x="${x}" y="${y - 2}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r[key] ?? "-")}</text>`);
     });
-    if (r.data_note) {
-      parts.push(`<text x="${cols[1][2]}" y="${y + 22}" font-family="Verdana,Arial,sans-serif" font-size="12" fill="#a00">${esc(String(r.data_note).slice(0, 90))}</text>`);
-    }
   });
 
   parts.push(`</svg>`);

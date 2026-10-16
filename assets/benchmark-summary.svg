@@ -35,7 +35,6 @@
 <text x="1060" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">94</text>
 <text x="1270" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">38</text>
 <text x="1470" y="240" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">88%</text>
-<text x="850" y="264" font-family="Verdana,Arial,sans-serif" font-size="12" fill="#a00">quest: event not run for this provider</text>
 <rect y="280" width="1720" height="76" fill="#f4f2ea"/>
 <image x="90" y="301" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAe1BMVEX/////TQD/UQD/KQD//fz/IwD/NQD/TAD//Pv/MAD/AAD/QgD/y7P/GgD/+fb/OwD/poL/7ub/9O7/4tX/YQn/sJD/j1//upz/ZiL/iVf/dzn/bin/mGz/vaH/xKz/4NP/2cr/0Lz/6N//oXj/gkv/1cT/lWf/YxX/cTRRFkaZAAABh0lEQVRIid2V23aCMBBFM+QCSQjUa63YiFht//8LCwSMIAnksZ3lC6zZzpkzQ4LQPw3S/kJitw9EUqXeURIArGiEDyFEhgEkBKhqAMg/QiTVAIhqcYmUN0B8XFyhiBsA+MK2SaXafKCbZfkoMvnA02X5J9YB7HNRhbQTVAO6xuecImfRKwJcomqbzeRnNh9othNsroEcbMRaAZuRdHoGgEVAV35BCkYh3/wF5BgA7vXpNR9yXwmzpaNQmbvEDXdJEbOA9CyttkuB7TjUejqbJOizB/ilsn45uxCZ+XCgXeyrncjW1XFe9gBDhOAH4Jj2GQPvhPNd/fwV9wCeXsCb/UvZDEv35YBOd10+PDXOb/BMhX5qkTi3mlf4YfJ006STQLV5rkQqvS6hwri+77ZNp+jeEvLqAMwUpN1Osm6npxyfBEGNq7h8Nr050eJvRwFENB03eOH+I/Yg42GD9THOXR3UkSAmi+GrPC98X1yCpByqFD/+i4ig42Cqm/vcxfVyNAbev38ifgFqHQ8FZqCT6wAAAABJRU5ErkJggg=="/>
 <text x="36" y="328" font-family="Verdana,Arial,sans-serif" font-size="24">🥉</text>
@@ -75,7 +74,6 @@
 <text x="1060" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">n/a</text>
 <text x="1270" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">n/a</text>
 <text x="1470" y="544" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">n/a</text>
-<text x="850" y="568" font-family="Verdana,Arial,sans-serif" font-size="12" fill="#a00">scrape: no scorable cases (all quota or rate-limited); search: no scorable cases (all quot</text>
 <rect y="584" width="1720" height="76" fill="#f4f2ea"/>
 <image x="90" y="605" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAPFBMVEVHcEwAlZX0ZGTrYGAAlJTwY2MAlJQAkZHzZGQAkpL0ZGS1aGgGjo7nX1/uYmIBkJDsYWEAkZEAlJQAkJB5vhSIAAAAEHRSTlMAwug73J/vaf2fzg0lJWVTJvrNkQAAAZpJREFUWIXtl9GSgyAMRRVEEAoC+f9/XcB2aZUgo06d2dm83+NNiIF03TdCTUjwNv3sPThfCOeHR4P+MbgQUAgHfmoyAA6NsQHA3WlAJf4BFwCG2x3cnoK/HfAHUrgfcLqIcDqF/mYAnC/i3SlcUINrHShNKdX6KIAySYSwRDJzBGCIsK8Qlqk2gH8BlLSfIXWjg+V9QK1YAYQwTQCXHjl6LU8I0wAAN0c9KegDQTcAxvhGYkV9qIPaTyE+smgpgRRm/xRiDdcHkHMgewDwvGbACrqbQsjSoHor2A4gtRHDHTzLiALAx0OUFQDRdUAfP4DLA4BWAclAV+6i9ypigOePVANUHSxdWGmDnRqkHuiOn0Kehsf6APKqgfyLCaDxRhrzzMJzkNi/AG6c88RSqAGKAMCP7zMTmwfPCmwBoX6rVatMIOWRFuxvFq3NTE56WgJAsF/Y9NTGg5A5S57V4VE1b+WRYFaD/f1m4b/qIEcXTcXCfx0h8XZjH/cjX5bUsef1NVWZdDmGq3F1vXI/9BOfH6qsa4xz6lr8AHc5kPU1PyPPAAAAAElFTkSuQmCC"/>
 <text x="36" y="632" font-family="Verdana,Arial,sans-serif" font-size="24"></text>
@@ -85,7 +83,6 @@
 <text x="1060" y="620" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">54</text>
 <text x="1270" y="620" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">25</text>
 <text x="1470" y="620" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">54%</text>
-<text x="850" y="644" font-family="Verdana,Arial,sans-serif" font-size="12" fill="#a00">search: event not run for this provider; quest: event not run for this provider; only 1 ev</text>
 <rect y="660" width="1720" height="76" fill="#ffffff"/>
 <image x="90" y="681" width="34" height="34" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAUVBMVEVHcEz/QAD/QQD/////SgD/QwD/OQD/PAD/PgD/KwD/MAD/RwD/KAD/QQD/UAD/OwD/IQD/TQT/NgD/VAn/7un/29P/bU3/jXX/q5r/xLf/CwAIaoj2AAAACnRSTlMAYAv/3qwghzrR7UleYgAAA+lJREFUWIWdV9mi6iAMdGmtUihbocv/f+gNhbCVnuO50QerZhiGIYTbrRXv0QXzwSGUUuTd/Ot1PvMAPAKo17f5r1G2GBD1+C7/0fl0jxAZAIXPdwCQ32bwBYLj2If8mgGBF+3Dn5oxdNMku06G8RsMCKEfQin9DE3mE4SEwPSzBh6DUkEbc+l0BJCZBtwH5lOX7yBOCJ2OAJwFBkwRZi2nRIUpwNDkAgHyA8Co18VCAldEruYJYRYmIGMXdlkDBUFFieDGDwBsdknztq7HBx9mXc3xaHZkIESfAfQaGajt+WOsO+aLfCleyGBcfs5/Pq1AhEc1Bwcw2t/yn08uPECp4nAAyHH+HcDsXsR7YxXYIcBszLZtpkpzX3khDxkqBu9DAy+AsZS6hR8X1HPeLHGq7bs1KEOlwQD5wAATVq04mJAw/0jBSooKjQs7724KxSq4CWiWrSCYh4+M+LUXnFO1ZHNadgfwyWfgCMhy1qti2n8CG6/lbweASCUu2KCSeyNhUa2oFA0AmQjTMYXqbzMN4y6ihq6nAFaenJlLF2wiiLLuJfRMTiLe/TKWPrQ0ABpR/DArv4y5k15+GQuELawiZIhchNltbgdQOHHymylHkDw+SKLT92NzL/RhOyeEVfG4M8GI0SNShIJSFtY7FhSGWZrxuPgLwRXF3QwA5VH5mLCk4bgrYXrzTlzHyMCKWNJuZaSiigMbCXV0tJZBGdRBxAUr2rksD6kqK7TDQo9DQQmcC1TEUJVrCfyGxrIe/WS0YozY9Lyng6E+6x9TBMjNAPLl+0iGcwGUvNURTyZW1GVdmHAVOIX+BDBEEfMdMSuWPzoRPMD9BPCODPJ8ybnOnxGANtqdyCD53sDZzJRMHLYwhfPZCtEHgOTmTbnTmal0WqGI9CzB7XEPAFNwkrEE6qqWFApqWMlF4OF6lgC2dOwPnJuNhdLOXSU1i3MPfJqPfM+g2ebI2KEwNhKwYCzjCxR2wV1zEBi0m60+b3E4yY9ZN7jr0pBBs0e63VOLM7KlOiVnS32HdPRI7a73lTHg1UHgdpZrkgKDZj7UNQSAt6oaBSgEKjK46jf7TAOmbN7iMOp6ZWTQlgDcnDEYwULRkmBAbBMPBpdte9FojiydTKFbDwyuO+YhZwDvo5SC/qnRPBi0bOjjIXMG4CelZ8NUvC94BuQyH6yQGPgbCyekaHUdgx+vPkPJoLqxHAyuJ4AcEoOxui+4+PXq9eou7wvw/nxzbRrwvsCq+wJRVw6q4t21GXy+vve5e9P5zvTl8IHEiQH/w8UVSeQa/Gl4JIEyct79dfhAAhn8x/CBxMHgP4f3MbDuF+v+A4tzcSbr/fGlAAAAAElFTkSuQmCC"/>
 <text x="36" y="708" font-family="Verdana,Arial,sans-serif" font-size="24"></text>
@@ -95,5 +92,4 @@
 <text x="1060" y="696" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">100</text>
 <text x="1270" y="696" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">100</text>
 <text x="1470" y="696" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">n/a</text>
-<text x="850" y="720" font-family="Verdana,Arial,sans-serif" font-size="12" fill="#a00">scrape: event not run for this provider; quest: event not run for this provider; only 1 ev</text>
 </svg>
