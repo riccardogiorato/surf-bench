@@ -69,7 +69,9 @@ speed 0.15**. Quality comes from the judge panel; it is never a string match.
 - Always `bun run audit` before publishing; it exits non-zero on blocking issues.
 - Keenable is org-rate-limited to 10 req/s: all its search + fetch calls share the paced gate in `keenableClient.ts` (~9 req/s, 429 backoff); its timings include that pacing. Only `request()` may enter the gate — nesting `paced()` deadlocked every run with >4 concurrent fetches. To run a single provider's suite, blank the other keys on the command line (`EXA_API_KEY= ... bunx vitest run src/suites`) — SDK clients construct lazily so absent keys never throw.
 - `SURFBENCH_TURBO=1` swaps exa → `exa-fast` (search `type:"fast"`, serialized + rate-limit backoff) and parallel → `parallel-turbo` (search `mode:"turbo"`) for the search event only, recorded under those names. Never run two exa-flavored suites concurrently — the org cap is shared.
-- `bun run scripts/quest-turbo.ts` — quest side-event in super-fast configs → `results/raw/quest-turbo.jsonl`.
+- `bun run scripts/quest-turbo.ts` — quest in the same fast configs → `results/raw/quest-turbo.jsonl`.
+- Fast configs are RANKED ROWS on the overall board (`exa (fast)`, `parallel (turbo)`), never merged into the default row — a provider must not pick its best mode per event. They reuse the parent's scrape event (no fast scrape mode) and count toward each event's fastest-p50 speed anchor. To refresh them: `SURFBENCH_TURBO=1 bunx vitest run src/suites/search -t "(exa-fast|parallel-turbo) vendor"`, then `quest-turbo.ts`, then `judge:search`.
+- `assets/hero.svg` reads `results/summary.json`; re-run `hero.ts` after `report`.
 - Records dedupe by (provider, case) keeping the LAST line in the jsonl.
 - The Y2K theme: retro windows, bevels, Silkscreen pixel accents. Design doc lives locally at `docs/surfbench-design.html` (gitignored on purpose).
 - Type-check with `npx tsc --noEmit` before committing.

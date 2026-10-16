@@ -6,13 +6,29 @@ SurfBench compares web-access APIs on the three things agents actually do: **sea
 
 ![SurfBench hero](assets/hero.svg)
 
-## Overall Agent-Ready Leaderboard — 5 September 2026
+## Overall Agent-Ready Leaderboard — 16 October 2026
 
 ![Overall agent-ready leaderboard](assets/benchmark-summary.svg)
 
+### How scoring works
+
+Every provider is scored on three axes, averaged across the three events, then combined:
+
+| axis | weight | what it measures |
+|---|---|---|
+| **quality** | 0.50 | judge-panel verdicts (0–10, Kimi K3 + GLM-5.3, averaged) — never string matching |
+| **reliability** | 0.35 | share of cases that produced usable output |
+| **speed** | 0.15 | median latency relative to the fastest config in each event (floored at 25) |
+
+- **Search** — the ranked result set for each answerability query is graded on whether it lets an agent answer the question.
+- **Scrape** — every one of the 50 extractions is graded on whether the page's main content is there. A scrape passes at ≥ 4/10 (partial content); blocks, login walls and empty responses score 0.
+- **Quest** — search → fetch the top results → the panel grades whether the fetched content answers the question. A leg over 30s is a wipeout.
+- **Fast modes are separate rows.** `exa (fast)` (search `type: "fast"`, index-only contents) and `parallel (turbo)` (search `mode: "turbo"`) are ranked on their own, never merged with the default config. Scrape has no fast mode, so they reuse their parent's scrape result.
+- **n/a, never zero.** Rate-limit and quota failures are excluded rather than scored. An event needs ≥ 80% of cases scorable, and a composite needs quality plus ≥ 2 scored events — otherwise the provider shows `n/a`.
+
 ## Recommendation
 
-**Pair an exa or parallel search leg with parallel's extraction.** Parallel is the only provider that scraped all 50 hard URLs — it renders the bot-protected pages the others fail, at 0.6s average. For search, exa and parallel tie on quality (28/29) while exa is ~2× faster; brave is the fastest raw search if you want to mix providers. New this run: **keenable** — one key for both search and fetch, 100,000 free requests/month, top quest judge score (8.3) and the second-best scrape p95, though it can't render the hardest bot-walled pages (36/50).
+**exa in fast mode is the best all-rounder (85).** It has the top search (8.9) and quest (9.3) judge scores and answers a quest in 1.5s. Its weak spot is scraping (66%): it refuses X, Reddit and eBay, and returns ~1,000-character previews of some news articles. **For scraping, keenable** gets the most usable pages (44/50, quality 73%) but is the slowest (10.6s median); firecrawl and parallel follow at 38/50. **parallel turbo** is the budget pick: 77 overall at about $2 per 1k searches + 1k fetches. keenable has no quest run yet, so its composite covers search and scrape only.
 
 **Pricing at 1,000 searches + 1,000 scraped URLs** (list prices, September 2026):
 

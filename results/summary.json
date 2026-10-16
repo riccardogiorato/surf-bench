@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T15:41:26.082Z",
+  "generatedAt": "2026-10-16T18:03:02.290Z",
   "weights": {
     "quality": 0.5,
     "reliability": 0.35,
@@ -94,6 +94,18 @@
   ],
   "search": [
     {
+      "provider": "exa-fast",
+      "answerability_cases": 12,
+      "scored": 12,
+      "excluded": 0,
+      "reliability": "100%",
+      "quality": "89%",
+      "judge_avg": "8.9",
+      "capability": "29/29",
+      "p50_s": "0.9s",
+      "note": ""
+    },
+    {
       "provider": "exa",
       "answerability_cases": 12,
       "scored": 12,
@@ -166,6 +178,18 @@
       "note": ""
     },
     {
+      "provider": "parallel-turbo",
+      "answerability_cases": 12,
+      "scored": 12,
+      "excluded": 0,
+      "reliability": "100%",
+      "quality": "80%",
+      "judge_avg": "8.0",
+      "capability": "27/29",
+      "p50_s": "0.8s",
+      "note": ""
+    },
+    {
       "provider": "linkup",
       "answerability_cases": 12,
       "scored": 12,
@@ -179,6 +203,19 @@
     }
   ],
   "quest": [
+    {
+      "provider": "exa-fast",
+      "quests": 15,
+      "scored": 15,
+      "excluded": 0,
+      "delivered": 15,
+      "reliability": "100%",
+      "quality": "93%",
+      "judge_avg": "9.3",
+      "wipeouts": 0,
+      "p50_s": "1.5s",
+      "note": ""
+    },
     {
       "provider": "exa",
       "quests": 15,
@@ -243,29 +280,31 @@
       "wipeouts": 0,
       "p50_s": "20.4s",
       "note": ""
+    },
+    {
+      "provider": "parallel-turbo",
+      "quests": 15,
+      "scored": 15,
+      "excluded": 0,
+      "delivered": 15,
+      "reliability": "100%",
+      "quality": "69%",
+      "judge_avg": "6.9",
+      "wipeouts": 1,
+      "p50_s": "3.1s",
+      "note": ""
     }
   ],
   "overall": [
     {
-      "provider": "exa",
-      "agent_ready": "81",
-      "quality": "77",
+      "provider": "exa-fast",
+      "agent_ready": "85",
+      "quality": "80",
       "reliability": "89",
-      "speed": "76",
+      "speed": "92",
       "scrape_reliability": "66%",
-      "search_quality": "87%",
-      "quest_quality": "88%",
-      "data_note": ""
-    },
-    {
-      "provider": "parallel",
-      "agent_ready": "78",
-      "quality": "76",
-      "reliability": "92",
-      "speed": "50",
-      "scrape_reliability": "76%",
-      "search_quality": "86%",
-      "quest_quality": "80%",
+      "search_quality": "89%",
+      "quest_quality": "93%",
       "data_note": ""
     },
     {
@@ -273,18 +312,51 @@
       "agent_ready": "78",
       "quality": "79",
       "reliability": "94",
-      "speed": "38",
+      "speed": "34",
       "scrape_reliability": "88%",
       "search_quality": "85%",
       "quest_quality": "n/a",
       "data_note": "quest: event not run for this provider"
     },
     {
+      "provider": "exa",
+      "agent_ready": "77",
+      "quality": "77",
+      "reliability": "89",
+      "speed": "48",
+      "scrape_reliability": "66%",
+      "search_quality": "87%",
+      "quest_quality": "88%",
+      "data_note": ""
+    },
+    {
+      "provider": "parallel-turbo",
+      "agent_ready": "77",
+      "quality": "70",
+      "reliability": "92",
+      "speed": "61",
+      "scrape_reliability": "76%",
+      "search_quality": "80%",
+      "quest_quality": "69%",
+      "data_note": ""
+    },
+    {
+      "provider": "parallel",
+      "agent_ready": "74",
+      "quality": "76",
+      "reliability": "92",
+      "speed": "28",
+      "scrape_reliability": "76%",
+      "search_quality": "86%",
+      "quest_quality": "80%",
+      "data_note": ""
+    },
+    {
       "provider": "firecrawl",
-      "agent_ready": "76",
+      "agent_ready": "74",
       "quality": "73",
       "reliability": "92",
-      "speed": "49",
+      "speed": "32",
       "scrape_reliability": "76%",
       "search_quality": "86%",
       "quest_quality": "74%",
@@ -292,10 +364,10 @@
     },
     {
       "provider": "tavily",
-      "agent_ready": "72",
+      "agent_ready": "70",
       "quality": "66",
       "reliability": "85",
-      "speed": "61",
+      "speed": "51",
       "scrape_reliability": "54%",
       "search_quality": "83%",
       "quest_quality": "72%",
@@ -303,10 +375,10 @@
     },
     {
       "provider": "linkup",
-      "agent_ready": "66",
+      "agent_ready": "64",
       "quality": "62",
       "reliability": "84",
-      "speed": "36",
+      "speed": "27",
       "scrape_reliability": "52%",
       "search_quality": "65%",
       "quest_quality": "79%",
@@ -328,7 +400,7 @@
       "agent_ready": "n/a",
       "quality": "87",
       "reliability": "100",
-      "speed": "100",
+      "speed": "83",
       "scrape_reliability": "n/a",
       "search_quality": "87%",
       "quest_quality": "n/a",

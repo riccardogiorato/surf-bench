@@ -16,7 +16,7 @@ import "dotenv/config";
 //
 //   parallel-turbo  search mode "turbo" (fastest preset, $1/1k tier) + the
 //                   same full-content extract as the main bench
-//   exa-express     search type "fast" + contents livecrawl "never" (index-only)
+//   exa-fast        search type "fast" + contents livecrawl "never" (index-only)
 //
 // Compare against the default-quest numbers in results/README.md.
 
@@ -55,7 +55,7 @@ const configs: FastConfig[] = [
     },
   },
   {
-    name: "exa-express",
+    name: "exa-fast",
     search: async (query) => {
       const response = await exaClientFactory().search(query, {
         numResults: 3,

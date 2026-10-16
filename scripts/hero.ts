@@ -31,13 +31,31 @@ function podiumCard(
   );
 }
 
+type Row = Record<string, string>;
+
+// Display names for fast-mode configs; must match scripts/report.ts.
+const TURBO_PARENT: Record<string, string> = { "exa-fast": "exa", "parallel-turbo": "parallel" };
+const DISPLAY: Record<string, string> = { "exa-fast": "exa (fast)", "parallel-turbo": "parallel (turbo)" };
+const displayName = (p: string) => DISPLAY[p] ?? p;
+const num = (v: string | undefined) => (v && v !== "n/a" ? parseFloat(v) : -1);
+const top = (rows: Row[], key: string) => [...rows].sort((a, b) => num(b[key]) - num(a[key]))[0];
+
 function main() {
+  const summary = JSON.parse(fs.readFileSync("results/summary.json", "utf8"));
+  const ranked: Row[] = (summary.overall as Row[]).filter((r) => r.agent_ready !== "n/a");
+  const searchTop = top(summary.search, "quality");
+  const scrapeTop = top(summary.scrape, "reliability");
+  const questTop = top(summary.quest, "quality");
+  const runDate = new Date(summary.generatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const winners: Array<[string, string, number]> = ranked
+    .slice(0, 3)
+    .map((r, i) => [["🥇", "🥈", "🥉"][i], r.provider, Number(r.agent_ready)]);
   const W = 1600, H = 900; // 16:9 OG image
   const svg: string[] = [];
 
   svg.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="ht hd">`);
   svg.push(`<title id="ht">SurfBench</title>`);
-  svg.push(`<desc id="hd">SurfBench — the web-access benchmark for agents: podium parallel, exa, keenable across the search, scrape and quest events.</desc>`);
+  svg.push(`<desc id="hd">SurfBench — the web-access benchmark for agents: podium ${winners.map((w) => displayName(w[1])).join(", ")} across the search, scrape and quest events.</desc>`);
   svg.push(`<rect width="${W}" height="${H}" fill="#c0c0c0"/>`);
 
   // titlebar strip
@@ -48,13 +66,8 @@ function main() {
   svg.push(`<rect x="16" y="68" width="${W - 32}" height="${H - 84}" fill="#ffffff" stroke="#808080" stroke-width="2"/>`);
 
   // ===== TOP: podium of the three top-overall providers =====
-  const winners: Array<[string, string, number]> = [
-    ["🥇", "parallel", 74],
-    ["🥈", "exa", 66],
-    ["🥉", "keenable", 56],
-  ];
   winners.forEach(([medal, name, score], i) => {
-    svg.push(podiumCard(80 + i * 500, 100, medal, name, score, faviconDataUri(name)));
+    svg.push(podiumCard(80 + i * 500, 100, medal, displayName(name), score, faviconDataUri(TURBO_PARENT[name] ?? name)));
   });
 
   // ===== LEFT: name + short description =====
@@ -64,9 +77,9 @@ function main() {
 
   // ===== RIGHT: three event winner panels, stacked =====
   const panels: Array<[string, string, string]> = [
-    ["SEARCH", "29 queries / 12 dims", "winner: brave 0.8s p50"],
-    ["SCRAPE", "50-URL gauntlet", "winner: parallel 50/50 @ 0.6s"],
-    ["QUEST", "15 questions + judge", "winner: keenable 15/15 · judge 8.3"],
+    ["SEARCH", "12 answerability queries", `winner: ${displayName(searchTop.provider)} · quality ${searchTop.quality}`],
+    ["SCRAPE", "50-URL gauntlet", `winner: ${displayName(scrapeTop.provider)} ${scrapeTop.passed}/50 · ${scrapeTop.reliability}`],
+    ["QUEST", "15 questions + judge", `winner: ${displayName(questTop.provider)} · judge ${questTop.judge_avg}`],
   ];
   panels.forEach((p, i) => {
     const x = 1020;
@@ -85,7 +98,7 @@ function main() {
   // ===== BOTTOM: Y2K taskbar strip with run stats =====
   svg.push(`<rect x="32" y="818" width="${W - 64}" height="52" fill="#c0c0c0" stroke="#808080" stroke-width="2"/>`);
   svg.push(`<rect x="34" y="820" width="${W - 68}" height="2" fill="#ffffff"/>`);
-  svg.push(`<text x="52" y="851" font-family="Verdana,Arial,sans-serif" font-size="21" font-weight="bold" fill="#111111">50 URLs · 29 queries · 15 quests — 8 providers · run of 5 September 2026</text>`);
+  svg.push(`<text x="52" y="851" font-family="Verdana,Arial,sans-serif" font-size="21" font-weight="bold" fill="#111111">50 URLs · 29 queries · 15 quests — ${ranked.length} ranked configs · run of ${runDate}</text>`);
   svg.push(`<text x="${W - 52}" y="851" text-anchor="end" font-family="Verdana,Arial,sans-serif" font-size="19" fill="#000080">github.com/riccardogiorato/surf-bench</text>`);
 
   svg.push(`</svg>`);

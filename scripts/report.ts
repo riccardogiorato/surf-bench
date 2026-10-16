@@ -235,7 +235,8 @@ function searchRows(
 // ---------- quest ----------
 function collectQuest(): Map<string, ProviderEvent> {
   const by = new Map<string, ProviderEvent>();
-  for (const r of readJsonl("quest")) {
+  // Fast-mode configs record to their own file under their own provider names.
+  for (const r of [...readJsonl("quest"), ...readJsonl("quest-turbo")]) {
     const p = String(r.provider);
     if (!by.has(p)) by.set(p, emptyEvent());
     const agg = by.get(p)!;
@@ -274,9 +275,17 @@ function questRows(by: Map<string, ProviderEvent>): Row[] {
 }
 
 // ---------- overall ----------
+// Fast-mode configs are ranked as their own rows, never merged into the
+// default row, so a provider cannot pick its best mode per event. Scrape has no
+// fast mode, so those rows reuse the parent's scrape event unchanged.
 const TURBO_PARENT: Record<string, string> = {
   "exa-fast": "exa",
   "parallel-turbo": "parallel",
+};
+
+const DISPLAY_NAME: Record<string, string> = {
+  "exa-fast": "exa (fast)",
+  "parallel-turbo": "parallel (turbo)",
 };
 
 function overallLeaderboard(
@@ -284,16 +293,12 @@ function overallLeaderboard(
   search: Map<string, ProviderEvent>,
   quest: Map<string, ProviderEvent>,
 ): Row[] {
-  const providers = new Set(
-    [...scrape.keys(), ...search.keys(), ...quest.keys()].filter(
-      (p) => !TURBO_PARENT[p],
-    ),
-  );
+  const providers = new Set([...scrape.keys(), ...search.keys(), ...quest.keys()]);
 
   const scored = new Map<string, { scrape: EventScore; search: EventScore; quest: EventScore }>();
   for (const p of providers) {
     scored.set(p, {
-      scrape: scoreEvent(scrape.get(p) ?? emptyEvent()),
+      scrape: scoreEvent(scrape.get(TURBO_PARENT[p] ?? p) ?? emptyEvent()),
       search: scoreEvent(search.get(p) ?? emptyEvent()),
       quest: scoreEvent(quest.get(p) ?? emptyEvent()),
     });
@@ -441,13 +446,14 @@ function writeScoreboardSvg(rows: Row[]) {
     const y = 128 + ri * rowH + rowH / 2;
     const stripe = ri % 2 ? "#ffffff" : "#f4f2ea";
     parts.push(`<rect y="${128 + ri * rowH}" width="${W}" height="${rowH}" fill="${stripe}"/>`);
-    const uri = faviconDataUri(String(r.provider));
+    const id = String(r.provider);
+    const uri = faviconDataUri(TURBO_PARENT[id] ?? id);
     if (uri) {
       parts.push(`<image x="${colLogo}" y="${y - 17}" width="34" height="34" href="${uri}"/>`);
     }
     const unscored = r.agent_ready === "n/a";
     parts.push(`<text x="${medalX}" y="${y + 10}" font-family="Verdana,Arial,sans-serif" font-size="24">${unscored ? "" : (medals[ri] ?? "")}</text>`);
-    parts.push(`<text x="${colName}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(r.provider)}</text>`);
+    parts.push(`<text x="${colName}" y="${y + 9}" font-family="Verdana,Arial,sans-serif" font-size="24" font-weight="bold" fill="#111">${esc(DISPLAY_NAME[id] ?? id)}</text>`);
     parts.push(`<text x="${cols[0][2]}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="30" font-weight="bold" fill="${unscored ? "#888" : "#000080"}">${esc(r.agent_ready)}</text>`);
     if (!unscored) {
       parts.push(`<text x="${cols[0][2] + 70}" y="${y + 6}" font-family="Verdana,Arial,sans-serif" font-size="14" fill="#666">/100</text>`);
