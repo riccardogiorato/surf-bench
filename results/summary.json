@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-15T21:41:24.054Z",
+  "generatedAt": "2026-10-16T15:41:26.082Z",
   "weights": {
     "quality": 0.5,
     "reliability": 0.35,
@@ -17,6 +17,18 @@
       "quality": "73%",
       "substance_avg": "6.52",
       "p50_s": "10.6s",
+      "note": ""
+    },
+    {
+      "provider": "parallel",
+      "attempts": 50,
+      "scored": 50,
+      "excluded": 0,
+      "passed": 38,
+      "reliability": "76%",
+      "quality": "61%",
+      "substance_avg": "6.07",
+      "p50_s": "0.9s",
       "note": ""
     },
     {
@@ -78,18 +90,6 @@
       "substance_avg": "3.71",
       "p50_s": "2.2s",
       "note": ""
-    },
-    {
-      "provider": "parallel",
-      "attempts": 50,
-      "scored": 0,
-      "excluded": 50,
-      "passed": 0,
-      "reliability": "n/a",
-      "quality": "n/a",
-      "substance_avg": "-",
-      "p50_s": "-",
-      "note": "no scorable cases (all quota or rate-limited)"
     }
   ],
   "search": [
@@ -130,6 +130,18 @@
       "note": ""
     },
     {
+      "provider": "parallel",
+      "answerability_cases": 12,
+      "scored": 12,
+      "excluded": 0,
+      "reliability": "100%",
+      "quality": "86%",
+      "judge_avg": "8.6",
+      "capability": "28/29",
+      "p50_s": "3.6s",
+      "note": ""
+    },
+    {
       "provider": "keenable",
       "answerability_cases": 12,
       "scored": 12,
@@ -142,30 +154,6 @@
       "note": ""
     },
     {
-      "provider": "linkup",
-      "answerability_cases": 12,
-      "scored": 12,
-      "excluded": 0,
-      "reliability": "100%",
-      "quality": "65%",
-      "judge_avg": "6.5",
-      "capability": "12/21",
-      "p50_s": "2.6s",
-      "note": ""
-    },
-    {
-      "provider": "parallel",
-      "answerability_cases": 12,
-      "scored": 0,
-      "excluded": 12,
-      "reliability": "n/a",
-      "quality": "n/a",
-      "judge_avg": "-",
-      "capability": "-",
-      "p50_s": "-",
-      "note": "no scorable cases (all quota or rate-limited)"
-    },
-    {
       "provider": "tavily",
       "answerability_cases": 12,
       "scored": 12,
@@ -175,6 +163,18 @@
       "judge_avg": "8.3",
       "capability": "23/29",
       "p50_s": "2.9s",
+      "note": ""
+    },
+    {
+      "provider": "linkup",
+      "answerability_cases": 12,
+      "scored": 12,
+      "excluded": 0,
+      "reliability": "100%",
+      "quality": "65%",
+      "judge_avg": "6.5",
+      "capability": "12/21",
+      "p50_s": "2.6s",
       "note": ""
     }
   ],
@@ -190,6 +190,19 @@
       "judge_avg": "8.8",
       "wipeouts": 0,
       "p50_s": "10.1s",
+      "note": ""
+    },
+    {
+      "provider": "parallel",
+      "quests": 15,
+      "scored": 15,
+      "excluded": 0,
+      "delivered": 15,
+      "reliability": "100%",
+      "quality": "80%",
+      "judge_avg": "8.0",
+      "wipeouts": 0,
+      "p50_s": "11.6s",
       "note": ""
     },
     {
@@ -230,19 +243,6 @@
       "wipeouts": 0,
       "p50_s": "20.4s",
       "note": ""
-    },
-    {
-      "provider": "parallel",
-      "quests": 15,
-      "scored": 0,
-      "excluded": 15,
-      "delivered": 0,
-      "reliability": "n/a",
-      "quality": "n/a",
-      "judge_avg": "-",
-      "wipeouts": 0,
-      "p50_s": "-",
-      "note": "no scorable cases (all quota or rate-limited)"
     }
   ],
   "overall": [
@@ -255,6 +255,17 @@
       "scrape_reliability": "66%",
       "search_quality": "87%",
       "quest_quality": "88%",
+      "data_note": ""
+    },
+    {
+      "provider": "parallel",
+      "agent_ready": "78",
+      "quality": "76",
+      "reliability": "92",
+      "speed": "50",
+      "scrape_reliability": "76%",
+      "search_quality": "86%",
+      "quest_quality": "80%",
       "data_note": ""
     },
     {
@@ -300,17 +311,6 @@
       "search_quality": "65%",
       "quest_quality": "79%",
       "data_note": ""
-    },
-    {
-      "provider": "parallel",
-      "agent_ready": "n/a",
-      "quality": "n/a",
-      "reliability": "n/a",
-      "speed": "n/a",
-      "scrape_reliability": "n/a",
-      "search_quality": "n/a",
-      "quest_quality": "n/a",
-      "data_note": "scrape: no scorable cases (all quota or rate-limited); search: no scorable cases (all quota or rate-limited); quest: no scorable cases (all quota or rate-limited); no quality verdicts — composite withheld"
     },
     {
       "provider": "jina",
