@@ -1,0 +1,9 @@
+# Only the published pages are deployed (see vercel.json). Never upload full
+# page content, caches or keys.
+.env
+.env.*
+results/raw
+cache
+node_modules
+docs
+site

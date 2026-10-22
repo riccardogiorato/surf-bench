@@ -47,6 +47,7 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 - Wipeout rule: >30s per leg = DNF.
 - Grades are stamped with reader model + prompt hashes + a hash of every task's answer contract (`GRADE_STAMP` in `tasks-grade.ts`) and the record's `startedAt`. Editing a key, a prompt or a rubric re-grades automatically; stale grades are ignored by report and audit.
 - Records dedupe by (run, round, provider, task) keeping the LAST line in the jsonl.
+- Site: https://surf-bench.vercel.app (Vercel, personal team, deploys on push to `main`). `vercel.json` copies only `index.html`, `assets/` and `results/runs/` into the output; `.vercelignore` keeps `results/raw/`, caches and `.env*` out of CLI uploads. `tasks:html` rewrites the root `index.html` redirect to the latest run's recap.
 - The Y2K theme: retro windows, bevels, Silkscreen pixel accents. Design doc lives locally at `docs/surfbench-design.html` (gitignored on purpose). README panels are SVGs (GitHub strips `<style>` from inline HTML).
 - Type-check with `npx tsc --noEmit` before committing.
 

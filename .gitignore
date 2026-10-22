@@ -145,3 +145,8 @@ docs/surfbench-design.html
 
 # raw run records: too heavy for git (full page content); CSVs + summary are committed
 results/raw/
+
+# Vercel build output and link
+site/
+.vercel
+.env*

@@ -179,6 +179,13 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
   await fs.writeFile(out, html);
   console.log(`wrote ${out}`);
 
+  // Site root (Vercel): always lands on the published run's recap.
+  const recapUrl = `results/runs/${runId}/recap.html`;
+  await fs.writeFile(
+    "index.html",
+    `<!doctype html><meta charset="utf-8"><title>SurfBench</title><meta http-equiv="refresh" content="0; url=${recapUrl}"><link rel="canonical" href="${recapUrl}"><a href="${recapUrl}">SurfBench recap</a>\n`,
+  );
+
   // ---------- README panels (SVG: GitHub strips <style> from markdown) ----------
   const W = 1200;
   const SANS = "Verdana,Arial,sans-serif";
