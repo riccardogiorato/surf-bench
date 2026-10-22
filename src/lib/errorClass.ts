@@ -13,7 +13,7 @@
 //                excluded from scoring rather than counted as failures.
 //   timeout    - provider was too slow to answer. Counts against it.
 //   blocked    - provider could not get past a bot wall. Counts against it:
-//                this is precisely what the scrape event measures.
+//                getting past it is part of what is measured.
 //   empty      - provider answered, with nothing usable. Counts against it.
 //   provider   - any other provider-side failure. Counts against it.
 
@@ -40,7 +40,7 @@ export const NON_SCORING: ReadonlySet<ErrorClass> = new Set<ErrorClass>([
 // things to tell a vendor, and the audit output is only credible if it can
 // tell them apart.
 const PATTERNS: Array<[ErrorClass, RegExp]> = [
-  ["rate_limit", /\b429\b|rate.?limit|too many requests|requests per second|slow down/i],
+  ["rate_limit", /\b429\b|rate.?limit|too many requests|requests per second|slow down|excessive requests|reduce the rate/i],
   [
     "quota",
     /\b402\b|insufficient credit|insufficient_quota|payment required|out of credits?|quota exceeded|credit limit|plan and billing|billing details|\b401\b|\b403 .*(api key|unauthorized)|invalid api key|unauthorized/i,

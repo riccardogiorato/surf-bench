@@ -1,0 +1,150 @@
+{
+  "runId": "2026-10-22T16-00-frozen",
+  "dir": "results/runs/2026-10-22T16-00-frozen",
+  "board": [
+    {
+      "provider": "exa-fast",
+      "tasksScored": 50,
+      "coverage": 1,
+      "p50Ms": 1047.5,
+      "costUsd": 0.9680000000000006,
+      "passes": 29,
+      "usdPer1kPassed": 15.744957709824343,
+      "quality": 70.61666666666667,
+      "reliability": 57.99999999999999,
+      "speed": 100,
+      "overall": 70.60833333333333,
+      "ci": [
+        60.87499999999999,
+        79.875
+      ],
+      "group": 1
+    },
+    {
+      "provider": "parallel",
+      "tasksScored": 50,
+      "coverage": 1,
+      "p50Ms": 3598,
+      "costUsd": 0.7780000000000006,
+      "passes": 34.666666666666664,
+      "usdPer1kPassed": 10.585994194484767,
+      "quality": 81.28333333333333,
+      "reliability": 69.33333333333333,
+      "speed": 29.113396331295167,
+      "overall": 69.27534278302761,
+      "ci": [
+        60.2528246292148,
+        76.9296522684053
+      ],
+      "group": 1
+    },
+    {
+      "provider": "exa",
+      "tasksScored": 50,
+      "coverage": 1,
+      "p50Ms": 1656,
+      "costUsd": 0.9680000000000006,
+      "passes": 29,
+      "usdPer1kPassed": 15.744957709824343,
+      "quality": 71.26666666666668,
+      "reliability": 57.99999999999999,
+      "speed": 63.25483091787439,
+      "overall": 65.4215579710145,
+      "ci": [
+        55.68482587064677,
+        75.06730675977113
+      ],
+      "group": 2
+    },
+    {
+      "provider": "firecrawl",
+      "tasksScored": 50,
+      "coverage": 1,
+      "p50Ms": 1898,
+      "costUsd": 0.6034099999999992,
+      "passes": 31,
+      "usdPer1kPassed": 9.181527693244053,
+      "quality": 68.16666666666669,
+      "reliability": 62,
+      "speed": 55.18967334035827,
+      "overall": 64.06178433438708,
+      "ci": [
+        53.10263504611331,
+        74.0231884057971
+      ],
+      "group": 2
+    },
+    {
+      "provider": "parallel-turbo",
+      "tasksScored": 50,
+      "coverage": 1,
+      "p50Ms": 2262,
+      "costUsd": 0.3900000000000003,
+      "passes": 29.333333333333336,
+      "usdPer1kPassed": 6.2714408233276195,
+      "quality": 68.9888888888889,
+      "reliability": 58.666666666666664,
+      "speed": 46.308576480990276,
+      "overall": 61.97406424992632,
+      "ci": [
+        51.77633262260129,
+        71.17286821705426
+      ],
+      "group": 2
+    },
+    {
+      "provider": "tavily",
+      "tasksScored": 50,
+      "coverage": 1,
+      "p50Ms": 1870,
+      "costUsd": 1.6896000000000009,
+      "passes": 28.333333333333332,
+      "usdPer1kPassed": 28.12874583795784,
+      "quality": 65.85000000000001,
+      "reliability": 56.666666666666664,
+      "speed": 56.01604278074866,
+      "overall": 61.16073975044564,
+      "ci": [
+        50.69698478225676,
+        71.15395124001681
+      ],
+      "group": 2
+    },
+    {
+      "provider": "keenable",
+      "tasksScored": 50,
+      "coverage": 1,
+      "p50Ms": 6323,
+      "costUsd": 1.440000000000001,
+      "passes": 27.666666666666668,
+      "usdPer1kPassed": 24.551034325983196,
+      "quality": 68.67222222222222,
+      "reliability": 55.333333333333336,
+      "speed": 25,
+      "overall": 57.452777777777776,
+      "ci": [
+        47.42777777777777,
+        66.88055555555556
+      ],
+      "group": 2
+    },
+    {
+      "provider": "linkup",
+      "tasksScored": 50,
+      "coverage": 1,
+      "p50Ms": 4296.5,
+      "costUsd": 1.675,
+      "passes": 25.333333333333332,
+      "usdPer1kPassed": 31.187934458788483,
+      "quality": 56.93333333333332,
+      "reliability": 50.66666666666666,
+      "speed": 25,
+      "overall": 49.94999999999999,
+      "ci": [
+        39.175,
+        60.38333333333333
+      ],
+      "group": 3
+    }
+  ]
+}

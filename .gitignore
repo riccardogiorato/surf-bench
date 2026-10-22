@@ -139,7 +139,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 # Cache directories
 /cache
-/html
+
 /.pnpm-store
 docs/surfbench-design.html
 

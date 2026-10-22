@@ -1,7 +1,6 @@
 import {
   firecrawlClientFactory,
   exaClientFactory,
-  braveSearchClientFactory,
   linkupClientFactory,
   tavilyClientFactory,
   parallelClientFactory,
@@ -31,12 +30,6 @@ function limiterFor(vendor: string) {
 // 10 req/s. This paces request STARTS at a fixed minimum spacing, the same
 // pattern keenableClient.ts uses for its 10 req/s org cap, so the harness
 // mostly never needs the retry path at all instead of leaning on it.
-//
-// This singleton only coordinates calls across the whole search event because
-// vitest.config.ts runs the suite single-threaded with isolate:false — without
-// that, each of the search event's 13 separate test files (12 dims +
-// answerability) would get its own independent copy of exaNextStart and could
-// still burst past the cap by firing from different files at once.
 const EXA_MIN_SPACING_MS = 130; // ~7.7 req/s, under the 10/s cap with headroom
 let exaNextStart = 0;
 async function exaPaced<T>(fn: () => Promise<T>): Promise<T> {
@@ -56,7 +49,7 @@ async function exaPaced<T>(fn: () => Promise<T>): Promise<T> {
 // concurrency becomes the thing being measured: a baseline run scored exa
 // 16/29 on search, but 11 of its 13 failures were "Rate limit exceeded: 10
 // requests per second" — the org cap, tripped by this harness, recorded as if
-// exa had returned bad results. Only the exa-fast variant had backoff before.
+// exa had returned bad results.
 // Retry time is excluded from the reported latency so a provider is not also
 // punished on speed for the harness's pacing.
 const RATE_LIMIT_ATTEMPTS = 4;
@@ -155,19 +148,6 @@ const linkupSearch = defineSearchProvider("linkup", async (query, numResults) =>
     }));
 });
 
-const braveSearch = defineSearchProvider("brave", async (query, numResults) => {
-  const response = await braveSearchClientFactory().webSearch(query, {
-    count: numResults,
-  });
-  return (response.web?.results ?? [])
-    .slice(0, numResults)
-    .map((item: any) => ({
-      title: item.title || "",
-      url: item.url || "",
-      snippet: item.description || "",
-    }));
-});
-
 const tavilySearch = defineSearchProvider("tavily", async (query, numResults) => {
   const response = await tavilyClientFactory().search(query, { maxResults: numResults });
   return (response.results ?? []).map((item: any) => ({
@@ -191,39 +171,21 @@ const parallelSearch = defineSearchProvider("parallel", async (query, numResults
 
 const keenableSearch = defineSearchProvider("keenable", keenableSearchResults);
 
-// Super-fast variants for the "search turbo" leaderboard column, recorded
-// under their own provider names. Gated on SURFBENCH_TURBO so default runs
-// never see them: set SURFBENCH_TURBO=1 (plus the provider keys) to include
-// exa's type:"fast" and parallel's mode:"turbo" in the search event. The exa
-// variant is serialized (1 in flight) with backoff-retry on the org's 10 req/s
-// cap — the fast tier trips it even at low client-side concurrency.
-const exaFastLimited = createConcurrencyLimiter(1);
-
-async function exaFastCall(query: string, numResults: number) {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    try {
-      return await exaFastLimited(() =>
-        exaClientFactory().search(query, { numResults, type: "fast" }),
-      );
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "";
-      if (attempt === 3 || !/rate limit/i.test(msg)) throw e;
-      await new Promise((r) =>
-        setTimeout(r, 2000 * (attempt + 1) * (0.5 + Math.random())),
-      );
-    }
-  }
-  throw new Error("exa-fast rate limited");
-}
-
-const exaFastSearch = defineSearchProvider("exa-fast", async (query, numResults) => {
-  const response = await exaFastCall(query, numResults);
-  return (response.results ?? []).map((item: any) => ({
-    title: item.title || "",
-    url: item.url || "",
-    snippet: item.text || item.snippet || "",
-  }));
-});
+// Fast modes, ranked as their own rows ("exa (fast)", "parallel (turbo)") and
+// never merged into the default row: a provider must not pick its best mode
+// per task. exa-fast shares exa's pacer because the org cap is shared.
+const exaFastSearch = defineSearchProvider(
+  "exa-fast",
+  async (query, numResults) => {
+    const response = await exaClientFactory().search(query, { numResults, type: "fast" });
+    return (response.results ?? []).map((item: any) => ({
+      title: item.title || "",
+      url: item.url || "",
+      snippet: item.text || item.snippet || "",
+    }));
+  },
+  exaPaced,
+);
 
 const parallelTurboSearch = defineSearchProvider("parallel-turbo", async (query, numResults) => {
   const response = await parallelClientFactory().search({
@@ -237,42 +199,6 @@ const parallelTurboSearch = defineSearchProvider("parallel-turbo", async (query,
     snippet: excerptText(item),
   }));
 });
-
-// Serper (Google SERP via google.serper.dev) — plain REST, no SDK.
-const serperSearchImpl: SearchFunction = async (query, numResults = 5) => {
-  const startTime = Date.now();
-  try {
-    const response = await fetch("https://google.serper.dev/search", {
-      method: "POST",
-      headers: {
-        "X-API-KEY": process.env.SERPER_API_KEY ?? "",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ q: query, num: numResults }),
-    });
-    if (!response.ok) {
-      throw new Error(`Serper HTTP ${response.status}`);
-    }
-    const data = await response.json();
-    const results = (data.organic ?? [])
-      .slice(0, numResults)
-      .map((item: any) => ({
-        title: item.title || "",
-        url: item.link || "",
-        snippet: item.snippet || "",
-      }));
-    return { results, latencyMs: Date.now() - startTime };
-  } catch (error) {
-    return {
-      results: [],
-      latencyMs: Date.now() - startTime,
-      error: error instanceof Error ? error.message : "unknown error",
-    };
-  }
-};
-const serperSearch = withSearchCache("serper", (q, n) =>
-  limiterFor("serper")(() => serperSearchImpl(q, n)),
-);
 
 function gateOnKey(
   key: string | undefined,
@@ -289,35 +215,18 @@ export interface SearchClient {
 
 const gated: (SearchClient | null)[] = [
   gateOnKey(process.env.FIRECRAWL_API_KEY, "firecrawl", firecrawlSearch),
-  // SURFBENCH_TURBO swaps exa/parallel for their super-fast variants below —
-  // the org rate limit is shared, so the two never run side by side.
-  gateOnKey(
-    process.env.SURFBENCH_TURBO ? undefined : process.env.EXA_API_KEY,
-    "exa",
-    exaSearch,
-  ),
+  gateOnKey(process.env.EXA_API_KEY, "exa", exaSearch),
   gateOnKey(process.env.LINKUP_API_KEY, "linkup", linkupSearch),
   gateOnKey(process.env.TAVILY_API_KEY, "tavily", tavilySearch),
-  gateOnKey(process.env.BRAVE_API_KEY, "brave", braveSearch),
-  gateOnKey(
-    process.env.SURFBENCH_TURBO ? undefined : process.env.PARALLEL_API_KEY,
-    "parallel",
-    parallelSearch,
-  ),
-  gateOnKey(process.env.SERPER_API_KEY, "serper", serperSearch),
+  gateOnKey(process.env.PARALLEL_API_KEY, "parallel", parallelSearch),
   gateOnKey(process.env.KEENABLE_API_KEY, "keenable", keenableSearch),
-  // search-turbo variants (only when SURFBENCH_TURBO is set)
-  gateOnKey(
-    process.env.SURFBENCH_TURBO ? process.env.EXA_API_KEY : undefined,
-    "exa-fast",
-    exaFastSearch,
-  ),
-  gateOnKey(
-    process.env.SURFBENCH_TURBO ? process.env.PARALLEL_API_KEY : undefined,
-    "parallel-turbo",
-    parallelTurboSearch,
-  ),
+  gateOnKey(process.env.EXA_API_KEY, "exa-fast", exaFastSearch),
+  gateOnKey(process.env.PARALLEL_API_KEY, "parallel-turbo", parallelTurboSearch),
 ];
+
+// Fast modes have no fetch mode of their own: they fetch with the parent.
+export const FETCH_PROVIDER: Record<string, string> = { "exa-fast": "exa", "parallel-turbo": "parallel" };
+export const fetchProviderOf = (name: string) => FETCH_PROVIDER[name] ?? name;
 
 export const searchClients: SearchClient[] = gated.filter(
   (c): c is SearchClient => c !== null,

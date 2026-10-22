@@ -9,7 +9,6 @@ import {
 import { createConcurrencyLimiter } from "./concurrency.js";
 import { withCache } from "./cache/withCache.js";
 import { fetchParallelContent } from "./parallelClient.js";
-import { jinaScraper, shouldRunJina } from "./jinaClient.js";
 import { keenableScraperImpl, shouldRunKeenable } from "./keenableClient.js";
 
 // Cap each provider at 5 in-flight scrapes so vendors can run fully in
@@ -39,9 +38,10 @@ const firecrawlScraperImpl: ScraperFunction = async (
   const startTime = Date.now();
 
   try {
+    // maxAge left at the vendor default: the old 1-week override served
+    // week-old copies to tasks that require same-day freshness.
     const response = await firecrawlClientFactory().scrape(url, {
       formats: ["markdown"],
-      maxAge: CACHE_TIME_FIRECRAWL,
       timeout: timeout,
       storeInCache: true,
     });
@@ -356,15 +356,6 @@ export const scraperClients: ScraperClient[] = [
           name: "parallel",
           scrape: parallelScraper,
           healthCheck: checkParallel,
-        },
-      ]
-    : []),
-  ...(shouldRunJina
-    ? [
-        {
-          name: "jina",
-          scrape: jinaScraper,
-          healthCheck: async () => true,
         },
       ]
     : []),

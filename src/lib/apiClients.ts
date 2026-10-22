@@ -1,7 +1,6 @@
 import { LinkupClient } from "linkup-sdk";
 import Firecrawl from "@mendable/firecrawl-js";
 import { Exa } from "exa-js";
-import { BraveSearch } from "brave-search";
 import { tavily } from "@tavily/core";
 import Parallel from "parallel-web";
 import "dotenv/config";
@@ -40,15 +39,6 @@ export function exaClientFactory(): Exa {
     exaClient = new Exa(process.env.EXA_API_KEY ?? "");
   }
   return exaClient;
-}
-
-let braveSearchClient: BraveSearch | null = null;
-
-export function braveSearchClientFactory(): BraveSearch {
-  if (!braveSearchClient) {
-    braveSearchClient = new BraveSearch(process.env.BRAVE_API_KEY ?? "");
-  }
-  return braveSearchClient;
 }
 
 let tavilyClient: ReturnType<typeof tavily> | null = null;

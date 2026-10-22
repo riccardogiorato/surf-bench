@@ -8,14 +8,12 @@
   ],
   "scripts": {
     "test": "vitest run src",
-    "dev": "vitest watch src",
-    "dev:ui": "bunx vite preview --outDir html",
-    "report": "bun run scripts/report.ts",
-    "hero": "bun run scripts/hero.ts",
-    "judge": "bun run scripts/judge-quest.ts",
-    "judge:search": "bun run scripts/judge-search.ts",
-    "judge:scrape": "bun run scripts/judge-scrape.ts",
-    "audit": "bun run scripts/audit.ts"
+    "tasks": "bun run scripts/tasks-run.ts",
+    "tasks:grade": "bun run scripts/tasks-grade.ts",
+    "tasks:report": "bun run scripts/tasks-report.ts",
+    "tasks:spotcheck": "bun run scripts/tasks-spotcheck.ts",
+    "tasks:html": "bun run scripts/tasks-html.ts && bun run scripts/tasks-pages.ts",
+    "tasks:audit": "bun run scripts/tasks-audit.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
@@ -25,8 +23,6 @@
     "@mendable/firecrawl-js": "^4.46.0",
     "@tavily/core": "^0.7.14",
     "@types/node": "^26.6.5",
-    "@vitest/ui": "^4.1.11",
-    "brave-search": "^0.9.0",
     "exa-js": "^2.25.0",
     "linkup-sdk": "^3.7.1",
     "parallel-web": "^1.3.5",

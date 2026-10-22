@@ -29,6 +29,8 @@ function urlToFilename(url: string): string {
   
   export function withCache(vendor: string, fn: ScraperFunction): ScraperFunction {
     return async (url: string, timeout?: number) => {
+      // Live tasks and repeat rounds must hit the provider every time.
+      if (process.env.SURFBENCH_NO_CACHE) return fn(url, timeout);
       const vendorDir = path.join(CACHE_BASE_DIR, vendor);
       const filename = urlToFilename(url);
       const filePath = path.join(vendorDir, filename);

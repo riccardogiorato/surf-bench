@@ -15,6 +15,12 @@ describe("errorClass", () => {
     expect(isRetryable(msg)).toBe(true);
   });
 
+  it("recognises tavily's burst block as a rate limit", () => {
+    expect(
+      classifyError("Your request has been blocked due to excessive requests. Please reduce the rate of requests."),
+    ).toBe("rate_limit");
+  });
+
   it("classifies an unfunded account as quota", () => {
     expect(
       classifyError(
@@ -31,7 +37,7 @@ describe("errorClass", () => {
   it("keeps quota and rate_limit out of scoring, but scores real failures", () => {
     expect(isNonScoring("Too many requests")).toBe(true);
     expect(isNonScoring("402 Insufficient credit")).toBe(true);
-    // A bot wall is exactly what the scrape event measures: it must count.
+    // A bot wall is part of what is measured: it must count.
     expect(isNonScoring("looks like a blocked/error page (captcha)")).toBe(false);
     expect(classifyError("looks like a blocked/error page (captcha)")).toBe("blocked");
     expect(isNonScoring("The target URL could not be reached")).toBe(false);

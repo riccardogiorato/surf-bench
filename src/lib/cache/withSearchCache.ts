@@ -38,6 +38,8 @@ export function withSearchCache(
   fn: SearchFunction,
 ): SearchFunction {
   return async (query: string, numResults = 5) => {
+    // Live tasks and repeat rounds must hit the provider every time.
+    if (process.env.SURFBENCH_NO_CACHE) return fn(query, numResults);
     const vendorDir = path.join(CACHE_BASE_DIR, vendor);
     const filePath = path.join(vendorDir, queryToFilename(query, numResults));
 

@@ -1,0 +1,31 @@
+site,tasks,exa-fast,parallel,exa,firecrawl,parallel-turbo,tavily,keenable,linkup
+instagram.com,r-ig j-ig,0/4,4/4,0/4,0/4,4/4,1/4,4/4,1/4
+x.com,r-x j-x1 j-x2,0/7,7/7,0/7,7/7,4/7,7/7,4/7,1/7
+nytimes.com,r-nyt f-nyt,0/4,0/4,0/4,0/4,0/4,1/4,0/4,0/4
+bbc.com,r-bbc f-bbc,4/4,3/4,4/4,4/4,2/4,4/4,3/4,4/4
+amazon.com,r-amz j-amz1 j-amz2,7/7,2/7,4/7,7/7,4/7,3/7,4/7,6/7
+target.com,r-tgt,0/1,0/1,0/1,0/1,0/1,0/1,0/1,0/1
+homedepot.com,r-hd,1/1,0/1,1/1,0/1,0/1,1/1,0/1,0/1
+youtube.com,r-yt f-yt,0/4,4/4,0/4,4/4,4/4,2/4,1/4,1/4
+linkedin.com,r-li j-li,4/4,1/4,4/4,0/4,1/4,4/4,3/4,1/4
+arxiv.org,r-arxiv,1/1,1/1,1/1,1/1,1/1,1/1,0/1,1/1
+imdb.com,l-imdb,1/1,1/1,1/1,1/1,0/1,1/1,1/1,1/1
+delta.com,l-delta,1/1,1/1,1/1,1/1,0/1,1/1,1/1,1/1
+britishmuseum.org,l-bm,1/1,1/1,1/1,1/1,1/1,1/1,1/1,1/1
+stackoverflow.com,l-so,1/1,1/1,1/1,0/1,1/1,0/1,1/1,1/1
+walmart.com,l-wmt j-wmt,1/4,1/4,1/4,1/4,1/4,1/4,1/4,1/4
+github.com,l-gh f-ts,4/4,4/4,4/4,4/4,4/4,4/4,4/4,4/4
+wikipedia.org,l-wiki f-wiki,4/4,4/4,4/4,4/4,1/4,1/4,4/4,2/4
+reddit.com,f-rd1 f-rd2,0/6,5/6,0/6,0/6,6/6,0/6,0/6,0/6
+news.ycombinator.com,f-hn,3/3,1/3,3/3,3/3,2/3,0/3,3/3,0/3
+lemonde.fr,f-fr,0/3,0/3,0/3,3/3,0/3,0/3,0/3,0/3
+spiegel.de,f-de,0/3,0/3,0/3,0/3,0/3,0/3,0/3,0/3
+facebook.com,j-fb,0/3,1/3,0/3,0/3,0/3,0/3,0/3,0/3
+tiktok.com,j-tt,0/3,2/3,0/3,0/3,1/3,3/3,0/3,0/3
+ebay.com,j-ebay,3/3,3/3,3/3,3/3,3/3,0/3,3/3,1/3
+bestbuy.com,j-bby,0/3,3/3,0/3,0/3,0/3,0/3,0/3,0/3
+zillow.com,j-zil,3/3,1/3,3/3,3/3,3/3,3/3,0/3,3/3
+craigslist.org,j-cl,0/3,3/3,0/3,0/3,3/3,0/3,1/3,0/3
+airbnb.com,j-abnb,0/3,0/3,0/3,0/3,0/3,0/3,0/3,0/3
+espn.com,j-espn,0/3,0/3,3/3,3/3,0/3,0/3,0/3,0/3
+mercadolibre.com.mx,j-ml,3/3,3/3,3/3,0/3,0/3,0/3,0/3,0/3
