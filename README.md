@@ -6,6 +6,16 @@ SurfBench gives every web-access API the same 84 real tasks an agent gets asked 
 
 ![SurfBench summary](assets/v2-summary.svg)
 
+## Leaderboard
+
+**Live site: [surf-bench.vercel.app](https://surf-bench.vercel.app)**: the [recap](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/recap.html), the [task inspector](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/inspect.html) (every provider × task cell with its search results, fetched pages, reader answer and verdict), and the [methodology page](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/methodology.html), which shows every prompt, rubric and answer key verbatim, generated from the code that ran. Full run package in the repo: [`results/runs/2026-10-25T12-30/`](results/runs/2026-10-25T12-30/REPORT.md).
+
+![SurfBench leaderboard](assets/v2-leaderboard.svg)
+
+How each provider did per group of tasks (quality and pass rate; [`groups.csv`](results/runs/2026-10-25T12-30/groups.csv)):
+
+![SurfBench task groups map](assets/v2-groups.svg)
+
 ## How it works
 
 Every provider runs the same fixed pipeline, with no per-provider tuning:
@@ -33,16 +43,6 @@ request ─▶ provider search (top 5) ─▶ provider fetch (top 3) ─▶ fixe
 | **live-judge** | 16 | no key possible (X posts, eBay, Zillow, Airbnb…): yes/no constraints checked by a Kimi K3 + GLM-5.3 panel, including "on the site itself, not a mirror" and "dated within N days" |
 
 Live tasks run 3 rounds. Each leg has a 30-second limit, and going over it is a DNF.
-
-## Leaderboard
-
-**Live site: [surf-bench.vercel.app](https://surf-bench.vercel.app)**: the [recap](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/recap.html), the [task inspector](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/inspect.html) (every provider × task cell with its search results, fetched pages, reader answer and verdict), and the [methodology page](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/methodology.html), which shows every prompt, rubric and answer key verbatim, generated from the code that ran. Full run package in the repo: [`results/runs/2026-10-25T12-30/`](results/runs/2026-10-25T12-30/REPORT.md).
-
-![SurfBench leaderboard](assets/v2-leaderboard.svg)
-
-How each provider did per group of tasks (quality and pass rate; [`groups.csv`](results/runs/2026-10-25T12-30/groups.csv)):
-
-![SurfBench task groups map](assets/v2-groups.svg)
 
 ### Scoring
 
