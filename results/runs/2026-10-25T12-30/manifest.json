@@ -1,7 +1,7 @@
 {
   "runId": "2026-10-25T12-30",
-  "taskSet": "tasks-v2.1",
-  "commit": "2bf2a39",
+  "taskSet": "tasks-v2.2",
+  "commit": "d3bfb1e",
   "liveRounds": 3,
   "pipeline": {
     "searchResults": 5,
@@ -20,7 +20,7 @@
     ],
     "rubricId": "64284cafe991"
   },
-  "gradeStamp": "MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:a4f55603:g4",
+  "gradeStamp": "MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:972536ca:g5",
   "passScore": 0.8,
   "tracks": [
     {
@@ -115,7 +115,7 @@
         "j-zil",
         "j-cl",
         "j-abnb",
-        "j-espn",
+        "f-espn",
         "j-ml"
       ]
     }
@@ -2232,20 +2232,26 @@
       "track": "access"
     },
     {
-      "id": "j-espn",
-      "tier": "live-judge",
+      "id": "f-espn",
+      "tier": "live-feed",
       "category": "media",
       "site": "espn.com",
       "freshDays": 2,
       "request": "What were last night's NBA scores?",
-      "constraints": [
-        "Final scores are shown for at least 2 NBA games from the most recent game day before the run date"
-      ],
+      "reference": {
+        "kind": "scores",
+        "minGames": 2,
+        "source": {
+          "type": "espn-scoreboard",
+          "league": "nba"
+        }
+      },
       "verified": {
         "by": "agent-check",
-        "at": "2026-10-22",
+        "at": "2026-10-25",
         "evidence": [
-          "live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"
+          "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard",
+          "reference = final scores of the most recent US game day before the round (America/New_York)"
         ]
       },
       "track": "access"
@@ -5520,6 +5526,519 @@
         7712.57,
         7690.73
       ]
+    },
+    {
+      "runId": "2026-10-25T12-30",
+      "round": 1,
+      "taskId": "f-espn",
+      "capturedAt": "2026-10-25T14:44:11.387Z",
+      "items": [
+        "Charlotte Hornets 115, Miami Heat 110 (2026-10-24)",
+        "Cleveland Cavaliers 125, Brooklyn Nets 121 (2026-10-24)",
+        "Philadelphia 76ers 127, Milwaukee Bucks 116 (2026-10-24)",
+        "Chicago Bulls 120, Washington Wizards 124 (2026-10-24)",
+        "Dallas Mavericks 106, San Antonio Spurs 122 (2026-10-24)",
+        "Atlanta Hawks 114, Houston Rockets 121 (2026-10-24)",
+        "Denver Nuggets 141, New Orleans Pelicans 135 (2026-10-24)",
+        "Phoenix Suns 131, Golden State Warriors 122 (2026-10-24)"
+      ],
+      "games": [
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Charlotte Hornets",
+              "Hornets",
+              "CHA"
+            ],
+            [
+              "Miami Heat",
+              "Heat",
+              "MIA"
+            ]
+          ],
+          "scores": [
+            115,
+            110
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Cleveland Cavaliers",
+              "Cavaliers",
+              "CLE"
+            ],
+            [
+              "Brooklyn Nets",
+              "Nets",
+              "BKN"
+            ]
+          ],
+          "scores": [
+            125,
+            121
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Philadelphia 76ers",
+              "76ers",
+              "PHI"
+            ],
+            [
+              "Milwaukee Bucks",
+              "Bucks",
+              "MIL"
+            ]
+          ],
+          "scores": [
+            127,
+            116
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Chicago Bulls",
+              "Bulls",
+              "CHI"
+            ],
+            [
+              "Washington Wizards",
+              "Wizards",
+              "WSH"
+            ]
+          ],
+          "scores": [
+            120,
+            124
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Dallas Mavericks",
+              "Mavericks",
+              "DAL"
+            ],
+            [
+              "San Antonio Spurs",
+              "Spurs",
+              "SA"
+            ]
+          ],
+          "scores": [
+            106,
+            122
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Atlanta Hawks",
+              "Hawks",
+              "ATL"
+            ],
+            [
+              "Houston Rockets",
+              "Rockets",
+              "HOU"
+            ]
+          ],
+          "scores": [
+            114,
+            121
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Denver Nuggets",
+              "Nuggets",
+              "DEN"
+            ],
+            [
+              "New Orleans Pelicans",
+              "Pelicans",
+              "NO"
+            ]
+          ],
+          "scores": [
+            141,
+            135
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Phoenix Suns",
+              "Suns",
+              "PHX"
+            ],
+            [
+              "Golden State Warriors",
+              "Warriors",
+              "GS"
+            ]
+          ],
+          "scores": [
+            131,
+            122
+          ]
+        }
+      ],
+      "note": "captured after the run for the round started 2026-10-25T12:32:42.645Z; finals of a past game day do not change"
+    },
+    {
+      "runId": "2026-10-25T12-30",
+      "round": 2,
+      "taskId": "f-espn",
+      "capturedAt": "2026-10-25T14:44:11.725Z",
+      "items": [
+        "Charlotte Hornets 115, Miami Heat 110 (2026-10-24)",
+        "Cleveland Cavaliers 125, Brooklyn Nets 121 (2026-10-24)",
+        "Philadelphia 76ers 127, Milwaukee Bucks 116 (2026-10-24)",
+        "Chicago Bulls 120, Washington Wizards 124 (2026-10-24)",
+        "Dallas Mavericks 106, San Antonio Spurs 122 (2026-10-24)",
+        "Atlanta Hawks 114, Houston Rockets 121 (2026-10-24)",
+        "Denver Nuggets 141, New Orleans Pelicans 135 (2026-10-24)",
+        "Phoenix Suns 131, Golden State Warriors 122 (2026-10-24)"
+      ],
+      "games": [
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Charlotte Hornets",
+              "Hornets",
+              "CHA"
+            ],
+            [
+              "Miami Heat",
+              "Heat",
+              "MIA"
+            ]
+          ],
+          "scores": [
+            115,
+            110
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Cleveland Cavaliers",
+              "Cavaliers",
+              "CLE"
+            ],
+            [
+              "Brooklyn Nets",
+              "Nets",
+              "BKN"
+            ]
+          ],
+          "scores": [
+            125,
+            121
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Philadelphia 76ers",
+              "76ers",
+              "PHI"
+            ],
+            [
+              "Milwaukee Bucks",
+              "Bucks",
+              "MIL"
+            ]
+          ],
+          "scores": [
+            127,
+            116
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Chicago Bulls",
+              "Bulls",
+              "CHI"
+            ],
+            [
+              "Washington Wizards",
+              "Wizards",
+              "WSH"
+            ]
+          ],
+          "scores": [
+            120,
+            124
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Dallas Mavericks",
+              "Mavericks",
+              "DAL"
+            ],
+            [
+              "San Antonio Spurs",
+              "Spurs",
+              "SA"
+            ]
+          ],
+          "scores": [
+            106,
+            122
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Atlanta Hawks",
+              "Hawks",
+              "ATL"
+            ],
+            [
+              "Houston Rockets",
+              "Rockets",
+              "HOU"
+            ]
+          ],
+          "scores": [
+            114,
+            121
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Denver Nuggets",
+              "Nuggets",
+              "DEN"
+            ],
+            [
+              "New Orleans Pelicans",
+              "Pelicans",
+              "NO"
+            ]
+          ],
+          "scores": [
+            141,
+            135
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Phoenix Suns",
+              "Suns",
+              "PHX"
+            ],
+            [
+              "Golden State Warriors",
+              "Warriors",
+              "GS"
+            ]
+          ],
+          "scores": [
+            131,
+            122
+          ]
+        }
+      ],
+      "note": "captured after the run for the round started 2026-10-25T12:39:09.538Z; finals of a past game day do not change"
+    },
+    {
+      "runId": "2026-10-25T12-30",
+      "round": 3,
+      "taskId": "f-espn",
+      "capturedAt": "2026-10-25T14:44:11.786Z",
+      "items": [
+        "Charlotte Hornets 115, Miami Heat 110 (2026-10-24)",
+        "Cleveland Cavaliers 125, Brooklyn Nets 121 (2026-10-24)",
+        "Philadelphia 76ers 127, Milwaukee Bucks 116 (2026-10-24)",
+        "Chicago Bulls 120, Washington Wizards 124 (2026-10-24)",
+        "Dallas Mavericks 106, San Antonio Spurs 122 (2026-10-24)",
+        "Atlanta Hawks 114, Houston Rockets 121 (2026-10-24)",
+        "Denver Nuggets 141, New Orleans Pelicans 135 (2026-10-24)",
+        "Phoenix Suns 131, Golden State Warriors 122 (2026-10-24)"
+      ],
+      "games": [
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Charlotte Hornets",
+              "Hornets",
+              "CHA"
+            ],
+            [
+              "Miami Heat",
+              "Heat",
+              "MIA"
+            ]
+          ],
+          "scores": [
+            115,
+            110
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Cleveland Cavaliers",
+              "Cavaliers",
+              "CLE"
+            ],
+            [
+              "Brooklyn Nets",
+              "Nets",
+              "BKN"
+            ]
+          ],
+          "scores": [
+            125,
+            121
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Philadelphia 76ers",
+              "76ers",
+              "PHI"
+            ],
+            [
+              "Milwaukee Bucks",
+              "Bucks",
+              "MIL"
+            ]
+          ],
+          "scores": [
+            127,
+            116
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Chicago Bulls",
+              "Bulls",
+              "CHI"
+            ],
+            [
+              "Washington Wizards",
+              "Wizards",
+              "WSH"
+            ]
+          ],
+          "scores": [
+            120,
+            124
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Dallas Mavericks",
+              "Mavericks",
+              "DAL"
+            ],
+            [
+              "San Antonio Spurs",
+              "Spurs",
+              "SA"
+            ]
+          ],
+          "scores": [
+            106,
+            122
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Atlanta Hawks",
+              "Hawks",
+              "ATL"
+            ],
+            [
+              "Houston Rockets",
+              "Rockets",
+              "HOU"
+            ]
+          ],
+          "scores": [
+            114,
+            121
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Denver Nuggets",
+              "Nuggets",
+              "DEN"
+            ],
+            [
+              "New Orleans Pelicans",
+              "Pelicans",
+              "NO"
+            ]
+          ],
+          "scores": [
+            141,
+            135
+          ]
+        },
+        {
+          "day": "2026-10-24",
+          "teams": [
+            [
+              "Phoenix Suns",
+              "Suns",
+              "PHX"
+            ],
+            [
+              "Golden State Warriors",
+              "Warriors",
+              "GS"
+            ]
+          ],
+          "scores": [
+            131,
+            122
+          ]
+        }
+      ],
+      "note": "captured after the run for the round started 2026-10-25T12:44:57.698Z; finals of a past game day do not change"
     }
   ],
   "counts": {

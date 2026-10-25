@@ -16,7 +16,7 @@ import { GRADE_STAMP, gradeIsCurrent, onSite, readJsonl, runKey } from "./tasks-
 // everything needed to re-grade the snapshot.
 
 const RAW = "results/raw";
-const TASK_SET_VERSION = "tasks-v2.1";
+const TASK_SET_VERSION = "tasks-v2.2";
 const EXCERPT_CHARS = 600;
 
 function arg(name: string): string | undefined {

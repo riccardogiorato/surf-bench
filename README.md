@@ -39,8 +39,8 @@ request ─▶ provider search (top 5) ─▶ provider fetch (top 3) ─▶ fixe
 |---|---|---|
 | **stable-read** | 10 | a given URL on a hard site (X, Instagram, NYT, Amazon, LinkedIn…); facts checked against a verified key |
 | **stable-lookup** | 46 | a fixed fact the provider must find; verified key |
-| **live-feed** | 12 | items captured from the official RSS / API **in the same round** (Reddit, Hacker News, NYT, BBC, YouTube, GitHub…) |
-| **live-judge** | 16 | no key possible (X posts, eBay, Zillow, Airbnb…): yes/no constraints checked by a Kimi K3 + GLM-5.3 panel, including "on the site itself, not a mirror" and "dated within N days" |
+| **live-feed** | 13 | items captured from the official RSS / API **in the same round** (Reddit, Hacker News, NYT, BBC, YouTube, GitHub, ESPN's NBA finals…); on a named site, only what that site's own pages show counts |
+| **live-judge** | 15 | no key possible (X posts, eBay, Zillow, Airbnb…): yes/no constraints checked by a Kimi K3 + GLM-5.3 panel, including "on the site itself, not a mirror" and "dated within N days" |
 
 Live tasks run 3 rounds. Each leg has a 30-second limit, and going over it is a DNF.
 
@@ -62,7 +62,7 @@ Live tasks run 3 rounds. Each leg has a 30-second limit, and going over it is a 
 
 ### Known limits
 
-- **16 live-judge tasks have no ground truth.** The panel checks explicit constraints, not that an item is *the* newest. The judges' agreement with independent blind labels is published in `calibration.json`.
+- **15 live-judge tasks have no ground truth**, because their sites (X, Instagram, Facebook, TikTok, LinkedIn, Amazon, Walmart, eBay, Best Buy, Zillow, Craigslist, Airbnb, Mercado Libre) offer no public API that returns the true answer. The panel checks explicit constraints, including "on the site itself" and "dated within N days", but not that an item is *the* newest. Wherever an official source exists the task is keyed instead: NBA scores are now graded against ESPN's scoreboard API. That caught judge errors in both directions: a false fail on a correct espn.com scoreboard, and stale scores from an aggregator. The judges' agreement with independent blind labels is published in `calibration.json`.
 - **Answer keys are cross-checked by independent agents, not yet by a human.** The audit records this in `manifest.json`.
 - **84 tasks is small.** Most of the field lands in overlapping CIs; ties are shown as ties.
 - **One round of tool use.** This measures the search → fetch step an agent depends on, not a multi-step agent loop.

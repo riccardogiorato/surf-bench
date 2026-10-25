@@ -60,7 +60,7 @@ within tracks. Within a track, three axes (`src/lib/scoring.ts`), weighted **qua
 speed 0.10**: quality = mean task score, reliability = pass rate, speed = end-to-end
 p50 relative to the fastest row (floored at 25).
 
-- **Pass**: score ≥ 0.8. live-judge also needs every constraint met by at least one judge, the evidence on the target site itself (not a mirror or aggregator), and the freshness window met.
+- **Pass**: score ≥ 0.8. A live-feed task with a `site` only counts answers found on that site's own fetched pages (a mirror fetched alongside earns nothing). live-judge also needs every constraint met by at least one judge, the evidence on the target site itself (not a mirror or aggregator), and the freshness window met.
 - **Error taxonomy** (`errorClass.ts`): `quota` and `rate_limit` are NON-SCORING. A provider that never got a fair answer must publish as "no data", never as a low score — an unfunded key returning HTTP 402 on every task would otherwise render as a perfect 0 and read as a quality verdict. Order matters: `rate_limit` is matched before `quota` because providers link their billing docs inside 429 text. Error classes are recomputed from stored messages at report time, so taxonomy fixes apply retroactively. Covered by `errorClass.test.ts`.
 - **Coverage guard**: a provider needs ≥80% of tasks scorable to get a number, otherwise it is withheld as `n/a`.
 - **Uncertainty**: paired bootstrap over tasks; providers whose CIs overlap the leader's share a tie group.

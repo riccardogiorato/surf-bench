@@ -58,8 +58,8 @@ dominate the board. Assignment: `trackOf()` in `src/lib/tasks.ts`.
 |---|---|---|---|---|
 | **stable-read** | 10 | Key facts on a given URL | Regex per fact on the reader's answers | Yes |
 | **stable-lookup** | 46 | Fixed answer, written in the task file | Regex / numeric tolerance / allowed variants | Yes |
-| **live-feed** | 12 | Captured at run time from an official feed or API | Overlap with the captured top items, or match the newest item | Re-gradable snapshot |
-| **live-judge** | 16 | None possible (X, Instagram, marketplaces…) | Panel checks yes/no constraints, plus auto-added on-site and freshness checks | Re-gradable snapshot |
+| **live-feed** | 13 | Captured at run time from an official feed or API (finals of a past game day: any time) | Overlap with the captured top items, match the newest item, or match official final scores; on a named site only its own pages count | Re-gradable snapshot |
+| **live-judge** | 15 | None possible (X, Instagram, marketplaces…) | Panel checks yes/no constraints, plus auto-added on-site and freshness checks | Re-gradable snapshot |
 
 Notes from building it:
 - Reddit references use RSS (its JSON API returns 403 to servers) and union top + hot; news keys keep up to 100 feed items; S&P uses FRED.
@@ -94,7 +94,7 @@ without calling any provider.
 
 ## Known limits
 
-- **live-judge tasks have no ground truth.** The judge checks constraints, not that the item is *the* newest.
+- **live-judge tasks have no ground truth.** The judge checks constraints, not that the item is *the* newest. A task moves to live-feed as soon as an official source exists (NBA scores did, via ESPN's scoreboard API); Best Buy and eBay have official APIs behind free developer keys and are the next candidates.
 - **Live tasks aren't comparable across runs.** Compare providers within a run.
 - **84 tasks is small.** Pairwise CIs often overlap; ties are reported as ties.
 - **Recent-event and "current limit" keys age.** `s-new-*` test index freshness only for a few weeks; `s-doc-6` (Lambda limits) and `s-doc-7` (Actions limits) must be re-checked the morning of each run (last: 2026-10-25, both unchanged) and the key edited if a page has moved.

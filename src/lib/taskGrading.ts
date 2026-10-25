@@ -5,7 +5,7 @@ import { createConcurrencyLimiter } from "./concurrency.js";
 import { judgeConstraints, togetherJson, type ConstraintVerdict } from "./judge/judge.js";
 import { READER_SYSTEM, TASK_CONSTRAINTS_RUBRIC } from "./judge/rubrics.js";
 import type { ReferenceCapture } from "./references.js";
-import { siteHosts, type Task } from "./tasks.js";
+import { hostMatches, siteHosts, type Task } from "./tasks.js";
 
 // Different model family from the judge panel (Kimi, GLM) on purpose: the
 // reader extracts, the panel audits, and neither grades its own family.
@@ -246,6 +246,47 @@ function matchNumeric(value: number | null, ref: ReferenceCapture, tolerance: nu
   return { score: 0, detail: `${value} vs ${vals[0]}` };
 }
 
+export interface ReaderGame {
+  teams: string[];
+  scores: number[];
+}
+
+const teamIs = (said: string, names: string[]) => {
+  const n = ` ${normalize(said)} `;
+  return names.some((x, i) => (i === 2 ? normalize(said) === normalize(x) : n.includes(` ${normalize(x)} `)));
+};
+
+// Final scores: a game counts when both teams and both scores match one final
+// of the official game day, and the page itself shows them.
+export function gradeScores(games: ReaderGame[], ref: ReferenceCapture, minGames: number, pages?: string): Pick<Grade, "score" | "detail"> {
+  const finals = ref.games ?? [];
+  if (finals.length === 0) return { score: 0, detail: "reference has no games" };
+  const used = new Set<number>();
+  let unread = 0;
+  for (const g of games.slice(0, 15)) {
+    const [t0, t1] = (g.teams ?? []).map(String);
+    const [s0, s1] = (g.scores ?? []).map(Number);
+    if (!t0 || !t1 || !Number.isFinite(s0) || !Number.isFinite(s1)) continue;
+    const i = finals.findIndex((f, k) =>
+      !used.has(k) &&
+      ((teamIs(t0, f.teams[0]) && teamIs(t1, f.teams[1]) && s0 === f.scores[0] && s1 === f.scores[1]) ||
+        (teamIs(t0, f.teams[1]) && teamIs(t1, f.teams[0]) && s0 === f.scores[1] && s1 === f.scores[0])),
+    );
+    if (i < 0) continue;
+    const f = finals[i];
+    if (pages !== undefined && ![String(s0), String(s1), f.teams[0][1], f.teams[1][1]].every((x) => groundedIn(x, pages))) {
+      unread++;
+      continue;
+    }
+    used.add(i);
+  }
+  const need = Math.min(minGames, finals.length);
+  return {
+    score: Math.min(1, used.size / need),
+    detail: `${used.size} of ${games.length} games match the official ${finals[0].day} finals (need ${need})${unread ? `; ${unread} not in the pages` : ""}`,
+  };
+}
+
 // ---------- per-tier entry point ----------
 
 export function freshnessConstraint(task: Task, runDate: string): string | null {
@@ -284,7 +325,9 @@ export function buildPrompt(task: Task, runDate: string, bundle: string): TaskPr
         ? `List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {"items": [string, ...]}; use [] if the documents contain none.`
         : kind === "latest"
           ? `Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {"answer": string}; use "NOT FOUND" if the documents do not contain it.`
-          : `Answer the REQUEST with the single number it asks for, as written in the documents. Reply as {"answer": number | null}.`;
+          : kind === "scores"
+            ? `List the final scores the DOCUMENTS show for the games the REQUEST asks about, as written in the documents (at most 15 games). Reply as {"games": [{"teams": [string, string], "scores": [number, number]}, ...]} with each score in the same order as its team; use [] if the documents show none.`
+            : `Answer the REQUEST with the single number it asks for, as written in the documents. Reply as {"answer": number | null}.`;
     return { to: "reader", prompt: `${header}${ask}` };
   }
   const fresh = freshnessConstraint(task, runDate);
@@ -323,12 +366,16 @@ export async function gradeTask(input: {
         return { score: 0, pass: false, detail: "no reference captured", error: `reference: ${reference?.error ?? "missing"}` };
       }
       const reader = await cachedReader(built.prompt);
+      // A site task's answer must be on that site's pages, not on a mirror fetched alongside.
+      const evidence = task.site ? formatBundle(docs.filter((d) => hostMatches(d.url, task.site!))) : pages;
       const g =
         ref.kind === "overlap"
-          ? gradeOverlap(Array.isArray(reader.items) ? reader.items.map(String) : [], reference, pages)
+          ? gradeOverlap(Array.isArray(reader.items) ? reader.items.map(String) : [], reference, evidence)
           : ref.kind === "latest"
-            ? gradeLatest(String(reader.answer ?? ""), reference, pages)
-            : gradeNumeric(parseNumber(reader.answer), reference, ref.tolerance, pages);
+            ? gradeLatest(String(reader.answer ?? ""), reference, evidence)
+            : ref.kind === "scores"
+              ? gradeScores(Array.isArray(reader.games) ? reader.games : [], reference, ref.minGames, evidence)
+              : gradeNumeric(parseNumber(reader.answer), reference, ref.tolerance, evidence);
       const gated = task.site ? onSite : true;
       return { ...g, pass: g.score >= PASS_SCORE && gated, reader, detail: gated ? g.detail : `${g.detail}; not from ${task.site}` };
     }

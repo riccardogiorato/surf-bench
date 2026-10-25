@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { factNeedles, formatBundle, gradeFacts, gradeLatest, gradeNumeric, gradeOverlap, groundedIn, parseNumber, titlesMatch } from "./taskGrading.js";
+import { factNeedles, formatBundle, gradeFacts, gradeLatest, gradeNumeric, gradeOverlap, gradeScores, groundedIn, parseNumber, titlesMatch } from "./taskGrading.js";
 import { TASKS, groupOf, hostMatches, trackOf } from "./tasks.js";
 
 const ref = (items: string[], values?: number[]) => ({ taskId: "t", capturedAt: "", items, values });
@@ -109,6 +109,30 @@ describe("groundedIn", () => {
     expect(gradeLatest("v24.22.1", ref(["v24.22.1"]), "Node 24.22.0 is out").score).toBe(0);
     expect(gradeNumeric(6712.5, ref([], [6712.5]), 0.001, "S&P 500 closed at 6,712.50").score).toBe(1);
     expect(gradeNumeric(6712.5, ref([], [6712.5]), 0.001, "S&P 500 closed at 6,700").score).toBe(0);
+  });
+});
+
+describe("gradeScores", () => {
+  const finals = {
+    ...ref(["Charlotte Hornets 115, Miami Heat 110 (2026-10-24)"]),
+    games: [
+      { day: "2026-10-24", teams: [["Charlotte Hornets", "Hornets", "CHA"], ["Miami Heat", "Heat", "MIA"]] as [string[], string[]], scores: [115, 110] as [number, number] },
+      { day: "2026-10-24", teams: [["Philadelphia 76ers", "76ers", "PHI"], ["Milwaukee Bucks", "Bucks", "MIL"]] as [string[], string[]], scores: [127, 116] as [number, number] },
+    ],
+  };
+  const page = "Heat 110 Hornets 115 Final | Bucks 116 76ers 127 Final";
+  it("counts games whose teams and scores match the official finals, in either order", () => {
+    const g = gradeScores([{ teams: ["Miami Heat", "Charlotte Hornets"], scores: [110, 115] }, { teams: ["PHI", "MIL"], scores: [127, 116] }], finals, 2, page);
+    expect(g.score).toBe(1);
+  });
+  it("gives nothing for wrong scores or an older game day", () => {
+    expect(gradeScores([{ teams: ["Hornets", "Heat"], scores: [110, 115] }], finals, 2, page).score).toBe(0);
+    expect(gradeScores([{ teams: ["Lakers", "Celtics"], scores: [101, 99] }], finals, 2, page).score).toBe(0);
+  });
+  it("needs the score on the page", () => {
+    const g = gradeScores([{ teams: ["Hornets", "Heat"], scores: [115, 110] }], finals, 2, "Hornets beat the Heat");
+    expect(g.score).toBe(0);
+    expect(g.detail).toContain("not in the pages");
   });
 });
 

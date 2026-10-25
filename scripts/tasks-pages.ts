@@ -107,12 +107,15 @@ ${task.facts.map((f) => `<tr><td>${esc(f.q)}</td><td class="mono">/${esc(f.patte
       : src.type === "github-releases" ? `GitHub releases API for ${esc(src.repo)} (version tags only)`
       : src.type === "node-lts" ? "https://nodejs.org/dist/index.json (newest LTS)"
       : src.type === "wikipedia-featured" ? "Wikimedia featured-content API (today's featured article)"
+      : src.type === "espn-scoreboard" ? `ESPN's public scoreboard API (<a href="https://site.api.espn.com/apis/site/v2/sports/basketball/${src.league}/scoreboard">${src.league.toUpperCase()}</a>), every final of the most recent US game day before the round`
       : `FRED series ${esc(src.series)}`;
     const how =
       r.kind === "overlap" ? `The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top ${r.pool} (token overlap or containment).`
       : r.kind === "latest" ? "The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0."
+      : r.kind === "scores" ? `The reader lists the games and final scores the documents show. A game counts when both teams and both scores match an official final of that game day and the pages show them; score = counted games / ${r.minGames}, capped at 1. Scores from an older game day count for nothing.`
       : `The reader gives one number. Score 1 within ±${(r.tolerance * 100).toFixed(2)}% of the latest value, 0.5 for the previous value, else 0.`;
-    return `<p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: ${source}.</p><p>${how} Pass at ≥ ${PASS_SCORE}${task.site ? `, and at least one fetched page must be on ${esc(siteHosts(task.site).join(" / "))}` : ""}.</p>`;
+    const when = r.kind === "scores" ? "for the round's date (finals never change, so the capture time does not matter)" : "in the same round, minutes before the providers run";
+    return `<p><b>Ground truth</b> captured ${when}, from: ${source}.</p><p>${how} ${task.site ? `Only what the pages fetched from ${esc(siteHosts(task.site).join(" / "))} show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. ` : ""}Pass at ≥ ${PASS_SCORE}${task.site ? `, and at least one fetched page must be on the site` : ""}.</p>`;
   }
   return `<p>No answer key can exist. Both judges answer every constraint yes/no from the documents (prompt below). A constraint's value = share of judges that said yes. Score = (on-site + sum of constraint values) / (1 + constraints). <b>Pass</b> needs: a fetched page on ${esc(siteHosts(task.site!).join(" / "))}, every constraint supported by at least one judge, the freshness constraint (if any) supported by both, and score ≥ ${PASS_SCORE}.</p>`;
 }

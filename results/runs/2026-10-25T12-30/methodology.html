@@ -37,7 +37,7 @@
 <div class="win"><div class="bar-title"><span>METHODOLOGY.TXT</span><span>SurfBench methodology — 2026-10-25T12-30</span></div><div class="body">
 
 <h1>Methodology</h1>
-<p class="sub">Generated from the code that grades the benchmark: every prompt below is produced by <span class="mono">buildPrompt()</span> in <span class="mono">src/lib/taskGrading.ts</span>, the same function <span class="mono">tasks:grade</span> calls. Run <b>2026-10-25T12-30</b> · commit <span class="mono">2bf2a39</span> · grade stamp <span class="mono">MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:a4f55603:g4</span>.</p>
+<p class="sub">Generated from the code that grades the benchmark: every prompt below is produced by <span class="mono">buildPrompt()</span> in <span class="mono">src/lib/taskGrading.ts</span>, the same function <span class="mono">tasks:grade</span> calls. Run <b>2026-10-25T12-30</b> · commit <span class="mono">d3bfb1e</span> · grade stamp <span class="mono">MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:972536ca:g5</span>.</p>
 <p class="sub">The grade stamp hashes the reader model, both prompts and every task's answer contract, so it matching the run proves the tasks below are exactly the ones this run was graded against.</p>
 
 <h2>Pipeline</h2>
@@ -1280,7 +1280,7 @@ Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in o
 </div><h2>search · live-feed · 8</h2><div class="task" id="f-hn">
   <div><span class="tag">f-hn</span><b>What are the top stories on Hacker News right now?</b></div>
   <div class="sub">site news.ycombinator.com · fresh within 1 days · category news</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Hacker News Firebase API (topstories).</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 30 (token overlap or containment). Pass at ≥ 0.8, and at least one fetched page must be on news.ycombinator.com.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Hacker News Firebase API (topstories).</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 30 (token overlap or containment). Only what the pages fetched from news.ycombinator.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: What are the top stories on Hacker News right now?
 
@@ -1300,7 +1300,7 @@ List the 5 most prominent items (headlines or post titles; an item's summary lin
 </div><div class="task" id="f-ts">
   <div><span class="tag">f-ts</span><b>What is the latest release of microsoft/TypeScript on GitHub?</b></div>
   <div class="sub">site github.com · fresh within 60 days · category reference</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: GitHub releases API for microsoft/TypeScript (version tags only).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Pass at ≥ 0.8, and at least one fetched page must be on github.com.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: GitHub releases API for microsoft/TypeScript (version tags only).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Only what the pages fetched from github.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: What is the latest release of microsoft/TypeScript on GitHub?
 
@@ -1340,7 +1340,7 @@ Answer the REQUEST with the single item it asks for (exact title, name or versio
 </div><div class="task" id="f-bbc">
   <div><span class="tag">f-bbc</span><b>What are the top stories on BBC News right now?</b></div>
   <div class="sub">site bbc.com · fresh within 1 days · category news</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://feeds.bbci.co.uk/news/rss.xml">https://feeds.bbci.co.uk/news/rss.xml</a> + <a href="https://feeds.bbci.co.uk/news/world/rss.xml">https://feeds.bbci.co.uk/news/world/rss.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Pass at ≥ 0.8, and at least one fetched page must be on bbc.com / bbc.co.uk / bbci.co.uk.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://feeds.bbci.co.uk/news/rss.xml">https://feeds.bbci.co.uk/news/rss.xml</a> + <a href="https://feeds.bbci.co.uk/news/world/rss.xml">https://feeds.bbci.co.uk/news/world/rss.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Only what the pages fetched from bbc.com / bbc.co.uk / bbci.co.uk show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: What are the top stories on BBC News right now?
 
@@ -1360,7 +1360,7 @@ List the 5 most prominent items (headlines or post titles; an item's summary lin
 </div><div class="task" id="f-fr">
   <div><span class="tag">f-fr</span><b>Quels sont les titres à la une du Monde ?</b></div>
   <div class="sub">site lemonde.fr · fresh within 1 days · category news · lang fr</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.lemonde.fr/rss/une.xml">https://www.lemonde.fr/rss/une.xml</a> + <a href="https://www.lemonde.fr/rss/en_continu.xml">https://www.lemonde.fr/rss/en_continu.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Pass at ≥ 0.8, and at least one fetched page must be on lemonde.fr.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.lemonde.fr/rss/une.xml">https://www.lemonde.fr/rss/une.xml</a> + <a href="https://www.lemonde.fr/rss/en_continu.xml">https://www.lemonde.fr/rss/en_continu.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Only what the pages fetched from lemonde.fr show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: Quels sont les titres à la une du Monde ?
 
@@ -1380,7 +1380,7 @@ List the 5 most prominent items (headlines or post titles; an item's summary lin
 </div><div class="task" id="f-de">
   <div><span class="tag">f-de</span><b>Was sind die Top-Schlagzeilen auf Spiegel Online?</b></div>
   <div class="sub">site spiegel.de · fresh within 1 days · category news · lang de</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.spiegel.de/index.rss">https://www.spiegel.de/index.rss</a> + <a href="https://www.spiegel.de/schlagzeilen/tops/index.rss">https://www.spiegel.de/schlagzeilen/tops/index.rss</a> + <a href="https://www.spiegel.de/schlagzeilen/index.rss">https://www.spiegel.de/schlagzeilen/index.rss</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Pass at ≥ 0.8, and at least one fetched page must be on spiegel.de.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.spiegel.de/index.rss">https://www.spiegel.de/index.rss</a> + <a href="https://www.spiegel.de/schlagzeilen/tops/index.rss">https://www.spiegel.de/schlagzeilen/tops/index.rss</a> + <a href="https://www.spiegel.de/schlagzeilen/index.rss">https://www.spiegel.de/schlagzeilen/index.rss</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Only what the pages fetched from spiegel.de show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: Was sind die Top-Schlagzeilen auf Spiegel Online?
 
@@ -1400,7 +1400,7 @@ List the 5 most prominent items (headlines or post titles; an item's summary lin
 </div><div class="task" id="f-wiki">
   <div><span class="tag">f-wiki</span><b>What is today's featured article on English Wikipedia?</b></div>
   <div class="sub">site wikipedia.org · fresh within 1 days · category reference</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Wikimedia featured-content API (today's featured article).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Pass at ≥ 0.8, and at least one fetched page must be on wikipedia.org.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Wikimedia featured-content API (today's featured article).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Only what the pages fetched from wikipedia.org show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: What is today's featured article on English Wikipedia?
 
@@ -1739,10 +1739,10 @@ QUESTIONS:
 
 Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
   <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://www.walmart.com/cp/returns/1231920 (90 days, checked 2026-10-22)">https://www.walmart.com/cp/returns/1231920 (90 days, checked 2026-10-22)</a></li><li>blind check: https://www.walmart.com/help/article/walmart-standard-return-policy/adc0dfb692954e67a4de206fb8d9e03a (90 days)</li></ul></details>
-</div><h2>access · live-feed · 4</h2><div class="task" id="f-yt">
+</div><h2>access · live-feed · 5</h2><div class="task" id="f-yt">
   <div><span class="tag">f-yt</span><b>What is MrBeast's latest YouTube video?</b></div>
   <div class="sub">site youtube.com · fresh within 14 days · category media</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA">https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA</a>.</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Pass at ≥ 0.8, and at least one fetched page must be on youtube.com / youtu.be.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA">https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA</a>.</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Only what the pages fetched from youtube.com / youtu.be show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: What is MrBeast's latest YouTube video?
 
@@ -1762,7 +1762,7 @@ Answer the REQUEST with the single item it asks for (exact title, name or versio
 </div><div class="task" id="f-rd1">
   <div><span class="tag">f-rd1</span><b>What are the top posts on r/technology today?</b></div>
   <div class="sub">site reddit.com · fresh within 2 days · category social</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.reddit.com/r/technology/top/.rss?t=day&amp;limit=25">https://www.reddit.com/r/technology/top/.rss?t=day&amp;limit=25</a> + <a href="https://www.reddit.com/r/technology/.rss?limit=25">https://www.reddit.com/r/technology/.rss?limit=25</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 50 (token overlap or containment). Pass at ≥ 0.8, and at least one fetched page must be on reddit.com.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.reddit.com/r/technology/top/.rss?t=day&amp;limit=25">https://www.reddit.com/r/technology/top/.rss?t=day&amp;limit=25</a> + <a href="https://www.reddit.com/r/technology/.rss?limit=25">https://www.reddit.com/r/technology/.rss?limit=25</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 50 (token overlap or containment). Only what the pages fetched from reddit.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: What are the top posts on r/technology today?
 
@@ -1782,7 +1782,7 @@ List the 5 most prominent items (headlines or post titles; an item's summary lin
 </div><div class="task" id="f-rd2">
   <div><span class="tag">f-rd2</span><b>What are the top posts on r/LocalLLaMA this week?</b></div>
   <div class="sub">site reddit.com · fresh within 7 days · category social</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.reddit.com/r/LocalLLaMA/top/.rss?t=week&amp;limit=25">https://www.reddit.com/r/LocalLLaMA/top/.rss?t=week&amp;limit=25</a> + <a href="https://www.reddit.com/r/LocalLLaMA/.rss?limit=25">https://www.reddit.com/r/LocalLLaMA/.rss?limit=25</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 50 (token overlap or containment). Pass at ≥ 0.8, and at least one fetched page must be on reddit.com.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.reddit.com/r/LocalLLaMA/top/.rss?t=week&amp;limit=25">https://www.reddit.com/r/LocalLLaMA/top/.rss?t=week&amp;limit=25</a> + <a href="https://www.reddit.com/r/LocalLLaMA/.rss?limit=25">https://www.reddit.com/r/LocalLLaMA/.rss?limit=25</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 50 (token overlap or containment). Only what the pages fetched from reddit.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: What are the top posts on r/LocalLLaMA this week?
 
@@ -1802,7 +1802,7 @@ List the 5 most prominent items (headlines or post titles; an item's summary lin
 </div><div class="task" id="f-nyt">
   <div><span class="tag">f-nyt</span><b>What are the top headlines on nytimes.com right now?</b></div>
   <div class="sub">site nytimes.com · fresh within 1 days · category news</div>
-  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml">https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Pass at ≥ 0.8, and at least one fetched page must be on nytimes.com.</p>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml">https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Only what the pages fetched from nytimes.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
   <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
 REQUEST: What are the top headlines on nytimes.com right now?
 
@@ -1819,7 +1819,27 @@ PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
 
 List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
   <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>NYT HomePage RSS probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
-</div><h2>access · live-judge · 16</h2><div class="task" id="j-x1">
+</div><div class="task" id="f-espn">
+  <div><span class="tag">f-espn</span><b>What were last night's NBA scores?</b></div>
+  <div class="sub">site espn.com · fresh within 2 days · category media</div>
+  <p><b>Ground truth</b> captured for the round's date (finals never change, so the capture time does not matter), from: ESPN's public scoreboard API (<a href="https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard">NBA</a>), every final of the most recent US game day before the round.</p><p>The reader lists the games and final scores the documents show. A game counts when both teams and both scores match an official final of that game day and the pages show them; score = counted games / 2, capped at 1. Scores from an older game day count for nothing. Only what the pages fetched from espn.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What were last night's NBA scores?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the final scores the DOCUMENTS show for the games the REQUEST asks about, as written in the documents (at most 15 games). Reply as {&quot;games&quot;: [{&quot;teams&quot;: [string, string], &quot;scores&quot;: [number, number]}, ...]} with each score in the same order as its team; use [] if the documents show none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard">https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard</a></li><li>reference = final scores of the most recent US game day before the round (America/New_York)</li></ul></details>
+</div><h2>access · live-judge · 15</h2><div class="task" id="j-x1">
   <div><span class="tag">j-x1</span><b>Show me MrBeast's 5 most recent posts on X.</b></div>
   <div class="sub">site x.com · fresh within 14 days · category social</div>
   <p>No answer key can exist. Both judges answer every constraint yes/no from the documents (prompt below). A constraint's value = share of judges that said yes. Score = (on-site + sum of constraint values) / (1 + constraints). <b>Pass</b> needs: a fetched page on x.com / twitter.com, every constraint supported by at least one judge, the freshness constraint (if any) supported by both, and score ≥ 0.8.</p>
@@ -2143,29 +2163,6 @@ CONSTRAINTS:
 3. It fits at least 2 guests
 4. A nightly price under $120 is shown
 5. The items that satisfy the constraints above are shown on a airbnb.com page itself (not a third-party aggregator, mirror, review or news site)
-
-DOCUMENTS:
---- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
-PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
-&lt;page content as returned by the provider, first 40,000 characters&gt;
-
---- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
-&lt;…&gt;
-
---- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
-&lt;…&gt;</pre></details>
-  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
-</div><div class="task" id="j-espn">
-  <div><span class="tag">j-espn</span><b>What were last night's NBA scores?</b></div>
-  <div class="sub">site espn.com · fresh within 2 days · category media</div>
-  <p>No answer key can exist. Both judges answer every constraint yes/no from the documents (prompt below). A constraint's value = share of judges that said yes. Score = (on-site + sum of constraint values) / (1 + constraints). <b>Pass</b> needs: a fetched page on espn.com, every constraint supported by at least one judge, the freshness constraint (if any) supported by both, and score ≥ 0.8.</p>
-  <details><summary>Exact prompt sent to the judges</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
-REQUEST: What were last night's NBA scores?
-
-CONSTRAINTS:
-1. Final scores are shown for at least 2 NBA games from the most recent game day before the run date
-2. The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)
-3. The items that satisfy the constraints above are dated within 2 days before the run date (&lt;RUN DATE, YYYY-MM-DD&gt;); pinned or older items elsewhere on the page are ignored
 
 DOCUMENTS:
 --- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;

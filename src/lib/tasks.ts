@@ -25,7 +25,8 @@ export interface Fact {
 export type ReferenceKind =
   | { kind: "overlap"; source: FeedSource; pool: number }
   | { kind: "latest"; source: FeedSource }
-  | { kind: "numeric"; source: FeedSource; tolerance: number };
+  | { kind: "numeric"; source: FeedSource; tolerance: number }
+  | { kind: "scores"; source: FeedSource; minGames: number }; // final scores vs the official scoreboard
 
 export type FeedSource =
   | { type: "rss"; url: string; also?: string[] } // also: extra listings unioned into the pool
@@ -33,7 +34,8 @@ export type FeedSource =
   | { type: "github-releases"; repo: string }
   | { type: "node-lts" }
   | { type: "wikipedia-featured" }
-  | { type: "fred"; series: string };
+  | { type: "fred"; series: string }
+  | { type: "espn-scoreboard"; league: "nba" };
 
 export interface Task {
   id: string;
@@ -74,7 +76,7 @@ const ACCESS_TASKS = new Set([
   "l-wmt",
   "f-yt", "f-rd1", "f-rd2", "f-nyt",
   "j-x1", "j-x2", "j-ig", "j-fb", "j-tt", "j-li", "j-amz1", "j-amz2", "j-ebay", "j-wmt",
-  "j-bby", "j-zil", "j-cl", "j-abnb", "j-espn", "j-ml",
+  "j-bby", "j-zil", "j-cl", "j-abnb", "f-espn", "j-ml",
 ]);
 export const trackOf = (t: Task | string): Track => (ACCESS_TASKS.has(typeof t === "string" ? t : t.id) ? "access" : "search");
 
@@ -762,10 +764,11 @@ export const TASKS: Task[] = [
     verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
   },
   {
-    id: "j-espn", tier: "live-judge", category: "media", site: "espn.com", freshDays: 2,
+    id: "f-espn", tier: "live-feed", category: "media", site: "espn.com", freshDays: 2,
     request: "What were last night's NBA scores?",
-    constraints: ["Final scores are shown for at least 2 NBA games from the most recent game day before the run date"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
+    // Was a judged task (j-espn); ESPN's public scoreboard API gives the true finals.
+    reference: { kind: "scores", minGames: 2, source: { type: "espn-scoreboard", league: "nba" } },
+    verified: checkedOn("2026-10-25", "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard", "reference = final scores of the most recent US game day before the round (America/New_York)"),
   },
   {
     id: "j-ml", tier: "live-judge", category: "ecommerce", site: "mercadolibre.com.mx", lang: "es",

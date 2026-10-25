@@ -11,8 +11,18 @@ export interface ReferenceCapture {
   alts?: string[][]; // per item: other texts that identify it (feed summary line)
   accept?: string[]; // "latest" refs: other answers that are also current
   values?: number[]; // numeric references, newest first
+  games?: GameResult[]; // "scores" refs: every final of the game day
+  note?: string;
   error?: string;
 }
+
+export interface GameResult {
+  day: string; // YYYY-MM-DD, US Eastern
+  teams: [string[], string[]]; // each team's names: full, short, abbreviation
+  scores: [number, number];
+}
+
+const easternDay = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(d);
 
 const UA = "Mozilla/5.0 (compatible; SurfBench/2.0; +https://github.com/riccardogiorato/surf-bench)";
 
@@ -81,8 +91,25 @@ function feedEntries(xml: string): FeedEntry[] {
     .filter((e) => e.title);
 }
 
-async function capture(source: FeedSource, pool: number): Promise<Omit<ReferenceCapture, "taskId" | "capturedAt">> {
+async function capture(source: FeedSource, pool: number, at: Date): Promise<Omit<ReferenceCapture, "taskId" | "capturedAt">> {
   switch (source.type) {
+    case "espn-scoreboard": {
+      // "Last night" = the most recent US game day before the round's own day.
+      for (let back = 1; back <= 10; back++) {
+        const day = easternDay(new Date(at.getTime() - back * 86400000));
+        const data = JSON.parse(await get(`https://site.api.espn.com/apis/site/v2/sports/basketball/${source.league}/scoreboard?dates=${day.replace(/-/g, "")}`));
+        const games: GameResult[] = (data.events ?? [])
+          .map((e: any) => e.competitions?.[0])
+          .filter((c: any) => c?.status?.type?.completed)
+          .map((c: any) => {
+            const [a, b] = c.competitors;
+            const names = (t: any) => [t.team.displayName, t.team.shortDisplayName, t.team.abbreviation].filter(Boolean);
+            return { day, teams: [names(a), names(b)], scores: [Number(a.score), Number(b.score)] };
+          });
+        if (games.length) return { items: games.map((g) => `${g.teams[0][0]} ${g.scores[0]}, ${g.teams[1][0]} ${g.scores[1]} (${day})`), games };
+      }
+      throw new Error("no completed games in the last 10 days");
+    }
     case "rss": {
       // Sequential: Reddit 429s concurrent feed requests.
       const entries: FeedEntry[] = [];
@@ -142,12 +169,13 @@ async function capture(source: FeedSource, pool: number): Promise<Omit<Reference
   }
 }
 
-export async function captureReference(task: Task): Promise<ReferenceCapture> {
+// `at` is the round's time; only date-keyed sources (final scores) honour a past one.
+export async function captureReference(task: Task, at = new Date()): Promise<ReferenceCapture> {
   const capturedAt = new Date().toISOString();
   const ref = task.reference!;
   try {
     const pool = ref.kind === "overlap" ? ref.pool : 5;
-    const out = normalizeReference(task, { taskId: task.id, capturedAt, ...(await capture(ref.source, pool)) });
+    const out = normalizeReference(task, { taskId: task.id, capturedAt, ...(await capture(ref.source, pool, at)) });
     if (out.items.length === 0) throw new Error("reference feed returned no items");
     return out;
   } catch (e) {

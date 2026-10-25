@@ -8654,9 +8654,9 @@
   "taskId": "f-yt",
   "round": 1,
   "startedAt": "2026-10-25T12:32:38.447Z",
-  "score": 0.5,
+  "score": 0,
   "pass": false,
-  "detail": "matches an older item: Eat Everything In A Grocery Store, Win $1,000,000 (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
+  "detail": "Eat Everything In A Grocery Store Win $1,000,000 is not in the pages (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
   "reader": {
    "answer": "Eat Everything In A Grocery Store Win $1,000,000"
   },
@@ -8757,7 +8757,7 @@
   "startedAt": "2026-10-25T12:32:38.667Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Meta planning sweeping layoffs as AI costs mount",
@@ -12811,55 +12811,148 @@
  },
  {
   "provider": "perplexity-fast",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:32:42.645Z",
-  "score": 0.125,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "StatMuse lists many finals dated 'Fri, Oct 23, 2026': 'Knicks 103 Celtics 107', 'Rockets 114 Spurs 110'",
-     "Scores appear on statmuse.com and bleacherreport.com; espn.co.uk page shows headlines only, no game scores",
-     "No espn.com page shows dated scores; espn.co.uk has only relative '9h'/'4h' headlines without scores"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "No ESPN page shows final scores; only StatMuse/Bleacher Report list scores, and ESPN UK shows headlines only.",
-     "No espn.com document; only espn.co.uk appears, and it shows no game scores.",
-     "Scored items are on statmuse.com/bleacherreport.com, not espn.com; no dated scores on an ESPN page."
-    ]
-   }
-  ],
+  "detail": "0 of 13 games match the official 2026-10-24 finals (need 2); not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Knicks",
+      "Celtics"
+     ],
+     "scores": [
+      103,
+      107
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Spurs"
+     ],
+     "scores": [
+      114,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Hawks",
+      "Hornets"
+     ],
+     "scores": [
+      128,
+      81
+     ]
+    },
+    {
+     "teams": [
+      "Raptors",
+      "Wizards"
+     ],
+     "scores": [
+      112,
+      102
+     ]
+    },
+    {
+     "teams": [
+      "Timberwolves",
+      "Magic"
+     ],
+     "scores": [
+      115,
+      93
+     ]
+    },
+    {
+     "teams": [
+      "Mavericks",
+      "Pacers"
+     ],
+     "scores": [
+      121,
+      105
+     ]
+    },
+    {
+     "teams": [
+      "Bulls",
+      "Bucks"
+     ],
+     "scores": [
+      132,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Pistons",
+      "Heat"
+     ],
+     "scores": [
+      128,
+      111
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Jazz"
+     ],
+     "scores": [
+      119,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Clippers",
+      "Lakers"
+     ],
+     "scores": [
+      117,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Grizzlies",
+      "Warriors"
+     ],
+     "scores": [
+      111,
+      108
+     ]
+    },
+    {
+     "teams": [
+      "Trail Blazers",
+      "Kings"
+     ],
+     "scores": [
+      128,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "GSW",
+      "PHX"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
@@ -12901,9 +12994,9 @@
   "taskId": "f-yt",
   "round": 1,
   "startedAt": "2026-10-25T12:32:42.815Z",
-  "score": 0.5,
+  "score": 0,
   "pass": false,
-  "detail": "matches an older item: Eat Everything In A Grocery Store, Win $1,000,000 (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
+  "detail": "Eat Everything In A Grocery Store Win $1,000,000 is not in the pages (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
   "reader": {
    "answer": "Eat Everything In A Grocery Store Win $1,000,000"
   },
@@ -13613,7 +13706,7 @@
   "startedAt": "2026-10-25T12:32:42.857Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Meta planning sweeping layoffs as AI costs mount",
@@ -17806,55 +17899,148 @@
  },
  {
   "provider": "perplexity",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:32:51.536Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "StatMuse: 'Celtics 107 Knicks 103', 'Rockets 114 Spurs 110', dated 'Fri, Oct 23, 2026'",
-     "ESPN page shows only headlines and 'Complete scoreboard' link, no actual game scores",
-     "No scores appear on espn.com; dated scores (Oct 23, 2026) are only on statmuse.com"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "ESPN page shows only headlines, no scores; StatMuse scores are dated 'Fri, Oct 23, 2026', not the most recent game day (BR shows a GSW-PHX game 'Yesterday', Oct",
-     "espn.com/nba/ shows 'NBA scoreboard' link and headlines like 'Rockets... seal win' but no actual game scores.",
-     "No items satisfying constraints 1-2 exist; dated scores found are on statmuse.com, not espn.com."
-    ]
-   }
-  ],
+  "detail": "0 of 13 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Knicks",
+      "Celtics"
+     ],
+     "scores": [
+      103,
+      107
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Spurs"
+     ],
+     "scores": [
+      114,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Hawks",
+      "Hornets"
+     ],
+     "scores": [
+      128,
+      81
+     ]
+    },
+    {
+     "teams": [
+      "Raptors",
+      "Wizards"
+     ],
+     "scores": [
+      112,
+      102
+     ]
+    },
+    {
+     "teams": [
+      "Timberwolves",
+      "Magic"
+     ],
+     "scores": [
+      115,
+      93
+     ]
+    },
+    {
+     "teams": [
+      "Mavericks",
+      "Pacers"
+     ],
+     "scores": [
+      121,
+      105
+     ]
+    },
+    {
+     "teams": [
+      "Bulls",
+      "Bucks"
+     ],
+     "scores": [
+      132,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Pistons",
+      "Heat"
+     ],
+     "scores": [
+      128,
+      111
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Jazz"
+     ],
+     "scores": [
+      119,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Clippers",
+      "Lakers"
+     ],
+     "scores": [
+      117,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Grizzlies",
+      "Warriors"
+     ],
+     "scores": [
+      111,
+      108
+     ]
+    },
+    {
+     "teams": [
+      "Trail Blazers",
+      "Kings"
+     ],
+     "scores": [
+      128,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "GSW",
+      "PHX"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -18669,7 +18855,7 @@
   "startedAt": "2026-10-25T12:32:54.323Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "US residents furious at plan to seize and destroy their homes for AI data centers",
@@ -18774,9 +18960,9 @@
   "taskId": "f-rd2",
   "round": 1,
   "startedAt": "2026-10-25T12:32:54.654Z",
-  "score": 1,
+  "score": 0,
   "pass": false,
-  "detail": "5/5 items found in the reference top 46; not from reddit.com",
+  "detail": "0/5 items found in the reference top 46; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "OpenAI and Anthropic blocked the reverse engineering of smart TVs spying on us",
@@ -19741,9 +19927,9 @@
   "taskId": "f-fr",
   "round": 1,
   "startedAt": "2026-10-25T12:32:57.158Z",
-  "score": 1,
-  "pass": true,
-  "detail": "5/5 items found in the reference top 72",
+  "score": 0,
+  "pass": false,
+  "detail": "0/5 items found in the reference top 72; 5 not in the pages",
   "reader": {
    "items": [
     "Une journée de forte mobilisation sans incidents majeurs : Le droit de manifester est aussi important que le droit de vote",
@@ -20006,9 +20192,9 @@
   "taskId": "f-wiki",
   "round": 1,
   "startedAt": "2026-10-25T12:32:58.210Z",
-  "score": 1,
-  "pass": true,
-  "detail": "matches newest: The Kinks",
+  "score": 0,
+  "pass": false,
+  "detail": "The Kinks is not in the pages (newest: The Kinks)",
   "reader": {
    "answer": "The Kinks"
   },
@@ -22918,55 +23104,98 @@
  },
  {
   "provider": "exa-fast",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:33:05.495Z",
   "score": 1,
   "pass": true,
-  "detail": "✓ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✓ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✓ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 1
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows 8 finals, e.g. 'Heat 110 - Hornets 115', 'Nets 121 - Cavaliers 125'",
-     "Source URL: https://www.espn.com/nba/scoreboard, 'NBA Scores, 2026-27 Season - ESPN'",
-     "Page header 'Saturday, October 24, 2026', one day before run date 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows 8 finals for Oct 24, 2026, e.g. 'Heat 110, Hornets 115' and 'Nets 121, Cavaliers 125'",
-     "Document 2 is from https://www.espn.com/nba/scoreboard with final scores and top performers",
-     "ESPN page header: 'Saturday, October 24, 2026', one day before run date 2026-10-25"
-    ]
-   }
-  ],
+  "detail": "8 of 8 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Miami Heat",
+      "Charlotte Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    },
+    {
+     "teams": [
+      "Brooklyn Nets",
+      "Cleveland Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Milwaukee Bucks",
+      "Philadelphia 76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "New Orleans Pelicans",
+      "Denver Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -25513,9 +25742,9 @@
   "taskId": "f-rd2",
   "round": 1,
   "startedAt": "2026-10-25T12:33:18.114Z",
-  "score": 1,
+  "score": 0,
   "pass": false,
-  "detail": "5/5 items found in the reference top 46; not from reddit.com",
+  "detail": "0/5 items found in the reference top 46; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Kimi K3.1 Pro Tech Blog: Advancing Open Intelligence",
@@ -25622,7 +25851,7 @@
   "startedAt": "2026-10-25T12:33:16.497Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "US residents furious at plan to seize and destroy their homes for AI data centers",
@@ -26089,9 +26318,9 @@
   "taskId": "f-hn",
   "round": 1,
   "startedAt": "2026-10-25T12:33:19.655Z",
-  "score": 0.8,
-  "pass": true,
-  "detail": "4/5 items found in the reference top 30",
+  "score": 0.6,
+  "pass": false,
+  "detail": "3/5 items found in the reference top 30; 1 not in the pages",
   "reader": {
    "items": [
     "Local Wikipedia: Wikipedia, but only for things a half hour walk from you",
@@ -27174,7 +27403,7 @@
   "startedAt": "2026-10-25T12:33:22.993Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 30; not from news.ycombinator.com",
+  "detail": "0/5 items found in the reference top 30; 5 not in the pages; not from news.ycombinator.com",
   "reader": {
    "items": [
     "Brotli Decoder Flaw Behind Node.js RCE Also Affects Bun, Python and Other Widely Used Software",
@@ -27331,9 +27560,9 @@
   "taskId": "f-fr",
   "round": 1,
   "startedAt": "2026-10-25T12:33:24.620Z",
-  "score": 1,
-  "pass": true,
-  "detail": "5/5 items found in the reference top 72",
+  "score": 0,
+  "pass": false,
+  "detail": "0/5 items found in the reference top 72; 5 not in the pages",
   "reader": {
    "items": [
     "Une journée de forte mobilisation sans incidents majeurs : Le droit de manifester est aussi important que le droit de vote",
@@ -27645,9 +27874,9 @@
   "taskId": "f-wiki",
   "round": 1,
   "startedAt": "2026-10-25T12:33:26.238Z",
-  "score": 1,
-  "pass": true,
-  "detail": "matches newest: The Kinks",
+  "score": 0,
+  "pass": false,
+  "detail": "The Kinks is not in the pages (newest: The Kinks)",
   "reader": {
    "answer": "The Kinks"
   },
@@ -28091,7 +28320,7 @@
   "startedAt": "2026-10-25T12:33:26.369Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 16; not from nytimes.com",
+  "detail": "0/5 items found in the reference top 16; 5 not in the pages; not from nytimes.com",
   "reader": {
    "items": [
     "Targeting Biden, Catholic Bishops Advance Controversial Communion Plan",
@@ -28595,7 +28824,7 @@
   "startedAt": "2026-10-25T12:33:29.619Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 51",
+  "detail": "0/5 items found in the reference top 51; 5 not in the pages",
   "reader": {
    "items": [
     "Sicherheitslücken: Wettrennen gegen den Internet-Zusammenbruch",
@@ -32410,55 +32639,98 @@
  },
  {
   "provider": "exa",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:33:41.438Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "Doc1 lists 8 finals, e.g. 'Miami Heat 110 - Charlotte Hornets 115 | Final' for Oct 24, 2026",
-     "Sources are exa.ai, gmanetwork.com, foxsports.com; no espn.com page in documents",
-     "No espn.com items exist to date-verify; non-espn pages cannot satisfy the chain"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "Doc 1: 'Miami Heat 110 - Charlotte Hornets 115 | Final' plus 7 more final NBA scores for Oct 24, 2026",
-     "Sources are exa.ai, gmanetwork.com, and foxsports.com; no espn.com page in documents",
-     "Doc 1 title: 'NBA Games Scores — October 24, 2026'; Doc 2: 'Published October 25, 2026' for Oct 24 games"
-    ]
-   }
-  ],
+  "detail": "0 of 8 games match the official 2026-10-24 finals (need 2); 8 not in the pages; not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Miami Heat",
+      "Charlotte Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    },
+    {
+     "teams": [
+      "Brooklyn Nets",
+      "Cleveland Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Milwaukee Bucks",
+      "Philadelphia 76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "New Orleans Pelicans",
+      "Denver Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
@@ -34676,55 +34948,17 @@
  },
  {
   "provider": "parallel-turbo",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:33:52.119Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "Doc 3 lists 'Wednesday’s results': 'Hawks 132, Magic 125', 'Lakers 127, Warriors 105' etc. from Oct 21 games",
-     "Scores appear on nba.com pages; the espn.com doc (Jazz team page) shows no scores",
-     "Items dated 'OCT 21'/'October 22, 2026', more than 2 days before run date 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "Docs show final scores for Oct 21 games (e.g. 'Hawks 132, Magic 125'), but nothing establishes Oct 21 as the most recent game day before 2026-10-25.",
-     "Scores appear only on nba.com pages; the espn.com page (Doc 1) shows no game scores.",
-     "Doc 3 is 'Updated on October 22, 2026' — outside the 2-day window ending 2026-10-25."
-    ]
-   }
-  ],
+  "detail": "0 of 0 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": []
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -35593,7 +35827,7 @@
   "startedAt": "2026-10-25T12:34:00.297Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages",
   "reader": {
    "items": [
     "MacRumors: Apple Wants to Fix Safari's Cramped Layout on iPhone Duo",
@@ -37725,7 +37959,7 @@
   "startedAt": "2026-10-25T12:34:24.669Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 51",
+  "detail": "0/5 items found in the reference top 51; 5 not in the pages",
   "reader": {
    "items": [
     "Barleben: Bundeswehr-Lkw brannten in Werkstatt – Polizei prüft Bekennerschreiben",
@@ -41123,7 +41357,7 @@
   "startedAt": "2026-10-25T12:34:52.957Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 16; not from nytimes.com",
+  "detail": "0/5 items found in the reference top 16; 5 not in the pages; not from nytimes.com",
   "reader": {
    "items": [
     "Breaking News: Barack Obama forcefully criticized President Trump at a midterm rally, accusing him of historic “incompetence” in Washington.",
@@ -41557,55 +41791,98 @@
  },
  {
   "provider": "parallel",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:35:02.307Z",
   "score": 0.5,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "ESPN scoreboard shows only one final: 'WSH 124 CHI 120 Final'; other game is upcoming '11:30 PM'",
-     "Only one final score on espn.com; the 8-game list is on thebasketballscores.com, a third-party aggregator",
-     "No set of 2+ qualifying games exists; only 'Oct 24' date tab visible for a single final game"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "Doc 1: 'Charlotte Hornets 115 — 110 Miami Heat', 'Cleveland Cavaliers 125 — 121 Brooklyn Nets' plus 6 more NBA games",
-     "ESPN scoreboard (Doc 2) shows only one final: 'WSH 124 CHI 120 Final'; the multi-game scores are on thebasketballscores.com",
-     "Doc 1 header: 'Tonight · Sat 24 October' with games under /nba/2026-10-24/ URLs"
-    ]
-   }
-  ],
+  "detail": "1 of 8 games match the official 2026-10-24 finals (need 2); 7 not in the pages",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Charlotte Hornets",
+      "Miami Heat"
+     ],
+     "scores": [
+      115,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Cleveland Cavaliers",
+      "Brooklyn Nets"
+     ],
+     "scores": [
+      125,
+      121
+     ]
+    },
+    {
+     "teams": [
+      "Philadelphia 76ers",
+      "Milwaukee Bucks"
+     ],
+     "scores": [
+      127,
+      116
+     ]
+    },
+    {
+     "teams": [
+      "Chicago Bulls",
+      "Washington Wizards"
+     ],
+     "scores": [
+      120,
+      124
+     ]
+    },
+    {
+     "teams": [
+      "Dallas Mavericks",
+      "San Antonio Spurs"
+     ],
+     "scores": [
+      106,
+      122
+     ]
+    },
+    {
+     "teams": [
+      "Atlanta Hawks",
+      "Houston Rockets"
+     ],
+     "scores": [
+      114,
+      121
+     ]
+    },
+    {
+     "teams": [
+      "Denver Nuggets",
+      "New Orleans Pelicans"
+     ],
+     "scores": [
+      141,
+      135
+     ]
+    },
+    {
+     "teams": [
+      "Phoenix Suns",
+      "Golden State Warriors"
+     ],
+     "scores": [
+      131,
+      122
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -46090,7 +46367,7 @@
  },
  {
   "provider": "tavily",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:35:44.438Z",
   "score": 0,
@@ -46814,55 +47091,98 @@
  },
  {
   "provider": "firecrawl",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:36:03.631Z",
-  "score": 0.875,
-  "pass": false,
-  "detail": "✓ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✓ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows multiple Finals: Heat 110-Hornets 115, Nets 121-Cavaliers 125, Bucks 116-76ers 127",
-     "Source URL is https://www.espn.com/nba/scoreboard, an espn.com page with the game scores",
-     "Highlight image paths dated '2026/1025' (e.g. /wsc/2026/1025/99144690...), within 2 days of 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     true,
-     false
-    ],
-    "evidence": [
-     "ESPN scoreboard shows multiple Final scores, e.g. 'Heat ... 110' vs 'Hornets ... 115', 'Bucks 116' vs '76ers 127'",
-     "Document 1 source URL is https://www.espn.com/nba/scoreboard, an ESPN page",
-     "ESPN page shows a date strip (Oct 14-31) but no visible date attached to the listed games; no game date shown"
-    ]
-   }
-  ],
+  "score": 1,
+  "pass": true,
+  "detail": "8 of 8 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Miami Heat",
+      "Charlotte Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    },
+    {
+     "teams": [
+      "Brooklyn Nets",
+      "Cleveland Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Milwaukee Bucks",
+      "Philadelphia 76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "New Orleans Pelicans",
+      "Denver Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -47993,55 +48313,98 @@
  },
  {
   "provider": "keenable",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:36:14.812Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "nba.com/scores shows multiple Finals: 'Heat 110 Final 115 Hornets', 'Bucks 116 Final 127 76ers', etc.",
-     "Scores appear on nba.com and yahoo.com pages; no espn.com page in the documents",
-     "No espn.com items; dates only in image filenames like 'MIA_CHA_10_24_26_RECAP.jpg', not visible page dates"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "nba.com/scores shows multiple finals: 'Heat 110 Final 115 Hornets', 'Bucks 116 Final 127 76ers', 'Nets 121 Final 125 Cavaliers'",
-     "Scores appear on nba.com/scores and sports.yahoo.com; no espn.com page in documents",
-     "Recap image filenames show game date: 'MIA_CHA_10_24_26_RECAP.jpg', 'GSW_PHX_10_24_26_RECAP.jpg' (Oct 24, 2026)"
-    ]
-   }
-  ],
+  "detail": "0 of 8 games match the official 2026-10-24 finals (need 2); 8 not in the pages; not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Heat",
+      "Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    },
+    {
+     "teams": [
+      "Bucks",
+      "76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Nets",
+      "Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Spurs",
+      "Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Wizards",
+      "Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Warriors",
+      "Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
@@ -48080,55 +48443,38 @@
  },
  {
   "provider": "linkup",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 1,
   "startedAt": "2026-10-25T12:36:13.186Z",
   "score": 0.5,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "Only one ESPN game shown: 'final score 121-114, from October 24' (Rockets-Hawks); no second NBA game on ESPN",
-     "Second game (Warriors-Suns 122-131) is on cbssports.com, not espn.com; only one game on ESPN",
-     "Only one qualifying ESPN item dated Oct 24, 2026; two-game requirement unmet so freshness cannot be satisfied"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "HOU 121-114 ATL 'final score 121-114, from October 24, 2026' (ESPN); GS 122-131 PHO FINAL Oct 24 (CBS)",
-     "Only one game (Rockets 121-114 Hawks) is on espn.com; the second final score is on cbssports.com, not espn.com",
-     "'final score 121-114, from October 24, 2026' and 'Oct 24, 2026, 11:19 pm' — within 2 days of 2026-10-25"
-    ]
-   }
-  ],
+  "detail": "1 of 2 games match the official 2026-10-24 finals (need 2); 1 not in the pages",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -48170,9 +48516,9 @@
   "taskId": "f-yt",
   "round": 2,
   "startedAt": "2026-10-25T12:39:06.514Z",
-  "score": 0.5,
+  "score": 0,
   "pass": false,
-  "detail": "matches an older item: Eat Everything In A Grocery Store, Win $1,000,000 (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
+  "detail": "Eat Everything In A Grocery Store Win $1,000,000 is not in the pages (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
   "reader": {
    "answer": "Eat Everything In A Grocery Store Win $1,000,000"
   },
@@ -48221,7 +48567,7 @@
   "startedAt": "2026-10-25T12:39:06.514Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Meta planning sweeping layoffs as AI costs mount",
@@ -48274,9 +48620,9 @@
   "taskId": "f-yt",
   "round": 2,
   "startedAt": "2026-10-25T12:39:06.514Z",
-  "score": 0.5,
+  "score": 0,
   "pass": false,
-  "detail": "matches an older item: Eat Everything In A Grocery Store, Win $1,000,000 (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
+  "detail": "Eat Everything In A Grocery Store Win $1,000,000 is not in the pages (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
   "reader": {
    "answer": "Eat Everything In A Grocery Store Win $1,000,000"
   },
@@ -48779,7 +49125,7 @@
   "startedAt": "2026-10-25T12:39:06.510Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "US residents furious at plan to seize and destroy their homes for AI data centers",
@@ -48987,7 +49333,7 @@
   "startedAt": "2026-10-25T12:39:06.514Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "US residents furious at plan to seize and destroy their homes for AI data centers",
@@ -49042,7 +49388,7 @@
   "startedAt": "2026-10-25T12:39:06.514Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Meta planning sweeping layoffs as AI costs mount",
@@ -49391,9 +49737,9 @@
   "taskId": "f-rd2",
   "round": 2,
   "startedAt": "2026-10-25T12:39:07.622Z",
-  "score": 1,
+  "score": 0,
   "pass": false,
-  "detail": "5/5 items found in the reference top 46; not from reddit.com",
+  "detail": "0/5 items found in the reference top 46; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Kimi K3.1 Pro Tech Blog: Advancing Open Intelligence",
@@ -50051,9 +50397,9 @@
   "taskId": "f-rd2",
   "round": 2,
   "startedAt": "2026-10-25T12:39:07.800Z",
-  "score": 1,
+  "score": 0,
   "pass": false,
-  "detail": "5/5 items found in the reference top 46; not from reddit.com",
+  "detail": "0/5 items found in the reference top 46; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "OpenAI and Anthropic blocked the reverse engineering of smart TVs spying on us",
@@ -51539,7 +51885,7 @@
  },
  {
   "provider": "tavily",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:39:09.538Z",
   "score": 0,
@@ -52156,9 +52502,9 @@
   "taskId": "f-fr",
   "round": 2,
   "startedAt": "2026-10-25T12:39:09.586Z",
-  "score": 1,
-  "pass": true,
-  "detail": "5/5 items found in the reference top 71",
+  "score": 0,
+  "pass": false,
+  "detail": "0/5 items found in the reference top 71; 5 not in the pages",
   "reader": {
    "items": [
     "Une journée de forte mobilisation sans incidents majeurs : Le droit de manifester est aussi important que le droit de vote",
@@ -52213,7 +52559,7 @@
   "startedAt": "2026-10-25T12:39:08.463Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 30; not from news.ycombinator.com",
+  "detail": "0/5 items found in the reference top 30; 5 not in the pages; not from news.ycombinator.com",
   "reader": {
    "items": [
     "Show HN: Steal My Bitcoin (stealmybitcoin.com) 2026-10-25",
@@ -52615,9 +52961,9 @@
   "taskId": "f-fr",
   "round": 2,
   "startedAt": "2026-10-25T12:39:09.848Z",
-  "score": 1,
-  "pass": true,
-  "detail": "5/5 items found in the reference top 71",
+  "score": 0,
+  "pass": false,
+  "detail": "0/5 items found in the reference top 71; 5 not in the pages",
   "reader": {
    "items": [
     "Une journée de forte mobilisation sans incidents majeurs : Le droit de manifester est aussi important que le droit de vote",
@@ -53137,9 +53483,9 @@
   "taskId": "f-wiki",
   "round": 2,
   "startedAt": "2026-10-25T12:39:10.126Z",
-  "score": 1,
-  "pass": true,
-  "detail": "matches newest: The Kinks",
+  "score": 0,
+  "pass": false,
+  "detail": "The Kinks is not in the pages (newest: The Kinks)",
   "reader": {
    "answer": "The Kinks"
   },
@@ -53287,55 +53633,148 @@
  },
  {
   "provider": "perplexity-fast",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:39:10.763Z",
-  "score": 0.125,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "StatMuse lists many finals dated 'Fri, Oct 23, 2026': 'Knicks 103 Celtics 107', 'Rockets 114 Spurs 110'",
-     "Scores appear on statmuse.com and bleacherreport.com; espn.co.uk page shows headlines only, no game scores",
-     "No espn.com page shows dated scores; espn.co.uk has only relative '9h'/'4h' headlines without scores"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "No ESPN page shows final scores; only StatMuse/Bleacher Report list scores, and ESPN UK shows headlines only.",
-     "No espn.com document; only espn.co.uk appears, and it shows no game scores.",
-     "Scored items are on statmuse.com/bleacherreport.com, not espn.com; no dated scores on an ESPN page."
-    ]
-   }
-  ],
+  "detail": "0 of 13 games match the official 2026-10-24 finals (need 2); not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Knicks",
+      "Celtics"
+     ],
+     "scores": [
+      103,
+      107
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Spurs"
+     ],
+     "scores": [
+      114,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Hawks",
+      "Hornets"
+     ],
+     "scores": [
+      128,
+      81
+     ]
+    },
+    {
+     "teams": [
+      "Raptors",
+      "Wizards"
+     ],
+     "scores": [
+      112,
+      102
+     ]
+    },
+    {
+     "teams": [
+      "Timberwolves",
+      "Magic"
+     ],
+     "scores": [
+      115,
+      93
+     ]
+    },
+    {
+     "teams": [
+      "Mavericks",
+      "Pacers"
+     ],
+     "scores": [
+      121,
+      105
+     ]
+    },
+    {
+     "teams": [
+      "Bulls",
+      "Bucks"
+     ],
+     "scores": [
+      132,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Pistons",
+      "Heat"
+     ],
+     "scores": [
+      128,
+      111
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Jazz"
+     ],
+     "scores": [
+      119,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Clippers",
+      "Lakers"
+     ],
+     "scores": [
+      117,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Grizzlies",
+      "Warriors"
+     ],
+     "scores": [
+      111,
+      108
+     ]
+    },
+    {
+     "teams": [
+      "Trail Blazers",
+      "Kings"
+     ],
+     "scores": [
+      128,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "GSW",
+      "PHX"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
@@ -53480,9 +53919,9 @@
   "taskId": "f-wiki",
   "round": 2,
   "startedAt": "2026-10-25T12:39:10.560Z",
-  "score": 1,
-  "pass": true,
-  "detail": "matches newest: The Kinks",
+  "score": 0,
+  "pass": false,
+  "detail": "The Kinks is not in the pages (newest: The Kinks)",
   "reader": {
    "answer": "The Kinks"
   },
@@ -55486,7 +55925,7 @@
   "startedAt": "2026-10-25T12:39:11.349Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 16; not from nytimes.com",
+  "detail": "0/5 items found in the reference top 16; 5 not in the pages; not from nytimes.com",
   "reader": {
    "items": [
     "Targeting Biden, Catholic Bishops Advance Controversial Communion Plan",
@@ -58117,7 +58556,7 @@
   "startedAt": "2026-10-25T12:39:12.788Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 16",
+  "detail": "0/5 items found in the reference top 16; 4 not in the pages",
   "reader": {
    "items": [
     "After Return, Trump Gave Many Big Polluters a Pass",
@@ -58274,7 +58713,7 @@
   "startedAt": "2026-10-25T12:39:13.916Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 51",
+  "detail": "0/5 items found in the reference top 51; 5 not in the pages",
   "reader": {
    "items": [
     "Barleben: Bundeswehr-Lkw brannten in Werkstatt – Polizei prüft Bekennerschreiben",
@@ -58427,55 +58866,98 @@
  },
  {
   "provider": "exa",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:39:15.090Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "GMA doc lists multiple finals: 'Philadelphia 76ers 127-116 Milwaukee Bucks', 'Phoenix Suns 131-122 Golden State Warriors'",
-     "Sources are exa.ai, gmanetwork.com, foxsports.com; no espn.com page in documents",
-     "No espn.com items exist to date-verify; GMA page dated Oct 25, 2026 but not espn"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "Doc 2 lists multiple Oct 24 finals: 'Charlotte Hornets 115-110 Miami Heat', '76ers 127-116 Milwaukee Bucks', etc.",
-     "No espn.com source; documents are from exa.ai, gmanetwork.com, and foxsports.com.",
-     "Doc 2: 'Published October 25, 2026' covering games 'held on Saturday, October 24'."
-    ]
-   }
-  ],
+  "detail": "0 of 8 games match the official 2026-10-24 finals (need 2); 8 not in the pages; not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Charlotte Hornets",
+      "Miami Heat"
+     ],
+     "scores": [
+      115,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Cleveland Cavaliers",
+      "Brooklyn Nets"
+     ],
+     "scores": [
+      125,
+      121
+     ]
+    },
+    {
+     "teams": [
+      "Philadelphia 76ers",
+      "Milwaukee Bucks"
+     ],
+     "scores": [
+      127,
+      116
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Denver Nuggets",
+      "New Orleans Pelicans"
+     ],
+     "scores": [
+      141,
+      135
+     ]
+    },
+    {
+     "teams": [
+      "Phoenix Suns",
+      "Golden State Warriors"
+     ],
+     "scores": [
+      131,
+      122
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
@@ -58712,55 +59194,148 @@
  },
  {
   "provider": "perplexity",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:39:14.755Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "StatMuse: 'Celtics 107 Knicks 103', 'Rockets 114 Spurs 110', dated 'Fri, Oct 23, 2026'",
-     "ESPN page shows only headlines and 'Complete scoreboard' link, no actual game scores",
-     "No scores appear on espn.com; dated scores (Oct 23, 2026) are only on statmuse.com"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "ESPN page shows only headlines, no scores; StatMuse scores are dated 'Fri, Oct 23, 2026', not the most recent game day (BR shows a GSW-PHX game 'Yesterday', Oct",
-     "espn.com/nba/ shows 'NBA scoreboard' link and headlines like 'Rockets... seal win' but no actual game scores.",
-     "No items satisfying constraints 1-2 exist; dated scores found are on statmuse.com, not espn.com."
-    ]
-   }
-  ],
+  "detail": "0 of 13 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Knicks",
+      "Celtics"
+     ],
+     "scores": [
+      103,
+      107
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Spurs"
+     ],
+     "scores": [
+      114,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Hawks",
+      "Hornets"
+     ],
+     "scores": [
+      128,
+      81
+     ]
+    },
+    {
+     "teams": [
+      "Raptors",
+      "Wizards"
+     ],
+     "scores": [
+      112,
+      102
+     ]
+    },
+    {
+     "teams": [
+      "Timberwolves",
+      "Magic"
+     ],
+     "scores": [
+      115,
+      93
+     ]
+    },
+    {
+     "teams": [
+      "Mavericks",
+      "Pacers"
+     ],
+     "scores": [
+      121,
+      105
+     ]
+    },
+    {
+     "teams": [
+      "Bulls",
+      "Bucks"
+     ],
+     "scores": [
+      132,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Pistons",
+      "Heat"
+     ],
+     "scores": [
+      128,
+      111
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Jazz"
+     ],
+     "scores": [
+      119,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Clippers",
+      "Lakers"
+     ],
+     "scores": [
+      117,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Grizzlies",
+      "Warriors"
+     ],
+     "scores": [
+      111,
+      108
+     ]
+    },
+    {
+     "teams": [
+      "Trail Blazers",
+      "Kings"
+     ],
+     "scores": [
+      128,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "GSW",
+      "PHX"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -58799,55 +59374,98 @@
  },
  {
   "provider": "exa-fast",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:39:15.590Z",
   "score": 1,
   "pass": true,
-  "detail": "✓ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✓ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✓ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 1
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows multiple finals: 'Heat 110 - Hornets 115', 'Nets 121 - Cavaliers 125', 'Warriors 122 - Suns 131'",
-     "Source URL: https://www.espn.com/nba/scoreboard, 'NBA Scores, 2026-27 Season - ESPN'",
-     "Games listed under 'Saturday, October 24, 2026', one day before run date 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows finals: 'Hornets 115 Heat 110', 'Cavaliers 125 Nets 121', 'Suns 131 Warriors 122' etc.",
-     "Document 2 source URL: https://www.espn.com/nba/scoreboard",
-     "Page header: '### Saturday, October 24, 2026' — within 2 days of run date 2026-10-25"
-    ]
-   }
-  ],
+  "detail": "8 of 8 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Charlotte Hornets",
+      "Miami Heat"
+     ],
+     "scores": [
+      115,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Cleveland Cavaliers",
+      "Brooklyn Nets"
+     ],
+     "scores": [
+      125,
+      121
+     ]
+    },
+    {
+     "teams": [
+      "Philadelphia 76ers",
+      "Milwaukee Bucks"
+     ],
+     "scores": [
+      127,
+      116
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Denver Nuggets",
+      "New Orleans Pelicans"
+     ],
+     "scores": [
+      141,
+      135
+     ]
+    },
+    {
+     "teams": [
+      "Phoenix Suns",
+      "Golden State Warriors"
+     ],
+     "scores": [
+      131,
+      122
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -59243,7 +59861,7 @@
   "startedAt": "2026-10-25T12:39:10.297Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 16; not from nytimes.com",
+  "detail": "0/5 items found in the reference top 16; 5 not in the pages; not from nytimes.com",
   "reader": {
    "items": [
     "Breaking News: Barack Obama forcefully criticized President Trump at a midterm rally, accusing him of historic “incompetence” in Washington.",
@@ -59619,7 +60237,7 @@
   "startedAt": "2026-10-25T12:39:16.157Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 51",
+  "detail": "0/5 items found in the reference top 51; 5 not in the pages",
   "reader": {
    "items": [
     "Sicherheitslücken: Wettrennen gegen den Internet-Zusammenbruch",
@@ -61875,55 +62493,17 @@
  },
  {
   "provider": "parallel-turbo",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:39:27.175Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "Doc 3 lists 'Wednesday’s results': 'Hawks 132, Magic 125', 'Lakers 127, Warriors 105' etc. from Oct 21 games",
-     "Scores appear on nba.com pages; the espn.com doc (Jazz team page) shows no scores",
-     "Items dated 'OCT 21'/'October 22, 2026', more than 2 days before run date 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "Docs show final scores for Oct 21 games (e.g. 'Hawks 132, Magic 125'), but nothing establishes Oct 21 as the most recent game day before 2026-10-25.",
-     "Scores appear only on nba.com pages; the espn.com page (Doc 1) shows no game scores.",
-     "Doc 3 is 'Updated on October 22, 2026' — outside the 2-day window ending 2026-10-25."
-    ]
-   }
-  ],
+  "detail": "0 of 0 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": []
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -63431,55 +64011,98 @@
  },
  {
   "provider": "parallel",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:39:35.760Z",
-  "score": 0.25,
+  "score": 0.5,
   "pass": false,
-  "detail": "✓ on espn.com | ✗ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "ESPN scoreboard shows only one final: 'WSH 124 CHI 120 Final'; DET-PHI is upcoming ('11:30 PM'), not 2 finals",
-     "Only one final game shown on espn.com; the 8-game list is on uxscoreboard.com, a third-party site",
-     "No set of 2+ final games satisfying prior constraints exists on espn.com; only 'Oct 24' date tab visible"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "ESPN scoreboard shows only one final score: 'WSH 124 CHI 120 Final'; other games not final. Third-party doc has 8 finals but isn't ESPN.",
-     "No items satisfy constraint 1; the multi-score page (uxscoreboard.com) is not espn.com.",
-     "No qualifying items; ESPN page shows no dated final scores for Oct 23-24."
-    ]
-   }
-  ],
+  "detail": "1 of 8 games match the official 2026-10-24 finals (need 2); 7 not in the pages",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    },
+    {
+     "teams": [
+      "New Orleans Pelicans",
+      "Denver Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Milwaukee Bucks",
+      "Philadelphia 76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Brooklyn Nets",
+      "Cleveland Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Miami Heat",
+      "Charlotte Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -64579,55 +65202,98 @@
  },
  {
   "provider": "firecrawl",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:39:43.336Z",
-  "score": 0.875,
-  "pass": false,
-  "detail": "✓ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✓ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows multiple Finals: Heat 110-Hornets 115, Nets 121-Cavaliers 125, Bucks 116-76ers 127",
-     "Source URL is https://www.espn.com/nba/scoreboard, an espn.com page with the game scores",
-     "Highlight image paths dated '2026/1025' (e.g. /wsc/2026/1025/99144690...), within 2 days of 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     true,
-     false
-    ],
-    "evidence": [
-     "ESPN scoreboard shows multiple Final scores, e.g. 'Heat ... 110' vs 'Hornets ... 115', 'Bucks 116' vs '76ers 127'",
-     "Document 1 source URL is https://www.espn.com/nba/scoreboard, an ESPN page",
-     "ESPN page shows a date strip (Oct 14-31) but no visible date attached to the listed games; no game date shown"
-    ]
-   }
-  ],
+  "score": 1,
+  "pass": true,
+  "detail": "8 of 8 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Miami Heat",
+      "Charlotte Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    },
+    {
+     "teams": [
+      "Brooklyn Nets",
+      "Cleveland Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Milwaukee Bucks",
+      "Philadelphia 76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "New Orleans Pelicans",
+      "Denver Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -66757,55 +67423,38 @@
  },
  {
   "provider": "linkup",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:40:19.036Z",
-  "score": 0.75,
+  "score": 0.5,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ~ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✓ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 1
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     false,
-     true,
-     true
-    ],
-    "evidence": [
-     "Only one final score on ESPN: 'final score 121-114' Rockets vs Hawks; no second game shown",
-     "Game page is on espn.com: 'Houston Rockets @ Atlanta Hawks... Final... 121... 114'",
-     "'from October 24, 2026' and recap 'Oct 24, 2026, 11:19 pm' — within 2 days of run date"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "HOU 121-114 ATL (ESPN, Oct 24) and GS 122-131 PHO (CBS, 'beating the... Warriors 131-122 on Saturday night')",
-     "Only one final-score game (Rockets-Hawks 121-114) appears on espn.com; the second game is on cbssports.com",
-     "'final score 121-114, from October 24, 2026' and 'Oct 25, 2026' recap; both within 2 days of run date"
-    ]
-   }
-  ],
+  "detail": "1 of 2 games match the official 2026-10-24 finals (need 2); 1 not in the pages",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Phoenix Suns",
+      "Golden State Warriors"
+     ],
+     "scores": [
+      131,
+      122
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -67485,55 +68134,98 @@
  },
  {
   "provider": "keenable",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 2,
   "startedAt": "2026-10-25T12:41:06.964Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "nba.com/scores shows multiple finals: 'Heat 110 Final 115 Hornets', 'Bucks 116 Final 127 76ers', etc.",
-     "Scores appear on nba.com and yahoo.com; no espn.com page in the documents",
-     "No espn.com items exist to date; nba.com dates only in image filenames '10_24_26'"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "nba.com/scores shows multiple finals: 'Heat 110 Final 115 Hornets', 'Bucks 116 Final 127 76ers', 'Warriors 122 Final/OT 131 Suns'",
-     "No espn.com document; scores appear on nba.com/scores and Yahoo news pages, not espn.com",
-     "Recap image filenames on nba.com/scores show 'MIA_CHA_10_24_26_RECAP.jpg', 'GSW_PHX_10_24_26_RECAP.jpg' — dated 2026-10-24"
-    ]
-   }
-  ],
+  "detail": "0 of 8 games match the official 2026-10-24 finals (need 2); 8 not in the pages; not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Heat",
+      "Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    },
+    {
+     "teams": [
+      "Bucks",
+      "76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Nets",
+      "Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Spurs",
+      "Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Wizards",
+      "Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Warriors",
+      "Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
@@ -67575,9 +68267,9 @@
   "taskId": "f-yt",
   "round": 3,
   "startedAt": "2026-10-25T12:44:54.663Z",
-  "score": 0.5,
+  "score": 0,
   "pass": false,
-  "detail": "matches an older item: Eat Everything In A Grocery Store, Win $1,000,000 (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
+  "detail": "Eat Everything In A Grocery Store Win $1,000,000 is not in the pages (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
   "reader": {
    "answer": "Eat Everything In A Grocery Store Win $1,000,000"
   },
@@ -67624,9 +68316,9 @@
   "taskId": "f-yt",
   "round": 3,
   "startedAt": "2026-10-25T12:44:54.662Z",
-  "score": 0.5,
+  "score": 0,
   "pass": false,
-  "detail": "matches an older item: Eat Everything In A Grocery Store, Win $1,000,000 (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
+  "detail": "Eat Everything In A Grocery Store Win $1,000,000 is not in the pages (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
   "reader": {
    "answer": "Eat Everything In A Grocery Store Win $1,000,000"
   },
@@ -67675,7 +68367,7 @@
   "startedAt": "2026-10-25T12:44:54.663Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Meta planning sweeping layoffs as AI costs mount",
@@ -68069,7 +68761,7 @@
   "startedAt": "2026-10-25T12:44:54.658Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "US residents furious at plan to seize and destroy their homes for AI data centers",
@@ -68461,9 +69153,9 @@
   "taskId": "f-rd2",
   "round": 3,
   "startedAt": "2026-10-25T12:44:55.394Z",
-  "score": 0.8,
+  "score": 0,
   "pass": false,
-  "detail": "4/5 items found in the reference top 46; not from reddit.com",
+  "detail": "0/5 items found in the reference top 46; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Kimi K3.1 Pro Tech Blog: Advancing Open Intelligence",
@@ -68721,7 +69413,7 @@
   "startedAt": "2026-10-25T12:44:54.663Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "Meta planning sweeping layoffs as AI costs mount",
@@ -69278,7 +69970,7 @@
   "startedAt": "2026-10-25T12:44:54.662Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28; not from reddit.com",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "US residents furious at plan to seize and destroy their homes for AI data centers",
@@ -69473,9 +70165,9 @@
   "taskId": "f-rd2",
   "round": 3,
   "startedAt": "2026-10-25T12:44:56.042Z",
-  "score": 1,
+  "score": 0,
   "pass": false,
-  "detail": "5/5 items found in the reference top 46; not from reddit.com",
+  "detail": "0/5 items found in the reference top 46; 5 not in the pages; not from reddit.com",
   "reader": {
    "items": [
     "OpenAI and Anthropic blocked the reverse engineering of smart TVs spying on us",
@@ -69797,7 +70489,7 @@
   "startedAt": "2026-10-25T12:44:54.662Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 28",
+  "detail": "0/5 items found in the reference top 28; 5 not in the pages",
   "reader": {
    "items": [
     "MacRumors: Apple Wants to Fix Safari's Cramped Layout on iPhone Duo",
@@ -70841,9 +71533,9 @@
   "taskId": "f-fr",
   "round": 3,
   "startedAt": "2026-10-25T12:44:57.108Z",
-  "score": 1,
-  "pass": true,
-  "detail": "5/5 items found in the reference top 71",
+  "score": 0,
+  "pass": false,
+  "detail": "0/5 items found in the reference top 71; 5 not in the pages",
   "reader": {
    "items": [
     "Une journée de forte mobilisation sans incidents majeurs : Le droit de manifester est aussi important que le droit de vote",
@@ -71010,7 +71702,7 @@
  },
  {
   "provider": "tavily",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:44:57.698Z",
   "score": 0,
@@ -71719,9 +72411,9 @@
   "taskId": "f-wiki",
   "round": 3,
   "startedAt": "2026-10-25T12:44:57.756Z",
-  "score": 1,
-  "pass": true,
-  "detail": "matches newest: The Kinks",
+  "score": 0,
+  "pass": false,
+  "detail": "The Kinks is not in the pages (newest: The Kinks)",
   "reader": {
    "answer": "The Kinks"
   },
@@ -72127,7 +72819,7 @@
   "startedAt": "2026-10-25T12:44:56.428Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 30; not from news.ycombinator.com",
+  "detail": "0/5 items found in the reference top 30; 5 not in the pages; not from news.ycombinator.com",
   "reader": {
    "items": [
     "Show HN: Steal My Bitcoin (stealmybitcoin.com) 2026-10-25",
@@ -72180,9 +72872,9 @@
   "taskId": "f-fr",
   "round": 3,
   "startedAt": "2026-10-25T12:44:58.166Z",
-  "score": 1,
-  "pass": true,
-  "detail": "5/5 items found in the reference top 71",
+  "score": 0,
+  "pass": false,
+  "detail": "0/5 items found in the reference top 71; 5 not in the pages",
   "reader": {
    "items": [
     "Une journée de forte mobilisation sans incidents majeurs : Le droit de manifester est aussi important que le droit de vote",
@@ -72542,55 +73234,148 @@
  },
  {
   "provider": "perplexity-fast",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:44:58.718Z",
-  "score": 0.125,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "StatMuse lists many finals dated 'Fri, Oct 23, 2026': 'Knicks 103 Celtics 107', 'Rockets 114 Spurs 110'",
-     "Scores appear on statmuse.com and bleacherreport.com; espn.co.uk page shows headlines only, no game scores",
-     "No espn.com page shows dated scores; espn.co.uk has only relative '9h'/'4h' headlines without scores"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "No ESPN page shows final scores; only StatMuse/Bleacher Report list scores, and ESPN UK shows headlines only.",
-     "No espn.com document; only espn.co.uk appears, and it shows no game scores.",
-     "Scored items are on statmuse.com/bleacherreport.com, not espn.com; no dated scores on an ESPN page."
-    ]
-   }
-  ],
+  "detail": "0 of 13 games match the official 2026-10-24 finals (need 2); not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Knicks",
+      "Celtics"
+     ],
+     "scores": [
+      103,
+      107
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Spurs"
+     ],
+     "scores": [
+      114,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Hawks",
+      "Hornets"
+     ],
+     "scores": [
+      128,
+      81
+     ]
+    },
+    {
+     "teams": [
+      "Raptors",
+      "Wizards"
+     ],
+     "scores": [
+      112,
+      102
+     ]
+    },
+    {
+     "teams": [
+      "Timberwolves",
+      "Magic"
+     ],
+     "scores": [
+      115,
+      93
+     ]
+    },
+    {
+     "teams": [
+      "Mavericks",
+      "Pacers"
+     ],
+     "scores": [
+      121,
+      105
+     ]
+    },
+    {
+     "teams": [
+      "Bulls",
+      "Bucks"
+     ],
+     "scores": [
+      132,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Pistons",
+      "Heat"
+     ],
+     "scores": [
+      128,
+      111
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Jazz"
+     ],
+     "scores": [
+      119,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Clippers",
+      "Lakers"
+     ],
+     "scores": [
+      117,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Grizzlies",
+      "Warriors"
+     ],
+     "scores": [
+      111,
+      108
+     ]
+    },
+    {
+     "teams": [
+      "Trail Blazers",
+      "Kings"
+     ],
+     "scores": [
+      128,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "GSW",
+      "PHX"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
@@ -72814,9 +73599,9 @@
   "taskId": "f-yt",
   "round": 3,
   "startedAt": "2026-10-25T12:44:54.658Z",
-  "score": 0.5,
+  "score": 0,
   "pass": false,
-  "detail": "matches an older item: Eat Everything In A Grocery Store, Win $1,000,000 (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
+  "detail": "Eat Everything In A Grocery Store, Win $1,000,000 is not in the pages (newest: Lose 150 Lbs Together, Win $250,000); not from youtube.com",
   "reader": {
    "answer": "Eat Everything In A Grocery Store, Win $1,000,000"
   },
@@ -72971,9 +73756,9 @@
   "taskId": "f-wiki",
   "round": 3,
   "startedAt": "2026-10-25T12:44:58.662Z",
-  "score": 1,
-  "pass": true,
-  "detail": "matches newest: The Kinks",
+  "score": 0,
+  "pass": false,
+  "detail": "The Kinks is not in the pages (newest: The Kinks)",
   "reader": {
    "answer": "The Kinks"
   },
@@ -75333,7 +76118,7 @@
   "startedAt": "2026-10-25T12:44:59.854Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 16; not from nytimes.com",
+  "detail": "0/5 items found in the reference top 16; 5 not in the pages; not from nytimes.com",
   "reader": {
    "items": [
     "Targeting Biden, Catholic Bishops Advance Controversial Communion Plan",
@@ -77427,55 +78212,98 @@
  },
  {
   "provider": "exa",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:45:02.940Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "GMA doc lists multiple finals: 'Philadelphia 76ers 127-116 Milwaukee Bucks', 'Phoenix Suns 131-122 Golden State Warriors'",
-     "Sources are exa.ai, gmanetwork.com, foxsports.com; no espn.com page in documents",
-     "No espn.com items exist to date-verify; GMA page dated Oct 25, 2026 but not espn"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "Doc 2 lists multiple Oct 24 finals: 'Charlotte Hornets 115-110 Miami Heat', '76ers 127-116 Milwaukee Bucks', etc.",
-     "No espn.com source; documents are from exa.ai, gmanetwork.com, and foxsports.com.",
-     "Doc 2: 'Published October 25, 2026' covering games 'held on Saturday, October 24'."
-    ]
-   }
-  ],
+  "detail": "0 of 8 games match the official 2026-10-24 finals (need 2); 8 not in the pages; not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Charlotte Hornets",
+      "Miami Heat"
+     ],
+     "scores": [
+      115,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Cleveland Cavaliers",
+      "Brooklyn Nets"
+     ],
+     "scores": [
+      125,
+      121
+     ]
+    },
+    {
+     "teams": [
+      "Philadelphia 76ers",
+      "Milwaukee Bucks"
+     ],
+     "scores": [
+      127,
+      116
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Denver Nuggets",
+      "New Orleans Pelicans"
+     ],
+     "scores": [
+      141,
+      135
+     ]
+    },
+    {
+     "teams": [
+      "Phoenix Suns",
+      "Golden State Warriors"
+     ],
+     "scores": [
+      131,
+      122
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
@@ -77617,55 +78445,148 @@
  },
  {
   "provider": "perplexity",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:45:02.440Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "StatMuse: 'Celtics 107 Knicks 103', 'Rockets 114 Spurs 110', dated 'Fri, Oct 23, 2026'",
-     "ESPN page shows only headlines and 'Complete scoreboard' link, no actual game scores",
-     "No scores appear on espn.com; dated scores (Oct 23, 2026) are only on statmuse.com"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "ESPN page shows only headlines, no scores; StatMuse scores are dated 'Fri, Oct 23, 2026', not the most recent game day (BR shows a GSW-PHX game 'Yesterday', Oct",
-     "espn.com/nba/ shows 'NBA scoreboard' link and headlines like 'Rockets... seal win' but no actual game scores.",
-     "No items satisfying constraints 1-2 exist; dated scores found are on statmuse.com, not espn.com."
-    ]
-   }
-  ],
+  "detail": "0 of 13 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Knicks",
+      "Celtics"
+     ],
+     "scores": [
+      103,
+      107
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Spurs"
+     ],
+     "scores": [
+      114,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Hawks",
+      "Hornets"
+     ],
+     "scores": [
+      128,
+      81
+     ]
+    },
+    {
+     "teams": [
+      "Raptors",
+      "Wizards"
+     ],
+     "scores": [
+      112,
+      102
+     ]
+    },
+    {
+     "teams": [
+      "Timberwolves",
+      "Magic"
+     ],
+     "scores": [
+      115,
+      93
+     ]
+    },
+    {
+     "teams": [
+      "Mavericks",
+      "Pacers"
+     ],
+     "scores": [
+      121,
+      105
+     ]
+    },
+    {
+     "teams": [
+      "Bulls",
+      "Bucks"
+     ],
+     "scores": [
+      132,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Pistons",
+      "Heat"
+     ],
+     "scores": [
+      128,
+      111
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Jazz"
+     ],
+     "scores": [
+      119,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Clippers",
+      "Lakers"
+     ],
+     "scores": [
+      117,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Grizzlies",
+      "Warriors"
+     ],
+     "scores": [
+      111,
+      108
+     ]
+    },
+    {
+     "teams": [
+      "Trail Blazers",
+      "Kings"
+     ],
+     "scores": [
+      128,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "GSW",
+      "PHX"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -78108,7 +79029,7 @@
   "startedAt": "2026-10-25T12:45:02.368Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 52",
+  "detail": "0/5 items found in the reference top 52; 5 not in the pages",
   "reader": {
    "items": [
     "Sicherheitslücken: Wettrennen gegen den Internet-Zusammenbruch",
@@ -78157,55 +79078,98 @@
  },
  {
   "provider": "exa-fast",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:45:03.947Z",
   "score": 1,
   "pass": true,
-  "detail": "✓ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✓ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✓ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 1
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows multiple finals: 'Heat 110 - Hornets 115', 'Nets 121 - Cavaliers 125', 'Warriors 122 - Suns 131'",
-     "Source URL: https://www.espn.com/nba/scoreboard, 'NBA Scores, 2026-27 Season - ESPN'",
-     "Games listed under 'Saturday, October 24, 2026', one day before run date 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows finals: 'Hornets 115 Heat 110', 'Cavaliers 125 Nets 121', 'Suns 131 Warriors 122' etc.",
-     "Document 2 source URL: https://www.espn.com/nba/scoreboard",
-     "Page header: '### Saturday, October 24, 2026' — within 2 days of run date 2026-10-25"
-    ]
-   }
-  ],
+  "detail": "8 of 8 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Charlotte Hornets",
+      "Miami Heat"
+     ],
+     "scores": [
+      115,
+      110
+     ]
+    },
+    {
+     "teams": [
+      "Cleveland Cavaliers",
+      "Brooklyn Nets"
+     ],
+     "scores": [
+      125,
+      121
+     ]
+    },
+    {
+     "teams": [
+      "Philadelphia 76ers",
+      "Milwaukee Bucks"
+     ],
+     "scores": [
+      127,
+      116
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Denver Nuggets",
+      "New Orleans Pelicans"
+     ],
+     "scores": [
+      141,
+      135
+     ]
+    },
+    {
+     "teams": [
+      "Phoenix Suns",
+      "Golden State Warriors"
+     ],
+     "scores": [
+      131,
+      122
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -78687,7 +79651,7 @@
   "startedAt": "2026-10-25T12:44:58.046Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 16; not from nytimes.com",
+  "detail": "0/5 items found in the reference top 16; 5 not in the pages; not from nytimes.com",
   "reader": {
    "items": [
     "Breaking News: Barack Obama forcefully criticized President Trump at a midterm rally, accusing him of historic “incompetence” in Washington.",
@@ -79393,7 +80357,7 @@
   "startedAt": "2026-10-25T12:45:08.435Z",
   "score": 0,
   "pass": false,
-  "detail": "0/5 items found in the reference top 52",
+  "detail": "0/5 items found in the reference top 52; 5 not in the pages",
   "reader": {
    "items": [
     "Sicherheitslücken: Wettrennen gegen den Internet-Zusammenbruch",
@@ -81997,55 +82961,17 @@
  },
  {
   "provider": "parallel-turbo",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:45:17.224Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "Doc 3 lists 'Wednesday’s results': 'Hawks 132, Magic 125', 'Lakers 127, Warriors 105' etc. from Oct 21 games",
-     "Scores appear on nba.com pages; the espn.com doc (Jazz team page) shows no scores",
-     "Items dated 'OCT 21'/'October 22, 2026', more than 2 days before run date 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "Docs show final scores for Oct 21 games (e.g. 'Hawks 132, Magic 125'), but nothing establishes Oct 21 as the most recent game day before 2026-10-25.",
-     "Scores appear only on nba.com pages; the espn.com page (Doc 1) shows no game scores.",
-     "Doc 3 is 'Updated on October 22, 2026' — outside the 2-day window ending 2026-10-25."
-    ]
-   }
-  ],
+  "detail": "0 of 0 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": []
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -82677,55 +83603,98 @@
  },
  {
   "provider": "firecrawl",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:45:19.838Z",
-  "score": 0.875,
-  "pass": false,
-  "detail": "✓ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✓ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     true,
-     true
-    ],
-    "evidence": [
-     "ESPN scoreboard shows multiple Finals: Heat 110-Hornets 115, Nets 121-Cavaliers 125, Bucks 116-76ers 127",
-     "Source URL is https://www.espn.com/nba/scoreboard, an espn.com page with the game scores",
-     "Highlight image paths dated '2026/1025' (e.g. /wsc/2026/1025/99144690...), within 2 days of 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     true,
-     false
-    ],
-    "evidence": [
-     "ESPN scoreboard shows multiple Final scores, e.g. 'Heat ... 110' vs 'Hornets ... 115', 'Bucks 116' vs '76ers 127'",
-     "Document 1 source URL is https://www.espn.com/nba/scoreboard, an ESPN page",
-     "ESPN page shows a date strip (Oct 14-31) but no visible date attached to the listed games; no game date shown"
-    ]
-   }
-  ],
+  "score": 1,
+  "pass": true,
+  "detail": "8 of 8 games match the official 2026-10-24 finals (need 2)",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Miami Heat",
+      "Charlotte Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    },
+    {
+     "teams": [
+      "Brooklyn Nets",
+      "Cleveland Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Milwaukee Bucks",
+      "Philadelphia 76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "New Orleans Pelicans",
+      "Denver Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -83700,55 +84669,98 @@
  },
  {
   "provider": "parallel",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:45:26.447Z",
-  "score": 0.25,
+  "score": 0.5,
   "pass": false,
-  "detail": "✓ on espn.com | ✗ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✗ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "ESPN scoreboard shows only one final: 'WSH 124 CHI 120 Final'; DET-PHI is upcoming ('11:30 PM'), not 2 finals",
-     "Only one final game shown on espn.com; the 8-game list is on uxscoreboard.com, a third-party site",
-     "No set of 2+ final games satisfying prior constraints exists on espn.com; only 'Oct 24' date tab visible"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     false,
-     false,
-     false
-    ],
-    "evidence": [
-     "ESPN scoreboard shows only one final score: 'WSH 124 CHI 120 Final'; other games not final. Third-party doc has 8 finals but isn't ESPN.",
-     "No items satisfy constraint 1; the multi-score page (uxscoreboard.com) is not espn.com.",
-     "No qualifying items; ESPN page shows no dated final scores for Oct 23-24."
-    ]
-   }
-  ],
+  "detail": "1 of 8 games match the official 2026-10-24 finals (need 2); 7 not in the pages",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    },
+    {
+     "teams": [
+      "New Orleans Pelicans",
+      "Denver Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "San Antonio Spurs",
+      "Dallas Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Washington Wizards",
+      "Chicago Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Milwaukee Bucks",
+      "Philadelphia 76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Brooklyn Nets",
+      "Cleveland Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Miami Heat",
+      "Charlotte Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -86220,55 +87232,38 @@
  },
  {
   "provider": "linkup",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:46:08.085Z",
-  "score": 0.75,
+  "score": 0.5,
   "pass": false,
-  "detail": "✓ on espn.com | ~ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ~ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ✓ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0.5
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 1
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     false,
-     true,
-     true
-    ],
-    "evidence": [
-     "Only one game shown: 'final score 121-114' Rockets vs Hawks; no second NBA game with a final score in the documents",
-     "Source URL espn.com/nba/game/_/gameId/401909856 shows the Rockets-Hawks final score on ESPN itself",
-     "Game dated 'October 24, 2026' and recap 'Oct 24, 2026, 11:19 pm', within 2 days of 2026-10-25"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "Rockets 121-114 Hawks (ESPN, Oct 24) and Warriors 122-131 Suns (CBS, NBA_20261024) — two final scores from Oct 24.",
-     "Only one game (Rockets-Hawks 121-114) is on espn.com; the second final score is on cbssports.com.",
-     "ESPN game page: 'final score 121-114, from October 24, 2026' — within 2 days of 2026-10-25."
-    ]
-   }
-  ],
+  "detail": "1 of 2 games match the official 2026-10-24 finals (need 2); 1 not in the pages",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Houston Rockets",
+      "Atlanta Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Golden State Warriors",
+      "Phoenix Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": true,
   "siteInResults": true,
   "searchResults": [
@@ -86892,55 +87887,98 @@
  },
  {
   "provider": "keenable",
-  "taskId": "j-espn",
+  "taskId": "f-espn",
   "round": 3,
   "startedAt": "2026-10-25T12:47:13.456Z",
-  "score": 0.375,
+  "score": 0,
   "pass": false,
-  "detail": "✗ on espn.com | ✓ Final scores are shown for at least 2 NBA games from the most recent game day before the run date | ✗ The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site) | ~ The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-  "reader": null,
-  "constraints": [
-   {
-    "text": "Final scores are shown for at least 2 NBA games from the most recent game day before the run date",
-    "value": 1
-   },
-   {
-    "text": "The items that satisfy the constraints above are shown on a espn.com page itself (not a third-party aggregator, mirror, review or news site)",
-    "value": 0
-   },
-   {
-    "text": "The items that satisfy the constraints above are dated within 2 days before the run date (2026-10-25); pinned or older items elsewhere on the page are ignored",
-    "value": 0.5
-   }
-  ],
-  "judgeEvidence": [
-   {
-    "judge": "kimi-k3",
-    "met": [
-     true,
-     false,
-     false
-    ],
-    "evidence": [
-     "nba.com/scores shows multiple Finals: 'Heat 110 Final 115 Hornets', 'Bucks 116 Final 127 76ers', etc.",
-     "Scores are on nba.com and yahoo.com, not espn.com; no espn.com page in documents",
-     "No espn.com items exist; nba.com page shows no visible date text (only image filenames '10_24_26')"
-    ]
-   },
-   {
-    "judge": "glm-5.3",
-    "met": [
-     true,
-     false,
-     true
-    ],
-    "evidence": [
-     "nba.com/scores shows multiple finals: 'Heat 110 Final 115 Hornets', 'Bucks 116 Final 127 76ers'",
-     "Scores appear on nba.com/scores and sports.yahoo.com, not on any espn.com page",
-     "Recap images dated 'MIA_CHA_10_24_26_RECAP.jpg', 'GSW_PHX_10_24_26_RECAP.jpg' — Oct 24, within 2 days"
-    ]
-   }
-  ],
+  "detail": "0 of 8 games match the official 2026-10-24 finals (need 2); 8 not in the pages; not from espn.com",
+  "reader": {
+   "games": [
+    {
+     "teams": [
+      "Heat",
+      "Hornets"
+     ],
+     "scores": [
+      110,
+      115
+     ]
+    },
+    {
+     "teams": [
+      "Bucks",
+      "76ers"
+     ],
+     "scores": [
+      116,
+      127
+     ]
+    },
+    {
+     "teams": [
+      "Nets",
+      "Cavaliers"
+     ],
+     "scores": [
+      121,
+      125
+     ]
+    },
+    {
+     "teams": [
+      "Spurs",
+      "Mavericks"
+     ],
+     "scores": [
+      122,
+      106
+     ]
+    },
+    {
+     "teams": [
+      "Wizards",
+      "Bulls"
+     ],
+     "scores": [
+      124,
+      120
+     ]
+    },
+    {
+     "teams": [
+      "Rockets",
+      "Hawks"
+     ],
+     "scores": [
+      121,
+      114
+     ]
+    },
+    {
+     "teams": [
+      "Pelicans",
+      "Nuggets"
+     ],
+     "scores": [
+      135,
+      141
+     ]
+    },
+    {
+     "teams": [
+      "Warriors",
+      "Suns"
+     ],
+     "scores": [
+      122,
+      131
+     ]
+    }
+   ]
+  },
+  "constraints": null,
+  "judgeEvidence": null,
   "onSite": false,
   "siteInResults": false,
   "searchResults": [
