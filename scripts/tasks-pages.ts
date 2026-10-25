@@ -3,10 +3,10 @@ import path from "path";
 import { JUDGE_MODELS } from "../src/lib/judge/judge.js";
 import { READER_SYSTEM, TASK_CONSTRAINTS_RUBRIC } from "../src/lib/judge/rubrics.js";
 import { PRICES } from "../src/lib/pricing.js";
-import { MIN_COVERAGE, SPEED_FLOOR, WEIGHTS } from "../src/lib/scoring.js";
+import { MIN_COVERAGE, SPEED_FLOOR, TRACK_WEIGHTS, WEIGHTS } from "../src/lib/scoring.js";
 import { DOC_CHARS, PASS_SCORE, READER_MODEL, buildPrompt } from "../src/lib/taskGrading.js";
-import { FETCH_PROVIDER } from "../src/lib/searchClients.js";
-import { LIVE_ROUNDS, TASKS, siteHosts, type Task } from "../src/lib/tasks.js";
+import { FETCH_PROVIDER, SEARCH_CONTENT } from "../src/lib/searchClients.js";
+import { LIVE_ROUNDS, TASKS, TRACKS, siteHosts, trackOf, type Task } from "../src/lib/tasks.js";
 import { providerLabel as L } from "./favicons.js";
 import { GRADE_STAMP } from "./tasks-grade.js";
 
@@ -132,15 +132,17 @@ ${stale ? `<div class="banner">The code has changed since this run was graded (c
   <li>The provider's own fetch API retrieves the top ${esc(pipeline.fetchTop ?? 3)} results as ranked. stable-read tasks skip search and fetch the given URL.</li>
   <li>Each leg has a ${((pipeline.legTimeoutMs ?? 30000) / 1000).toFixed(0)}-second limit; going over is a DNF. Rate-limited calls are retried twice with backoff; survivors are excluded from scoring, never scored as 0.</li>
   <li>Fast modes are separate rows: ${Object.entries(FETCH_PROVIDER).map(([fast, parent]) => `<span class="mono">${esc(fast)}</span> searches in its fast mode and fetches with <span class="mono">${esc(parent)}</span>`).join("; ")}.</li>
+  <li>${[...SEARCH_CONTENT].map((p) => `<span class="mono">${esc(p)}</span>`).join(" and ")} have no fetch API: their search returns each page's extracted text, and the top 3 results' text is their fetch leg (fetch time 0, no fetch cost). On stable-read tasks they search for the given URL.</li>
   <li>Reader: <span class="mono">${esc(READER_MODEL)}</span>, temperature 0, sees each fetched page up to ${DOC_CHARS.toLocaleString("en-US")} characters. Judges: ${JUDGE_MODELS.map((m) => `<span class="mono">${esc(m)}</span>`).join(" and ")}, temperature 0. Neither ever sees the provider's name.</li>
   <li>Live tasks (live-feed, live-judge) run ${LIVE_ROUNDS} rounds; a task's score and pass are averaged over its rounds.</li>
 </ul>
 
 <h2>Scoring</h2>
 <ul>
-  <li><b>Quality</b> (${WEIGHTS.quality}) = mean task score × 100. <b>Reliability</b> (${WEIGHTS.reliability}) = share of tasks passed. <b>Speed</b> (${WEIGHTS.speed}) = fastest row's end-to-end median ÷ this row's, floored at ${SPEED_FLOOR * 100}.</li>
-  <li>A provider needs ≥ ${MIN_COVERAGE * 100}% of tasks scorable (not quota / rate-limited) to get a number.</li>
-  <li>95% confidence intervals from a paired bootstrap over tasks; providers whose interval overlaps the leader's share its tie group.</li>
+  <li>Two tracks: <b>search</b> (${TASKS.filter((t) => trackOf(t) === "search").length} tasks: find the answer on the open web) and <b>access</b> (${TASKS.filter((t) => trackOf(t) === "access").length} tasks: open a given page, or reach a named bot-walled site such as X, Instagram, Amazon or Zillow). <b>Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access.</b> The weights were fixed before the run.</li>
+  <li>Each track's score: <b>quality</b> (${WEIGHTS.quality}) = mean task score × 100; <b>reliability</b> (${WEIGHTS.reliability}) = share of tasks passed; <b>speed</b> (${WEIGHTS.speed}) = the fastest row's end-to-end median in that track ÷ this row's, floored at ${SPEED_FLOOR * 100}.</li>
+  <li>A provider needs ≥ ${MIN_COVERAGE * 100}% of each track's tasks scorable (not quota / rate-limited) to get a number.</li>
+  <li>95% confidence intervals from a paired bootstrap over tasks, resampled within each track; providers whose gap to a group's leader has an interval including 0 share its tie group.</li>
   <li>Cost is published, never scored: list price × the calls each provider actually made, per 1,000 passed tasks. Reader and judge calls are excluded.</li>
 </ul>
 
@@ -155,9 +157,10 @@ ${Object.entries(PRICES).map(([p, e]) => `<tr><td><b>${esc(p)}</b></td><td class
 
 <h2>The ${TASKS.length} tasks</h2>
 <p class="sub">Each task: the request, how it is graded, the exact prompt (with the run date and documents left as placeholders), and the verification record for its key.</p>
-${tiers.map((tier) => {
-  const ts = TASKS.filter((t) => t.tier === tier);
-  return `<h2>${esc(tier)} · ${ts.length}</h2>${ts.map((t) => {
+${TRACKS.flatMap((track) => tiers.map((tier) => [track, tier] as const)).map(([track, tier]) => {
+  const ts = TASKS.filter((t) => t.tier === tier && trackOf(t) === track);
+  if (!ts.length) return "";
+  return `<h2>${esc(track)} · ${esc(tier)} · ${ts.length}</h2>${ts.map((t) => {
     const built = buildPrompt(t, "<RUN DATE, YYYY-MM-DD>", DOCS_PLACEHOLDER);
     return `<div class="task" id="${esc(t.id)}">
   <div><span class="tag">${esc(t.id)}</span><b>${esc(t.request)}</b></div>
@@ -194,7 +197,7 @@ function inspector(runId: string, evidence: any[], board: Record<string, string>
   };
 
   const tasks = TASKS.map((t) => ({
-    id: t.id, tier: t.tier, request: t.request, site: t.site ?? null, url: t.url ?? null,
+    id: t.id, tier: t.tier, track: trackOf(t), request: t.request, site: t.site ?? null, url: t.url ?? null,
     facts: t.facts?.map((f) => ({ q: f.q, re: `/${f.pattern.source}/${f.pattern.flags}` })) ?? null,
     constraints: t.constraints ?? null,
   }));
@@ -208,7 +211,7 @@ function inspector(runId: string, evidence: any[], board: Record<string, string>
 <h1>Task inspector</h1>
 <p class="sub">Run <b>${esc(runId)}</b>. Each cell shows rounds passed / rounds run for one provider on one task. Click a cell to see exactly what happened: the search results, which pages were fetched and how big they were, what the reader answered or what each judge decided (with the evidence it quoted), the opening of the first fetched page, and why it passed or failed. Full prompts and answer keys: <a href="methodology.html">methodology.html</a>.</p>
 <div class="scroll"><table><thead><tr><th>task</th><th>request</th>${providers.map((p) => `<th>${esc(L(p))}</th>`).join("")}</tr></thead><tbody>
-${TASKS.map((t) => `<tr><td class="mono"><a href="methodology.html#${esc(t.id)}">${esc(t.id)}</a></td><td>${esc(t.request.length > 70 ? t.request.slice(0, 68) + "…" : t.request)}</td>${providers.map((p) => cell(p, t)).join("")}</tr>`).join("")}
+${TRACKS.flatMap((track) => [`<tr><th colspan="${providers.length + 2}">${esc(track)} track · ${Math.round(TRACK_WEIGHTS[track] * 100)}% of overall</th></tr>`, ...TASKS.filter((t) => trackOf(t) === track).map((t) => `<tr><td class="mono"><a href="methodology.html#${esc(t.id)}">${esc(t.id)}</a></td><td>${esc(t.request.length > 70 ? t.request.slice(0, 68) + "…" : t.request)}</td>${providers.map((p) => cell(p, t)).join("")}</tr>`)]).join("")}
 </tbody></table></div>
 <div id="detail" class="pane">Click a cell above.</div>`;
 
@@ -219,7 +222,7 @@ const link = (u) => '<a href="' + esc(u) + '" target="_blank" rel="noopener">' +
 function show(p, id) {
   const t = D.tasks.find((x) => x.id === id);
   const rs = D.cells[p + "|" + id] || [];
-  let h = '<h2>' + esc(p) + ' · ' + esc(id) + '</h2><p><b>' + esc(t.request) + '</b></p><p class="sub">tier ' + t.tier + (t.site ? ' · site ' + esc(t.site) : '') + (t.url ? ' · url ' + link(t.url) : '') + '</p>';
+  let h = '<h2>' + esc(p) + ' · ' + esc(id) + '</h2><p><b>' + esc(t.request) + '</b></p><p class="sub">' + t.track + ' track · tier ' + t.tier + (t.site ? ' · site ' + esc(t.site) : '') + (t.url ? ' · url ' + link(t.url) : '') + '</p>';
   if (t.facts) h += '<h3>Answer key</h3><ul>' + t.facts.map((f) => '<li>' + esc(f.q) + ' → <span class="mono">' + esc(f.re) + '</span></li>').join('') + '</ul>';
   for (const r of rs) {
     h += '<div class="round"><h3>Round ' + r.round + ' · <span class="' + (r.pass ? 'pass">PASS' : 'fail">FAIL') + '</span> · score ' + r.score.toFixed(2) + ' · ' + (r.totalMs/1000).toFixed(1) + 's · $' + (r.costUsd ?? 0).toFixed(4) + '</h3>';

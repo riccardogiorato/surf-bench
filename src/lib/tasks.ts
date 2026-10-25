@@ -1,4 +1,5 @@
-// SurfBench v2 task set: 50 hand-curated tasks, one event.
+// SurfBench v2 task set: 84 hand-curated tasks in two weighted tracks (search,
+// access; see TRACKS below), one event.
 //
 // Every task carries its own grading contract (gold facts, a live reference
 // feed, or explicit yes/no constraints) and a `verified` block recording who
@@ -56,11 +57,26 @@ export const AGENT_DRAFT = "agent-draft";
 export const AGENT_CHECK = "agent-check";
 const draft = (...evidence: string[]) => ({ by: AGENT_DRAFT, at: "2026-10-22", evidence });
 const checked = (...evidence: string[]) => ({ by: AGENT_CHECK, at: "2026-10-22", evidence });
+const checkedOn = (at: string, ...evidence: string[]) => ({ by: AGENT_CHECK, at, evidence });
 
 // Repeats per release. Stable tasks are deterministic enough to run once;
 // live tasks are averaged over rounds so one flaky request can't flip a cell.
 export const LIVE_ROUNDS = 3;
 export const isLive = (t: Task) => t.tier === "live-feed" || t.tier === "live-judge";
+
+// Two tracks, weighted in scoring.ts (TRACK_WEIGHTS). Search: find the answer
+// on the open web. Access: open a given page, or reach a named bot-walled site
+// (social, marketplaces, paywalls). Every task not listed here is search.
+export type Track = "search" | "access";
+export const TRACKS: Track[] = ["search", "access"];
+const ACCESS_TASKS = new Set([
+  "r-ig", "r-x", "r-nyt", "r-bbc", "r-amz", "r-tgt", "r-hd", "r-yt", "r-li", "r-arxiv",
+  "l-wmt",
+  "f-yt", "f-rd1", "f-rd2", "f-nyt",
+  "j-x1", "j-x2", "j-ig", "j-fb", "j-tt", "j-li", "j-amz1", "j-amz2", "j-ebay", "j-wmt",
+  "j-bby", "j-zil", "j-cl", "j-abnb", "j-espn", "j-ml",
+]);
+export const trackOf = (t: Task | string): Track => (ACCESS_TASKS.has(typeof t === "string" ? t : t.id) ? "access" : "search");
 
 export const TASKS: Task[] = [
   // ---------------- stable-read: can it open this page and pull the facts? ----------------
@@ -248,6 +264,321 @@ export const TASKS: Task[] = [
     request: "東京スカイツリーの高さは？",
     facts: [{ q: "東京スカイツリーの高さは何メートルですか？", pattern: /634/ }],
     verified: checked("https://www.tokyo-skytree.jp/ (634 m)", "blind check: https://www.tokyo-skytree.jp/about/ (634 m)"),
+  },
+
+  // ---------------- search · docs ----------------
+  {
+    id: "s-doc-1", tier: "stable-lookup", category: "reference",
+    request: "Per RFC 9112 (HTTP/1.1 message syntax), what is the minimum request-line length that all HTTP senders and recipients are recommended to support?",
+    facts: [
+      { q: "What minimum request-line length does RFC 9112 recommend all HTTP senders and recipients support?", pattern: /(?<![\d,.])8[,.]?000(?![\d,])/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.rfc-editor.org/rfc/rfc9112.txt", "https://www.rfc-editor.org/rfc/rfc9112.html#section-3", "blind check 2026-10-25 (high): 8000 octets"),
+  },
+  {
+    id: "s-doc-2", tier: "stable-lookup", category: "reference",
+    request: "In the WebSocket protocol (RFC 6455), what fixed GUID does the server append to Sec-WebSocket-Key when computing Sec-WebSocket-Accept, and what is the maximum payload length allowed for a control frame?",
+    facts: [
+      { q: "What GUID string is concatenated with Sec-WebSocket-Key to compute Sec-WebSocket-Accept?", pattern: /\b258EAFA5-E914-47DA-95CA-C5AB0DC85B11\b/i },
+      { q: "What is the maximum payload length of a WebSocket control frame?", pattern: /(?<![\d,.])125(?![\d,])/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.rfc-editor.org/rfc/rfc6455.txt", "https://www.rfc-editor.org/rfc/rfc6455.html#section-5.5", "blind check 2026-10-25 (high): 258EAFA5-E914-47DA-95CA-C5AB0DC85B11; 125 bytes"),
+  },
+  {
+    id: "s-doc-3", tier: "stable-lookup", category: "reference",
+    request: "SQLite limits: by default, how many databases can be attached to a single connection at the same time, and what is the highest that limit can ever be raised to?",
+    facts: [
+      { q: "What is the default maximum number of simultaneously attached databases in SQLite (SQLITE_MAX_ATTACHED)?", pattern: /(?<![\d,.])(10|ten)(?![\d,])/i },
+      { q: "What is the absolute maximum value the attached-database limit can be increased to?", pattern: /(?<![\d,.])125(?![\d,])/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.sqlite.org/limits.html", "https://www.sqlite.org/lang_attach.html", "blind check 2026-10-25 (high): 10; 125"),
+  },
+  {
+    id: "s-doc-4", tier: "stable-lookup", category: "reference",
+    request: "In Python 3.13, what is the default limit on the number of digits when converting a large int to or from a decimal string, and what is the lowest non-zero value that limit can be set to?",
+    facts: [
+      { q: "What is the default int/str conversion digit limit in Python 3.13 (sys.int_info.default_max_str_digits)?", pattern: /(?<![\d,.])4[,.]?300(?![\d,])/i },
+      { q: "What is the lowest non-zero value the limit can be configured to (sys.int_info.str_digits_check_threshold)?", pattern: /(?<![\d,.])640(?![\d,])/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://docs.python.org/3.13/library/stdtypes.html#int-max-str-digits", "https://docs.python.org/3.13/library/sys.html#sys.int_info", "blind check 2026-10-25 (high): 4300 digits; 640 digits"),
+  },
+  {
+    id: "s-doc-5", tier: "stable-lookup", category: "reference",
+    request: "In PostgreSQL 17, what are the default values of jit_above_cost and jit_inline_above_cost?",
+    facts: [
+      { q: "What is the default value of jit_above_cost in PostgreSQL 17?", pattern: /(?<![\d,.])100[, ]?000(?![\d,])/i },
+      { q: "What is the default value of jit_inline_above_cost in PostgreSQL 17?", pattern: /(?<![\d,.])500[, ]?000(?![\d,])/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.postgresql.org/docs/17/runtime-config-query.html", "https://raw.githubusercontent.com/postgres/postgres/REL_17_STABLE/src/backend/utils/misc/postgresql.conf.sample", "blind check 2026-10-25 (high): 100000; 500000"),
+  },
+  {
+    id: "s-doc-6", tier: "stable-lookup", category: "reference",
+    request: "What is the current AWS Lambda maximum payload size for asynchronous invocations, and the maximum response size for a function using response streaming?",
+    facts: [
+      { q: "What is the maximum invocation payload size for asynchronous Lambda invocations?", pattern: /(?<![\d,.])1\s*(MB|MiB|megabytes?)\b/i },
+      { q: "What is the maximum response payload size for a streamed Lambda response?", pattern: /(?<![\d,.])200\s*(MB|MiB|megabytes?)\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html", "https://aws.amazon.com/about-aws/whats-new/2025/10/aws-lambda-payload-size-256-kb-1-mb-invocations/", "blind check 2026-10-25 (medium): 1 MB; 200 MB"),
+  },
+  {
+    id: "s-doc-7", tier: "stable-lookup", category: "reference",
+    request: "GitHub Actions limits: what is the maximum number of jobs a matrix can generate in one workflow run, and how long can a single job run on a self-hosted runner before it is terminated?",
+    facts: [
+      { q: "What is the maximum number of jobs a matrix can generate per workflow run?", pattern: /(?<![\d,.])256(?![\d,])/i },
+      { q: "What is the maximum execution time for a single job on a self-hosted runner?", pattern: /\b(5|five)\s*days?\b|(?<![\d,.])120\s*hours?\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://docs.github.com/en/actions/reference/limits", "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax", "blind check 2026-10-25 (high): 256 jobs per workflow run; 5 days"),
+  },
+
+  // ---------------- search · multihop ----------------
+  {
+    id: "s-hop-1", tier: "stable-lookup", category: "general",
+    request: "The Ukrainian mathematician who won a Fields Medal in 2022 for her sphere-packing work earned a doctorate at a German university in 2013. Which university was it, and what was her dissertation titled?",
+    facts: [
+      { q: "At which German university did she earn her 2013 doctorate?", pattern: /\bbonn\b/i },
+      { q: "What was the title of her 2013 doctoral dissertation?", pattern: /\bmodular\s+functions\s+and\s+special\s+cycles\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://en.wikipedia.org/wiki/Maryna_Viazovska", "https://mathshistory.st-andrews.ac.uk/Biographies/Viazovska/", "blind check 2026-10-25 (high): University of Bonn (Rheinische Friedrich-Wilhelms-Universität Bonn); Modular Functions and Special Cycles"),
+  },
+  {
+    id: "s-hop-2", tier: "stable-lookup", category: "general",
+    request: "Two researchers shared a Turing Award for laying the foundations of reinforcement learning, and one of them had been the other's PhD advisor. Where did that advisor earn his own PhD, and what was his doctoral thesis about?",
+    facts: [
+      { q: "At which university did the advisor (the senior of the two laureates) earn his PhD?", pattern: /\bmichigan\b/i },
+      { q: "What was the subject of the advisor's doctoral thesis?", pattern: /\bcellular\s+automat/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://en.wikipedia.org/wiki/Andrew_Barto", "https://amturing.acm.org/award_winners/barto_9471663.cfm", "blind check 2026-10-25 (high): University of Michigan (Ann Arbor), PhD in computer science, 1975; Cellular automata, with the thesis titled 'Cellular Automata as Models of Natural Systems'"),
+  },
+  {
+    id: "s-hop-3", tier: "stable-lookup", category: "general",
+    request: "Which South African novelist finally won the Booker Prize after having been shortlisted twice before, which book won it, and who chaired the judging panel that year?",
+    facts: [
+      { q: "Which South African novelist won?", pattern: /\bgalgut\b/i },
+      { q: "What was the title of the winning novel?", pattern: /\bpromise\b/i },
+      { q: "Who chaired the Booker judges the year he won?", pattern: /\bjasanoff\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://thebookerprizes.com/the-booker-library/prize-years/2021", "https://en.wikipedia.org/wiki/Damon_Galgut", "blind check 2026-10-25 (high): The Promise (Damon Galgut, 2021 Booker Prize); Maya Jasanoff"),
+  },
+  {
+    id: "s-hop-4", tier: "stable-lookup", category: "general",
+    request: "The most recent bridge built across Venice's Grand Canal was designed by a Spanish architect-engineer. What is its official name, and on what date did it open to the public?",
+    facts: [
+      { q: "What is the bridge's official name?", pattern: /\b(costituzione|constitution)\b/i },
+      { q: "On what date did it open to the public?", pattern: /\b1[12](th)?\s+(of\s+)?sep(t(ember)?)?\.?,?\s+2008\b|\bsep(t(ember)?)?\.?\s+1[12](th)?,?\s+2008\b|\b2008-09-1[12]\b|\b1[12][\/.]0?9[\/.]2008\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://en.wikipedia.org/wiki/Ponte_della_Costituzione", "https://www.meetingvenice.it/en/art-and-history/can-t-miss/constitution-bridge", "blind check 2026-10-25 (medium): Ponte della Costituzione (Constitution Bridge), commonly called the Calatrava Bridge; 11 September 2008", "opened ~23:44 on 11 Sep 2008: 11 or 12 Sep accepted"),
+  },
+  {
+    id: "s-hop-5", tier: "stable-lookup", category: "general",
+    request: "The first African-born architect to win the Pritzker Prize built his very first building, a primary school, in his home village. What is the village called, and what major architecture award did that school win in 2004?",
+    facts: [
+      { q: "What is the name of the home village where his first building stands?", pattern: /\bgando\b/i },
+      { q: "Which award did the school win in 2004?", pattern: /\baga\s+khan\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.pritzkerprize.com/laureates/diebedo-francis-kere", "https://en.wikipedia.org/wiki/Di%C3%A9b%C3%A9do_Francis_K%C3%A9r%C3%A9", "blind check 2026-10-25 (high): Gando, Burkina Faso; Aga Khan Award for Architecture (2004 cycle)"),
+  },
+  {
+    id: "s-hop-6", tier: "stable-lookup", category: "general",
+    request: "The European spacecraft that delivered the first-ever lander onto a comet ended its own mission by deliberately crash-landing on that same comet. What name was given to its final impact site, and in which region of the comet is that site?",
+    facts: [
+      { q: "What name was given to the orbiter's final impact site?", pattern: /\bsa[iï]s\b/i },
+      { q: "In which region of the comet is the impact site?", pattern: /\bma['’`]?at\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://en.wikipedia.org/wiki/Rosetta_(spacecraft)", "https://blogs.esa.int/rosetta/2016/10/03/rosetta-impact-site-named-sais/index.html", "blind check 2026-10-25 (high): Sais (named after the Egyptian town where the Rosetta Stone was originally located); Ma'at region, on the comet's small lobe ('head') of 67P/Churyumov-Gerasimenko, just inside a shallow anc"),
+  },
+  {
+    id: "s-hop-7", tier: "stable-lookup", category: "general",
+    request: "The Nobel literature laureate who fled Zanzibar as a teenage refugee and later spent decades teaching English literature in England — what was his first novel, and what was the title of his PhD thesis?",
+    facts: [
+      { q: "What was his first novel?", pattern: /\bmemory\s+of\s+departure\b/i },
+      { q: "What was the title of his PhD thesis?", pattern: /\bcriteria\b.*\bwest\s+african\s+fiction\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://en.wikipedia.org/wiki/Abdulrazak_Gurnah", "https://kar.kent.ac.uk/94388/", "blind check 2026-10-25 (high): Memory of Departure (1987); Criteria in the Criticism of West African Fiction (PhD, University of Kent, 1982)"),
+  },
+
+  // ---------------- search · numbers ----------------
+  {
+    id: "s-num-1", tier: "stable-lookup", category: "general",
+    request: "What were Apple's total net sales and net income for fiscal year 2025 (the year ended September 27, 2025), per its 10-K?",
+    facts: [
+      { q: "What were Apple's total net sales for fiscal 2025?", pattern: /\b416,161\b|\b416(?:\.16?1?|\.2)?\s*(?:billion|bn|b)\b/i },
+      { q: "What was Apple's net income for fiscal 2025?", pattern: /\b112,010\b|\b112(?:\.01?0?)?\s*(?:billion|bn|b)\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.apple.com/newsroom/2025/10/apple-reports-fourth-quarter-results/", "https://data.sec.gov/api/xbrl/companyconcept/CIK0000320193/us-gaap/RevenueFromContractWithCustomerExcludingAssessedTax.json", "blind check 2026-10-25 (high): $416,161 million (~$416.2 billion); $112,010 million (~$112.0 billion)"),
+  },
+  {
+    id: "s-num-2", tier: "stable-lookup", category: "general",
+    request: "How much total revenue and GAAP net income did NVIDIA report for its fiscal year 2026 (ended January 25, 2026)?",
+    facts: [
+      { q: "What was NVIDIA's total revenue for fiscal 2026?", pattern: /\b215,938\b|\b215\.9(?:4|38)?\s*(?:billion|bn|b)\b/i },
+      { q: "What was NVIDIA's GAAP net income for fiscal 2026?", pattern: /\b120,067\b|\b120\.(?:1|07|067)\s*(?:billion|bn|b)\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2026", "blind check 2026-10-25 (high): $215,938 million (~$215.9 billion); $120,067 million (~$120.1 billion) GAAP net income"),
+  },
+  {
+    id: "s-num-3", tier: "stable-lookup", category: "general",
+    request: "What did the ECB set its deposit facility rate and main refinancing operations rate to at its 5 June 2025 monetary policy meeting?",
+    facts: [
+      { q: "What deposit facility rate did the ECB set on 5 June 2025?", pattern: /(?<![\d.])2(?:\.00?)?\s*(?:%|percent|per cent)/i },
+      { q: "What main refinancing operations rate did the ECB set on 5 June 2025?", pattern: /(?<![\d.])2\.15\s*(?:%|percent|per cent)?(?!\d)/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.ecb.europa.eu/press/pr/date/2025/html/ecb.mp250605~3b5f67d007.en.html", "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/key_ecb_interest_rates/html/index.en.html", "blind check 2026-10-25 (high): 2.00% (deposit facility rate); 2.15% (main refinancing operations rate)"),
+  },
+  {
+    id: "s-num-4", tier: "stable-lookup", category: "general",
+    request: "At the Federal Reserve's December 10, 2025 FOMC meeting, what target range was set for the federal funds rate, and how many voting members dissented?",
+    facts: [
+      { q: "What target range for the federal funds rate did the FOMC set on December 10, 2025?", pattern: /3(?:\.50?|-1\/2|\s1\/2|½)\s*(?:%|percent|per cent)?\s*(?:-|–|—|to)\s*3(?:\.75|-3\/4|\s3\/4|¾)/i },
+      { q: "How many FOMC voting members dissented from the December 10, 2025 decision?", pattern: /\b(3|three)\b(?![.\d%\-\u2013\/])/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.federalreserve.gov/newsevents/pressreleases/monetary20251210a.htm", "blind check 2026-10-25 (high): 3.50% to 3.75% (cut by 25 bp); 3 dissents: Stephen Miran (wanted a 50 bp cut); Austan Goolsbee and Jeffrey Schmid (wanted no change)"),
+  },
+  {
+    id: "s-num-5", tier: "stable-lookup", category: "general",
+    request: "According to the BLS September 2025 CPI release, how much did the CPI-U all items index rise over the 12 months ending September 2025, and what was the 12-month change in the energy index?",
+    facts: [
+      { q: "What was the 12-month (not seasonally adjusted) change in the CPI-U all items index for September 2025?", pattern: /(?<![\d.])3(?:\.0)?\s*(?:%|percent|per cent)/i },
+      { q: "What was the 12-month change in the CPI-U energy index for September 2025?", pattern: /(?<![\d.])2\.8\s*(?:%|percent|per cent)?(?!\d)/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.bls.gov/news.release/archives/cpi_10242025.htm", "blind check 2026-10-25 (high): +3.0%; +2.8%"),
+  },
+  {
+    id: "s-num-6", tier: "stable-lookup", category: "general",
+    request: "In NOAA's annual 2025 global climate report, how far above the 20th-century average was the 2025 global surface temperature, and where did 2025 rank in the record?",
+    facts: [
+      { q: "How far above the 20th-century average was the 2025 global surface temperature according to NOAA?", pattern: /\b1\.1[678]\s*\u00B0?\s*c?\b|\b2\.1[01]\s*\u00B0?\s*f?\b/i },
+      { q: "Where did 2025 rank among the warmest years in NOAA's record?", pattern: /\b(?:3rd|third)\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.ncei.noaa.gov/news/global-climate-202513", "blind check 2026-10-25 (high): 1.17°C (2.11°F) above the 20th-century average; Third-warmest year on record (records since 1850), behind 2024 and 2023"),
+  },
+  {
+    id: "s-num-7", tier: "stable-lookup", category: "general",
+    request: "What height won the men's pole vault final at the 2025 World Athletics Championships in Tokyo, and who took the silver medal?",
+    facts: [
+      { q: "What was the winning height in the men's pole vault final at the 2025 World Athletics Championships in Tokyo?", pattern: /(?<![\d.])6[.,]30?(?!\d)/i },
+      { q: "Who won silver in the men's pole vault at the 2025 World Athletics Championships?", pattern: /karalis/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://worldathletics.org/news/report/world-championships-tokyo-25-report-mens-pole-vault", "https://www.olympics.com/en/news/world-athletics-championships-tokyo-25-track-field-schedule-medal-table-finals-results", "blind check 2026-10-25 (high): 6.30 m (world record, Armand 'Mondo' Duplantis); Emmanouil Karalis (Greece), 6.00 m"),
+  },
+
+  // ---------------- search · longtail ----------------
+  {
+    id: "s-loc-1", tier: "stable-lookup", category: "general", lang: "ja",
+    request: "明石市立天文科学館は何年何月何日に開館しましたか？また、プラネタリウムのドームの直径は何メートルですか？",
+    facts: [
+      { q: "On what date did the Akashi Municipal Planetarium open?", pattern: /(1960|昭和\s*35).*(6\s*月\s*10\s*日|june\s*10|10\s*june|0?6[-\/.]10\b)|(6\s*月\s*10\s*日|june\s*10|10\s*june).*(1960|昭和\s*35)/i },
+      { q: "What is the diameter of the planetarium dome, in metres?", pattern: /(^|[^0-9.,])20\s*(m\b|ｍ|メートル|meters?\b|metres?\b)/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.am12.jp/about/", "https://www.am12.jp/akashi-shigosen/", "blind check 2026-10-25 (high): 10 June 1960 (1960年6月10日, 時の記念日); 20 m"),
+  },
+  {
+    id: "s-loc-2", tier: "stable-lookup", category: "general", lang: "de",
+    request: "In welchem Jahr ging das Deutsche Spielkartenmuseum in Leinfelden-Echterdingen an das Land Baden-Württemberg und die Stadt über, und wann wurde es unter diesem Namen in Leinfelden eröffnet?",
+    facts: [
+      { q: "In which year was the German Playing Card Museum transferred (sold) to the State of Baden-Württemberg and the city of Leinfelden-Echterdingen?", pattern: /\b1982\b/i },
+      { q: "In which year was the Deutsches Spielkartenmuseum opened in Leinfelden (at today's Schönbuchschule site)?", pattern: /\b1974\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://de.wikipedia.org/wiki/Deutsches_Spielkartenmuseum", "https://www.museum.de/de/museen/deutsches-spielkarten-museum", "https://www.leinfelden-echterdingen.de/site/Leinfelden-Echterdingen-Internet/get/params_E1468261240/11388732/Chronik%20Leinfelden%20bis%201974.pdf (city chronicle, 1974: \"Eröffnung des Spielkartenmuseums in der Grundschule Süd\")", "museum 40-year programme: transfer to the state and the city on 18 August 1982", "blind check 2026-10-25 (medium): 1982 (sold by ASS on 18 August 1982 to the State of Baden-Württemberg and the city; became a branch of the Württembergisches Landesmuseum); 1974"),
+  },
+  {
+    id: "s-loc-3", tier: "stable-lookup", category: "general", lang: "fr",
+    request: "Quelle est la hauteur du phare de Cordouan et combien de marches faut-il gravir pour atteindre le sommet ouvert au public ?",
+    facts: [
+      { q: "How tall is the Cordouan lighthouse, in metres?", pattern: /\b67[.,]50?(?!\d)/i },
+      { q: "How many steps must visitors climb to reach the top open to the public?", pattern: /\b301\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.phare-de-cordouan.fr/decouvrir/visite-virtuelle/", "https://www.phare-de-cordouan.fr/accessibilite/", "blind check 2026-10-25 (high): 67.5 m (67,50 m); 301 steps"),
+  },
+  {
+    id: "s-loc-4", tier: "stable-lookup", category: "general", lang: "es",
+    request: "¿En qué fecha se inauguró el Museo del Ferrocarril de Asturias en Gijón y en qué antigua estación está instalado?",
+    facts: [
+      { q: "On what date was the Asturias Railway Museum in Gijón officially inaugurated?", pattern: /\b22\b.*(octubre|october|\boct\b|\/10\/|-10-|\.10\.).*1998|(october|octubre)\s*22.*1998|1998-10-22/i },
+      { q: "Which former railway station building houses the museum?", pattern: /estaci[oó]n\s+(de(l)?\s+)?norte|north(ern)?\s+station/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://directoriomuseos.mcu.es/dirmuseos/generaPDF.do?id=1091&tipoPDF=fichaDetalle", "https://www.lne.es/gijon/2023/09/17/cuarto-siglo-futuro-tren-92191408.html", "blind check 2026-10-25 (high): 22 October 1998 (inaugurated by Felipe, then Prince of Asturias; opened to the public the next day); The former Estación del Norte (Gijón's old Norte railway station)"),
+  },
+  {
+    id: "s-loc-5", tier: "stable-lookup", category: "general", lang: "it",
+    request: "Quando è stato inaugurato il Museo del Violino di Cremona e chi ha curato il progetto acustico dell'Auditorium Giovanni Arvedi?",
+    facts: [
+      { q: "On what date was the Museo del Violino in Cremona inaugurated?", pattern: /\b14\b.*(settembre|september|\bsept?\b|\/0?9\/|-09-|\.0?9\.).*2013|september\s*14.*2013|2013-09-14/i },
+      { q: "Who was responsible for the acoustic design of the Auditorium Giovanni Arvedi?", pattern: /\btoyota\b|\bnagata\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.cremonaoggi.it/2013/09/14/aperto-lo-scrigno-della-liuteria-via-ufficiale-al-museo-violino/", "https://museodelviolino.org/it/auditorium/", "blind check 2026-10-25 (high): 14 September 2013; Yasuhisa Toyota of Nagata Acoustics"),
+  },
+  {
+    id: "s-loc-6", tier: "stable-lookup", category: "general", lang: "pt",
+    request: "Em que data foi inaugurado o Ascensor da Bica, em Lisboa, e em que ano passou a ser propriedade da Carris?",
+    facts: [
+      { q: "On what date was the Bica funicular (Ascensor da Bica) inaugurated?", pattern: /\b28\b.*(junho|june|\bjun\b|\/0?6\/|-06-|\.0?6\.).*1892|june\s*28.*1892|1892-06-28/i },
+      { q: "In which year did the Bica funicular become property of Carris?", pattern: /\b1926\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.carris.pt/a-carris/historia/", "https://carris.pt/descubra/frota/funciulares/", "blind check 2026-10-25 (high): 28 June 1892; 1926 (Carris acquired the Nova Companhia dos Ascensores Mecânicos de Lisboa's assets when that company was dissolved)"),
+  },
+  {
+    id: "s-loc-7", tier: "stable-lookup", category: "general",
+    request: "How much does the official Fairphone 5 replacement battery weigh, and what is its capacity?",
+    facts: [
+      { q: "What is the weight of the Fairphone 5 spare battery?", pattern: /\b63[.,]7(?!\d)/i },
+      { q: "What is the battery's capacity?", pattern: /\b4[,. ]?200\s*mah\b|\b4[,. ]?200\b|\b16[.,]25\s*wh\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.fairphone.com/shop/fairphone-5-battery-259", "https://support.fairphone.com/hc/en-us/articles/10380972881681-Maximize-your-battery-life", "blind check 2026-10-25 (high): 63.7 g; 4200 mAh (16.25 Wh)"),
+  },
+
+  // ---------------- search · recent ----------------
+  {
+    id: "s-new-1", tier: "stable-lookup", category: "news",
+    request: "Who won the men's singles final at the 2026 US Open tennis championships, and who did he beat in the final?",
+    facts: [
+      { q: "Who won the 2026 US Open men's singles title?", pattern: /zverev/i },
+      { q: "Who was the runner-up (the losing finalist) in the 2026 US Open men's singles final?", pattern: /shelton/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.usopen.org/en_US/news/articles/2026-09-13/alexander_zverev_defeats_ben_shelton_to_win_2026_us_open.html", "https://www.atptour.com/en/news/us-open-2026-results", "blind check 2026-10-25 (high): Alexander Zverev; Ben Shelton (final score 6-3, 7-6(2), 5-7, 6-2 on 13 Sep 2026)"),
+  },
+  {
+    id: "s-new-2", tier: "stable-lookup", category: "news",
+    request: "Who received the 2026 Nobel Prize in Chemistry, and what was it awarded for?",
+    facts: [
+      { q: "Name the laureate(s) of the 2026 Nobel Prize in Chemistry.", pattern: /^(?=[\s\S]*kagan)(?=[\s\S]*soai)/i },
+      { q: "What was the prize awarded for?", pattern: /asymmetric.*autocataly|autocataly.*asymmetric/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.nobelprize.org/prizes/chemistry/2026/press-release/", "https://www.kva.se/nyheter/nobelpriset-i-kemi-2026/", "blind check 2026-10-25 (high): Henri B. Kagan and Kenso Soai (jointly, 'for the discovery of non-linear effects and autocatalysis in asymmetric organic synthesis')"),
+  },
+  {
+    id: "s-new-3", tier: "stable-lookup", category: "news",
+    request: "What are the official US starting prices of the iPhone 18 Pro and iPhone 18 Pro Max that Apple announced in September 2026?",
+    facts: [
+      { q: "What is the US starting price of the iPhone 18 Pro?", pattern: /(?<![\d,])1,?199(?![\d])/i },
+      { q: "What is the US starting price of the iPhone 18 Pro Max?", pattern: /(?<![\d,])1,?299(?![\d])/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/", "https://www.macrumors.com/2026/09/09/iphone-18-pro-pricing/", "blind check 2026-10-25 (high): $1,199 (256GB); $1,299 (256GB)"),
+  },
+  {
+    id: "s-new-4", tier: "stable-lookup", category: "news",
+    request: "Who won the 2026 Mercury Prize, and for which album?",
+    facts: [
+      { q: "Which artist won the 2026 Mercury Prize?", pattern: /\braye\b/i },
+      { q: "What is the title of the album that won the 2026 Mercury Prize?", pattern: /this music may contain hope/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.mercuryprize.com/news/2026/raye-announced-as-overall-winner-of-the-2026-mercury-prize-album-of-the-year/", "https://www.theguardian.com/music/2026/oct/22/raye-wins-2026-mercury-prize-for-this-music-may-contain-hope", "blind check 2026-10-25 (high): RAYE; THIS MUSIC MAY CONTAIN HOPE."),
+  },
+  {
+    id: "s-new-5", tier: "stable-lookup", category: "news",
+    request: "In the final results of Sweden's September 2026 Riksdag election, how many seats did the Sweden Democrats and the Social Democrats each win?",
+    facts: [
+      { q: "How many Riksdag seats did the Sweden Democrats (SD) win in the 2026 Swedish general election?", pattern: /\b62\b/i },
+      { q: "How many Riksdag seats did the Social Democrats (S) win in the 2026 Swedish general election?", pattern: /\b99\b/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.riksdagen.se/sv/aktuellt/aktuelltnotiser/2026/sep/19/den-nya-riksdagen-efter-valet_cmsad780a37-f1ae-4d47-a4a7-b6ea2a69a21esv/", "https://www.val.se/download/18.7faaad3f1a0b0c300e4282/1789822515986/beslutsprotokoll-resultat-riksdagen-2026.pdf", "blind check 2026-10-25 (high): 62; 99"),
+  },
+  {
+    id: "s-new-6", tier: "stable-lookup", category: "news",
+    request: "Who were awarded the 2026 Sveriges Riksbank Prize in Economic Sciences (the economics Nobel)?",
+    facts: [
+      { q: "Name the laureate(s) of the 2026 Prize in Economic Sciences in Memory of Alfred Nobel.", pattern: /^(?=[\s\S]*\bhall\b)(?=[\s\S]*woodford)/i },
+    ],
+    verified: checkedOn("2026-10-25", "https://www.nobelprize.org/prizes/economic-sciences/2026/press-release/", "https://www.riksbank.se/en-gb/press-and-published/notices-and-press-releases/notices/2026/they-are-awarded-the-prize-in-economic-sciences-2026/", "blind check 2026-10-25 (high): Robert E. Hall and Michael Woodford (jointly, 'for microeconomic foundations of macroeconomic stabilisation')"),
   },
 
   // ---------------- live-feed: true answer captured from an official source ----------------

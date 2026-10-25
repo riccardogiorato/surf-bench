@@ -47,6 +47,40 @@ describe("scoreProviders", () => {
     expect(a.quality).toBeCloseTo(((19 + 0.5) / 20) * 100);
   });
 
+  it("weights track composites, so a weak minor track costs only its share", () => {
+    const tracks = [
+      { name: "search", weight: 0.85, taskIds: ids.slice(0, 15) },
+      { name: "access", weight: 0.15, taskIds: ids.slice(15) },
+    ];
+    const out = scoreProviders(
+      [...runs("searcher", (i) => (i < 15 ? 1 : 0)), ...runs("opener", (i) => (i < 15 ? 0 : 1))],
+      tracks,
+      { iterations: 50 },
+    );
+    const s = out.find((p) => p.provider === "searcher")!;
+    const o = out.find((p) => p.provider === "opener")!;
+    // Both have equal speed (100); composite is 100 on the strong track, 15 on the weak one.
+    expect(s.tracks.search.score).toBeCloseTo(100);
+    expect(s.tracks.access.score).toBeCloseTo(15);
+    expect(s.overall).toBeCloseTo(0.85 * 100 + 0.15 * 15);
+    expect(o.overall).toBeCloseTo(0.85 * 15 + 0.15 * 100);
+  });
+
+  it("withholds a provider missing most of one track even if the other is complete", () => {
+    const tracks = [
+      { name: "search", weight: 0.85, taskIds: ids.slice(0, 15) },
+      { name: "access", weight: 0.15, taskIds: ids.slice(15) },
+    ];
+    const out = scoreProviders(
+      [...runs("a", () => 1), ...runs("b", (i) => 1, {}).map((r, i) => (i >= 15 ? { ...r, nonScoring: true } : r))],
+      tracks,
+      { iterations: 50 },
+    );
+    const b = out.find((p) => p.provider === "b")!;
+    expect(b.overall).toBeNull();
+    expect(b.withheld).toMatch(/access tasks scorable/);
+  });
+
   it("is reproducible for the same records and seed", () => {
     const rs = [...runs("a", (i) => (i % 3) / 2), ...runs("b", (i) => (i % 2) * 0.9)];
     expect(scoreProviders(rs, ids, { iterations: 200 })).toEqual(scoreProviders(rs, ids, { iterations: 200 }));

@@ -1,14 +1,14 @@
 import "dotenv/config";
 import fs from "fs/promises";
 import path from "path";
-import { fetchProviderOf, searchClients } from "../src/lib/searchClients.js";
+import { SEARCH_CONTENT, fetchProviderOf, searchClients } from "../src/lib/searchClients.js";
 import { scraperClients } from "../src/lib/scraperClients.js";
 import { createConcurrencyLimiter } from "../src/lib/concurrency.js";
 import { classifyError } from "../src/lib/errorClass.js";
 import { captureReference } from "../src/lib/references.js";
 import { costUsd } from "../src/lib/pricing.js";
 import { LIVE_ROUNDS, TASKS, hostMatches, isLive, type Task } from "../src/lib/tasks.js";
-import type { ScrapedContent, SearchResponse } from "../src/lib/types.js";
+import type { ScrapedContent, SearchResponse, SearchResult } from "../src/lib/types.js";
 
 // SurfBench runner: every provider answers every task through the same
 // fixed pipeline — search(top 5) → fetch(top 3, same provider) — and the raw
@@ -63,40 +63,45 @@ const redact = (s: string) => SECRET_PATTERNS.reduce((t, p) => t.replace(p, "[RE
 type Search = (q: string, n?: number) => Promise<SearchResponse>;
 type Scrape = (url: string, timeout?: number) => Promise<ScrapedContent>;
 
-async function runOne(runId: string, round: number, provider: string, search: Search, scrape: Scrape, task: Task) {
+async function runOne(runId: string, round: number, provider: string, search: Search, scrape: Scrape | null, task: Task) {
   const startedAt = new Date().toISOString();
   let searchLeg: { ms: number; error?: string; results: { title: string; url: string }[] } | null = null;
   let urls: string[];
+  let found: SearchResult[] = [];
 
-  if (task.url) {
+  // Without a fetch API, a direct-URL task is a search for that URL.
+  if (task.url && scrape) {
     urls = [task.url];
   } else {
     const t0 = Date.now();
-    const res = await withTimeout(search(task.request, SEARCH_RESULTS), LEG_TIMEOUT_MS, (error) => ({ results: [], latencyMs: LEG_TIMEOUT_MS, error }));
+    const res = await withTimeout(search(task.url ?? task.request, SEARCH_RESULTS), LEG_TIMEOUT_MS, (error) => ({ results: [], latencyMs: LEG_TIMEOUT_MS, error }));
+    found = res.results.slice(0, SEARCH_RESULTS);
     searchLeg = {
       ms: Date.now() - t0,
       error: res.error,
-      results: res.results.slice(0, SEARCH_RESULTS).map((r) => ({ title: r.title, url: r.url })),
+      results: found.map((r) => ({ title: r.title, url: r.url })),
     };
     urls = searchLeg.results.map((r) => r.url).slice(0, FETCH_TOP);
   }
 
   const f0 = Date.now();
   const fetches = await Promise.all(
-    urls.map(async (url) => {
+    urls.map(async (url, i) => {
       const s = Date.now();
-      const r = await withTimeout(
-        scrape(url, LEG_TIMEOUT_MS).catch((e): ScrapedContent => ({ url, error: e instanceof Error ? e.message : "fetch failed" })),
-        LEG_TIMEOUT_MS + 5000,
-        (error): ScrapedContent => ({ url, error }),
-      );
+      const r: ScrapedContent = scrape
+        ? await withTimeout(
+            scrape(url, LEG_TIMEOUT_MS).catch((e): ScrapedContent => ({ url, error: e instanceof Error ? e.message : "fetch failed" })),
+            LEG_TIMEOUT_MS + 5000,
+            (error): ScrapedContent => ({ url, error }),
+          )
+        : { url, response: { title: found[i]?.title, content: found[i]?.content ?? "" } };
       const content = r.response?.content ?? "";
       // Some providers return the page title only as metadata (exa on YouTube: transcript body).
       const title = r.response?.title?.trim() || undefined;
       return { url, ms: Date.now() - s, chars: content.length, error: r.error ?? (content ? undefined : "empty content"), title, content: redact(content).slice(0, DOC_CHARS) };
     }),
   );
-  const fetchMs = urls.length ? Date.now() - f0 : 0;
+  const fetchMs = urls.length && scrape ? Date.now() - f0 : 0;
 
   const answered = fetches.filter((f) => f.chars > 0);
   const firstError = searchLeg?.error ?? (answered.length === 0 ? fetches.find((f) => f.error)?.error ?? "no search results" : undefined);
@@ -146,7 +151,7 @@ async function main() {
   const scrapers = new Map(scraperClients.map((c) => [c.name, c.scrape]));
   const only = arg("providers")?.split(",");
   const providers = searchClients
-    .filter((c) => scrapers.has(fetchProviderOf(c.name)))
+    .filter((c) => SEARCH_CONTENT.has(c.name) || scrapers.has(fetchProviderOf(c.name)))
     .filter((c) => !only || only.includes(c.name));
   const taskFilter = arg("tasks")?.split(",");
   const tasks = TASKS.filter((t) => !taskFilter || taskFilter.includes(t.id));
@@ -179,7 +184,7 @@ async function main() {
         await Promise.all(
           roundTasks.map((task) =>
             limit(async () => {
-              const r = await runWithRetry(runId, round, name, search, scrapers.get(fetchProviderOf(name))!, task);
+              const r = await runWithRetry(runId, round, name, search, SEARCH_CONTENT.has(name) ? null : scrapers.get(fetchProviderOf(name))!, task);
               done++;
               if (r.error && !r.answered) console.log(`  [r${round}] ${name} ${task.id}: ${r.errorClass} — ${String(r.error).slice(0, 90)}`);
               if (done % 10 === 0 || done === roundTasks.length) console.log(`  [r${round}] ${name}: ${done}/${roundTasks.length}`);

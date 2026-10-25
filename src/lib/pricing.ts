@@ -47,6 +47,18 @@ export const PRICES: Record<string, PriceEntry> = {
     source: "https://docs.parallel.ai/getting-started/pricing",
     asOf: "2026-10-22",
   },
+  perplexity: {
+    searchUsd: 5 / 1000, // Search API, page contents included
+    fetchUsd: flat(0), // no fetch call: contents come with the search
+    source: "https://docs.perplexity.ai/getting-started/pricing",
+    asOf: "2026-10-25",
+  },
+  "perplexity-fast": {
+    searchUsd: 1 / 1000, // search_type "fast"
+    fetchUsd: flat(0),
+    source: "https://docs.perplexity.ai/getting-started/pricing",
+    asOf: "2026-10-25",
+  },
   keenable: {
     searchUsd: 4 / 1000,
     fetchUsd: flat(4 / 1000),

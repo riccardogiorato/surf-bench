@@ -5,8 +5,9 @@ import { NON_SCORING, classifyError, type ErrorClass } from "../src/lib/errorCla
 import { READER_ID, TASK_RUBRIC_ID } from "../src/lib/judge/rubrics.js";
 import { PRICES } from "../src/lib/pricing.js";
 import { PASS_SCORE, READER_MODEL } from "../src/lib/taskGrading.js";
+import { TRACK_WEIGHTS } from "../src/lib/scoring.js";
 import { scoreProviders, type RunOutcome } from "../src/lib/taskScoring.js";
-import { AGENT_CHECK, AGENT_DRAFT, LIVE_ROUNDS, TASKS, type TaskTier } from "../src/lib/tasks.js";
+import { AGENT_CHECK, AGENT_DRAFT, LIVE_ROUNDS, TASKS, TRACKS, trackOf, type TaskTier, type Track } from "../src/lib/tasks.js";
 import { GRADE_STAMP, gradeIsCurrent, onSite, readJsonl, runKey } from "./tasks-grade.js";
 
 // Builds the v2 run package: results/runs/<runId>/ with the leaderboard
@@ -15,7 +16,7 @@ import { GRADE_STAMP, gradeIsCurrent, onSite, readJsonl, runKey } from "./tasks-
 // everything needed to re-grade the snapshot.
 
 const RAW = "results/raw";
-const TASK_SET_VERSION = "tasks-v2.0";
+const TASK_SET_VERSION = "tasks-v2.1";
 const EXCERPT_CHARS = 600;
 
 function arg(name: string): string | undefined {
@@ -89,7 +90,9 @@ async function main() {
     });
   }
 
-  const board = scoreProviders(outcomes, taskIds);
+  const trackDefs = TRACKS.map((name) => ({ name, weight: TRACK_WEIGHTS[name], taskIds: taskIds.filter((id) => trackOf(id) === name) }));
+  const board = scoreProviders(outcomes, trackDefs);
+  const tr = (b: (typeof board)[number], t: Track) => b.tracks[t]?.score ?? null;
   const providers = board.map((b) => b.provider);
 
   // Per-tier quality sub-scores (task-averaged, same rules as the main score).
@@ -142,8 +145,9 @@ async function main() {
         judges: { models: ["moonshotai/Kimi-K3", "zai-org/GLM-5.3"], rubricId: TASK_RUBRIC_ID },
         gradeStamp: GRADE_STAMP,
         passScore: PASS_SCORE,
+        tracks: trackDefs,
         pricing: Object.fromEntries(Object.entries(PRICES).map(([k, v]) => [k, { searchUsd: v.searchUsd, fetchUsd: v.fetchUsd("https://example.com/"), source: v.source, asOf: v.asOf, note: v.note ?? null }])),
-        tasks: TASKS.filter((t) => taskIds.includes(t.id)).map((t) => ({ ...t, facts: t.facts?.map((f) => ({ q: f.q, pattern: f.pattern.source })) })),
+        tasks: TASKS.filter((t) => taskIds.includes(t.id)).map((t) => ({ ...t, track: trackOf(t), facts: t.facts?.map((f) => ({ q: f.q, pattern: f.pattern.source })) })),
         references: refs,
         counts: { runs: runs.size, ungraded, unverifiedTasks: unverified.length, agentCheckedTasks: agentChecked.length },
       },
@@ -155,8 +159,8 @@ async function main() {
   await fs.writeFile(
     path.join(dir, "leaderboard.csv"),
     csv([
-      ["rank_group", "provider", "overall", "ci_low", "ci_high", "quality", "pass_rate", "p50_ms", "speed", "usd_per_1k_passed", "tasks_scored", "coverage", ...tiers.map((t) => `quality_${t}`), "withheld"],
-      ...board.map((b) => [b.group, b.provider, fmt(b.overall), fmt(b.ci?.[0]), fmt(b.ci?.[1]), fmt(b.quality), fmt(b.reliability), Math.round(b.p50Ms), fmt(b.speed), fmt(b.usdPer1kPassed, 2), b.tasksScored, fmt(b.coverage, 2), ...tiers.map((t) => fmt(tierScore(b.provider, t))), b.withheld ?? null]),
+      ["rank_group", "provider", "overall", "ci_low", "ci_high", ...TRACKS.map((t) => `${t}_score`), "quality", "pass_rate", "p50_ms", "speed", "usd_per_1k_passed", "tasks_scored", "coverage", ...TRACKS.flatMap((t) => [`${t}_quality`, `${t}_pass_rate`, `${t}_p50_ms`]), ...tiers.map((t) => `quality_${t}`), "withheld"],
+      ...board.map((b) => [b.group, b.provider, fmt(b.overall), fmt(b.ci?.[0]), fmt(b.ci?.[1]), ...TRACKS.map((t) => fmt(tr(b, t))), fmt(b.quality), fmt(b.reliability), Math.round(b.p50Ms), fmt(b.speed), fmt(b.usdPer1kPassed, 2), b.tasksScored, fmt(b.coverage, 2), ...TRACKS.flatMap((t) => [fmt(b.tracks[t]?.quality), fmt(b.tracks[t]?.reliability), Math.round(b.tracks[t]?.p50Ms ?? 0)]), ...tiers.map((t) => fmt(tierScore(b.provider, t))), b.withheld ?? null]),
     ]),
   );
   await fs.writeFile(
@@ -178,14 +182,14 @@ async function main() {
     "",
     "Providers in the same **group** are statistically tied (the 95% paired-bootstrap CI of their gap includes 0).",
     "",
-    "| group | provider | overall (95% CI) | quality | pass rate | p50 | $ / 1k passed tasks |",
-    "|---|---|---|---|---|---|---|",
+    `| group | provider | overall (95% CI) | search (${TRACK_WEIGHTS.search * 100}%) | access (${TRACK_WEIGHTS.access * 100}%) | quality | pass rate | p50 | $ / 1k passed tasks |`,
+    "|---|---|---|---|---|---|---|---|---|",
   );
   for (const b of board) {
     lines.push(
       b.overall === null
-        ? `| — | ${b.provider} | n/a (${b.withheld}) | | | | |`
-        : `| ${b.group} | **${b.provider}** | ${fmt(b.overall)} (${fmt(b.ci![0])}–${fmt(b.ci![1])}) | ${fmt(b.quality)} | ${fmt(b.reliability)}% | ${(b.p50Ms / 1000).toFixed(1)}s | $${fmt(b.usdPer1kPassed, 2)} |`,
+        ? `| — | ${b.provider} | n/a (${b.withheld}) | | | | | | |`
+        : `| ${b.group} | **${b.provider}** | ${fmt(b.overall)} (${fmt(b.ci![0])}–${fmt(b.ci![1])}) | ${fmt(tr(b, "search"))} | ${fmt(tr(b, "access"))} | ${fmt(b.quality)} | ${fmt(b.reliability)}% | ${(b.p50Ms / 1000).toFixed(1)}s | $${fmt(b.usdPer1kPassed, 2)} |`,
     );
   }
   lines.push("", "## Quality by tier", "", `| provider | ${tiers.join(" | ")} |`, `|---|${tiers.map(() => "---").join("|")}|`);
@@ -199,7 +203,8 @@ async function main() {
     "## How to read this",
     "",
     `- **quality** = mean task score (0–100, partial credit); **pass rate** = share of tasks scoring ≥ ${PASS_SCORE * 100}% (live tasks must also come from the named site, and live-judge tasks must be fresh). Repeated rounds are averaged per task.`,
-    "- **overall** = 0.50 quality + 0.35 pass rate + 0.15 speed (p50 vs. the fastest provider, floored at 25).",
+    `- **Tracks.** ${trackDefs.map((t) => `${t.name} (${t.taskIds.length} tasks)`).join(", ")}. Search = find the answer on the open web; access = open a given page or reach a named bot-walled site. Each track's score = 0.50 quality + 0.35 pass rate + 0.15 speed (p50 vs. the fastest provider in that track, floored at 25).`,
+    `- **overall** = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access. quality and pass rate above are track-weighted the same way. A provider needs ≥ 80% of each track's tasks scorable to get a number.`,
     "- **$ / 1k passed tasks** = list-price spend for one pass over the task set ÷ tasks passed × 1000. Not part of the score. Prices and sources are in `manifest.json`.",
     "- **Live tasks are a snapshot.** Compare providers within this run, never across runs. live-judge tasks have no ground truth: the panel checks explicit constraints.",
     "- Every task's verdict, reader answer, judge evidence, source URLs and a redacted excerpt are in `evidence.json`.",

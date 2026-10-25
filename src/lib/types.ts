@@ -20,6 +20,9 @@ export interface SearchResult {
   url: string;
   // Provider-supplied snippet/excerpt, when the API returns one for free.
   snippet?: string;
+  // Extracted page text, for providers whose search returns it in place of a
+  // fetch API (perplexity).
+  content?: string;
 }
 
 export interface SearchResponse {

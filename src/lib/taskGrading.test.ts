@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { formatBundle, gradeFacts, gradeLatest, gradeNumeric, gradeOverlap, parseNumber, titlesMatch } from "./taskGrading.js";
-import { TASKS, hostMatches } from "./tasks.js";
+import { TASKS, hostMatches, trackOf } from "./tasks.js";
 
 const ref = (items: string[], values?: number[]) => ({ taskId: "t", capturedAt: "", items, values });
 
@@ -75,9 +75,10 @@ describe("gradeFacts", () => {
 });
 
 describe("task set", () => {
-  it("has 50 unique tasks with a grading contract each", () => {
-    expect(TASKS).toHaveLength(50);
-    expect(new Set(TASKS.map((t) => t.id)).size).toBe(50);
+  it("has 84 unique tasks with a grading contract each, 53 search / 31 access", () => {
+    expect(TASKS).toHaveLength(84);
+    expect(new Set(TASKS.map((t) => t.id)).size).toBe(84);
+    expect(TASKS.filter((t) => trackOf(t) === "access")).toHaveLength(31);
     for (const t of TASKS) {
       if (t.tier.startsWith("stable")) expect(t.facts?.length, t.id).toBeGreaterThan(0);
       if (t.tier === "stable-read") expect(t.url, t.id).toBeTruthy();

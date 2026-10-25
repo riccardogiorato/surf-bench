@@ -2,7 +2,9 @@ import { MIN_COVERAGE, WEIGHTS, quantile, speedScore } from "./scoring.js";
 
 // The task is the unit. A task's score and pass are averaged over its rounds
 // (live tasks run LIVE_ROUNDS times), so a task never weighs more because it
-// was repeated. Uncertainty comes from a paired bootstrap over tasks.
+// was repeated. Tasks are split into weighted tracks: each track gets its own
+// composite, and overall is their weighted sum. Uncertainty comes from a paired
+// bootstrap over tasks, resampled within each track.
 
 export interface RunOutcome {
   provider: string;
@@ -15,17 +17,33 @@ export interface RunOutcome {
   costUsd: number | null;
 }
 
-export interface ProviderScore {
-  provider: string;
-  tasksScored: number;
+export interface TrackDef {
+  name: string;
+  weight: number;
+  taskIds: string[];
+}
+
+export interface TrackScore {
   coverage: number;
   quality: number | null; // 0-100
   reliability: number | null; // 0-100
   p50Ms: number;
-  speed: number | null;
+  speed: number | null; // relative to the fastest eligible row in this track
+  score: number | null; // the track composite
+}
+
+export interface ProviderScore {
+  provider: string;
+  tasksScored: number;
+  coverage: number;
+  quality: number | null; // 0-100, track-weighted
+  reliability: number | null; // 0-100, track-weighted
+  p50Ms: number; // over all tasks, for display
+  speed: number | null; // track-weighted
   overall: number | null;
   ci: [number, number] | null; // 95% bootstrap interval on overall
   group: number | null; // providers sharing a group are statistically tied
+  tracks: Record<string, TrackScore>;
   costUsd: number;
   passes: number; // pass-weighted run count, for $ per 1k passed tasks
   usdPer1kPassed: number | null;
@@ -64,6 +82,7 @@ function axes(aggs: Map<string, TaskAgg>, taskIds: string[]) {
     p50Ms: quantile(picked.flatMap((a) => a.times), 0.5),
   };
 }
+type Axes = NonNullable<ReturnType<typeof axes>>;
 
 function combine(quality: number, reliability: number, speed: number | null): number {
   const terms: Array<[number, number]> = [
@@ -73,6 +92,31 @@ function combine(quality: number, reliability: number, speed: number | null): nu
   ];
   const w = terms.reduce((s, [, x]) => s + x, 0);
   return terms.reduce((s, [v, x]) => s + v * x, 0) / w;
+}
+
+// Per-track axes for every provider on one task sample, speed anchored on the
+// fastest provider in that track; overall is the weighted sum of composites.
+function scoreSample(providers: string[], aggs: Map<string, Map<string, TaskAgg>>, tracks: TrackDef[], idsByTrack: string[][]) {
+  const perTrack = tracks.map((_, i) => {
+    const ax = new Map(providers.map((p) => [p, axes(aggs.get(p)!, idsByTrack[i])]));
+    const best = Math.min(...providers.map((p) => ax.get(p)?.p50Ms ?? 0).filter((v) => v > 0));
+    return { ax, best };
+  });
+  const totalW = tracks.reduce((s, t) => s + t.weight, 0);
+  const overall = new Map<string, number>();
+  for (const p of providers) {
+    let sum = 0;
+    for (let i = 0; i < tracks.length; i++) {
+      const a = perTrack[i].ax.get(p);
+      if (!a) {
+        sum = Number.NaN;
+        break;
+      }
+      sum += tracks[i].weight * combine(a.quality, a.reliability, speedScore(a.p50Ms, perTrack[i].best));
+    }
+    overall.set(p, sum / totalW);
+  }
+  return { perTrack, overall };
 }
 
 // Deterministic PRNG so a published CI is reproducible from the same records.
@@ -88,38 +132,30 @@ function mulberry32(seed: number) {
 
 export function scoreProviders(
   runs: RunOutcome[],
-  allTaskIds: string[],
+  tracksIn: TrackDef[] | string[],
   opts: { iterations?: number; seed?: number } = {},
 ): ProviderScore[] {
+  const tracks: TrackDef[] = typeof tracksIn[0] === "string" || tracksIn.length === 0
+    ? [{ name: "all", weight: 1, taskIds: tracksIn as string[] }]
+    : (tracksIn as TrackDef[]).filter((t) => t.taskIds.length > 0 && t.weight > 0);
+  const allTaskIds = tracks.flatMap((t) => t.taskIds);
   const iterations = opts.iterations ?? 2000;
   const providers = [...new Set(runs.map((r) => r.provider))].sort();
   const aggs = new Map(providers.map((p) => [p, aggregate(runs.filter((r) => r.provider === p))]));
 
-  const point = new Map(providers.map((p) => [p, axes(aggs.get(p)!, allTaskIds)]));
-  const eligible = providers.filter((p) => {
-    const covered = aggs.get(p)!.size / allTaskIds.length;
-    return point.get(p) && covered >= MIN_COVERAGE;
-  });
-  const bestP50 = Math.min(...eligible.map((p) => point.get(p)!.p50Ms).filter((v) => v > 0));
-
-  const overall = new Map<string, number>();
-  for (const p of eligible) {
-    const a = point.get(p)!;
-    overall.set(p, combine(a.quality, a.reliability, speedScore(a.p50Ms, bestP50)));
-  }
+  const trackCoverage = (p: string, t: TrackDef) => t.taskIds.filter((id) => aggs.get(p)!.has(id)).length / t.taskIds.length;
+  const eligible = providers.filter((p) => tracks.every((t) => trackCoverage(p, t) >= MIN_COVERAGE));
+  const point = scoreSample(eligible, aggs, tracks, tracks.map((t) => t.taskIds));
 
   // Paired bootstrap: every provider is re-scored on the SAME resampled task
-  // set, so the CI on a gap reflects task difficulty shared by both.
+  // set (stratified by track), so the CI on a gap reflects task difficulty
+  // shared by both.
   const rand = mulberry32(opts.seed ?? 20261022);
   const samples = new Map<string, number[]>(eligible.map((p) => [p, []]));
   for (let b = 0; b < iterations; b++) {
-    const ids = allTaskIds.map(() => allTaskIds[Math.floor(rand() * allTaskIds.length)]);
-    const ax = new Map(eligible.map((p) => [p, axes(aggs.get(p)!, ids)]));
-    const best = Math.min(...eligible.map((p) => ax.get(p)?.p50Ms ?? 0).filter((v) => v > 0));
-    for (const p of eligible) {
-      const a = ax.get(p);
-      samples.get(p)!.push(a ? combine(a.quality, a.reliability, speedScore(a.p50Ms, best)) : Number.NaN);
-    }
+    const ids = tracks.map((t) => t.taskIds.map(() => t.taskIds[Math.floor(rand() * t.taskIds.length)]));
+    const s = scoreSample(eligible, aggs, tracks, ids);
+    for (const p of eligible) samples.get(p)!.push(s.overall.get(p)!);
   }
   const ci = (xs: number[]): [number, number] => {
     const s = xs.filter((x) => !Number.isNaN(x)).sort((a, b) => a - b);
@@ -128,7 +164,7 @@ export function scoreProviders(
 
   // Tie groups: walk down the ranking; a provider joins the current group if
   // the 95% CI of its gap to the group's head includes 0.
-  const ranked = [...eligible].sort((a, b) => overall.get(b)! - overall.get(a)!);
+  const ranked = [...eligible].sort((a, b) => point.overall.get(b)! - point.overall.get(a)!);
   const group = new Map<string, number>();
   let g = 0;
   let head = ranked[0];
@@ -144,27 +180,55 @@ export function scoreProviders(
     group.set(p, g + 1);
   }
 
+  const totalW = tracks.reduce((s, t) => s + t.weight, 0);
+  const weighted = (f: (a: Axes, i: number) => number | null, p: string) => {
+    let sum = 0;
+    for (let i = 0; i < tracks.length; i++) {
+      const a = point.perTrack[i].ax.get(p);
+      const v = a ? f(a, i) : null;
+      if (v === null) return null;
+      sum += tracks[i].weight * v;
+    }
+    return sum / totalW;
+  };
+
   return providers
     .map((p): ProviderScore => {
       const prs = runs.filter((r) => r.provider === p);
-      const a = point.get(p);
-      const tasksScored = aggs.get(p)!.size;
+      const isEligible = eligible.includes(p);
+      const tasksScored = allTaskIds.filter((id) => aggs.get(p)!.has(id)).length;
       const costUsd = prs.reduce((s, r) => s + (r.costUsd ?? 0), 0);
       // Pass-weighted the same way scores are: a task passed in 2 of 3 rounds
       // counts 2/3 of a pass, over a run count normalised to one per task.
       const passes = [...aggs.get(p)!.values()].reduce((s, t) => s + t.pass, 0);
-      const runsPerTask = prs.filter((r) => !r.nonScoring).length / Math.max(1, tasksScored);
+      const runsPerTask = prs.filter((r) => !r.nonScoring).length / Math.max(1, aggs.get(p)!.size);
       const costPerTask = costUsd / Math.max(1, runsPerTask);
+      const trackScores = Object.fromEntries(
+        tracks.map((t, i): [string, TrackScore] => {
+          const a = axes(aggs.get(p)!, t.taskIds);
+          const speed = isEligible && a ? speedScore(a.p50Ms, point.perTrack[i].best) : null;
+          return [t.name, {
+            coverage: trackCoverage(p, t),
+            quality: isEligible ? a?.quality ?? null : null,
+            reliability: isEligible ? a?.reliability ?? null : null,
+            p50Ms: a?.p50Ms ?? 0,
+            speed,
+            score: isEligible && a ? combine(a.quality, a.reliability, speed) : null,
+          }];
+        }),
+      );
       const base = {
         provider: p,
         tasksScored,
         coverage: tasksScored / allTaskIds.length,
-        p50Ms: a?.p50Ms ?? 0,
+        p50Ms: axes(aggs.get(p)!, allTaskIds)?.p50Ms ?? 0,
+        tracks: trackScores,
         costUsd,
         passes,
         usdPer1kPassed: passes > 0 ? (costPerTask / passes) * 1000 : null,
       };
-      if (!eligible.includes(p)) {
+      if (!isEligible) {
+        const short = tracks.filter((t) => trackCoverage(p, t) < MIN_COVERAGE);
         return {
           ...base,
           quality: null,
@@ -173,15 +237,15 @@ export function scoreProviders(
           overall: null,
           ci: null,
           group: null,
-          withheld: `only ${Math.round(base.coverage * 100)}% of tasks scorable`,
+          withheld: short.map((t) => `only ${Math.round(trackCoverage(p, t) * 100)}% of ${tracks.length > 1 ? `${t.name} ` : ""}tasks scorable`).join("; "),
         };
       }
       return {
         ...base,
-        quality: a!.quality,
-        reliability: a!.reliability,
-        speed: speedScore(a!.p50Ms, bestP50),
-        overall: overall.get(p)!,
+        quality: weighted((a) => a.quality, p),
+        reliability: weighted((a) => a.reliability, p),
+        speed: weighted((a, i) => speedScore(a.p50Ms, point.perTrack[i].best), p),
+        overall: point.overall.get(p)!,
         ci: ci(samples.get(p)!),
         group: group.get(p)!,
       };

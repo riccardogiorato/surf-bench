@@ -1,4 +1,4 @@
-# SurfBench — 50 Checked Tasks
+# SurfBench — 84 Checked Tasks, Two Tracks
 
 > Status: harness built and run. Answer keys cross-checked by independent agents
 > (`agent-check`); human verification and human judge calibration still to do.
@@ -8,7 +8,7 @@
 
 ## Principles
 
-1. **Few tasks, each checked.** 50 tasks, each with an answer key or explicit
+1. **Few tasks, each checked.** 84 tasks, each with an answer key or explicit
    constraints, the evidence for it, who checked it, and when.
 2. **Graded against a key, not vibes.** A fixed reader model turns every bundle into a
    short answer, and that answer is checked against the key. The judge panel only
@@ -36,14 +36,26 @@ request ─search(top 5)─▶ results ─fetch(top 3, same provider)─▶ bund
   panel, so a reader summary can't hide or invent evidence.
 - 30 s per leg = DNF. Rate-limited calls are retried twice with backoff; survivors stay non-scoring.
 - Runs bypass the search/scrape caches; providers fetch with their vendor-default cache policy.
-- Fast modes (`exa-fast`, `parallel-turbo`) are separate ranked rows that fetch with their parent.
+- Fast modes (`exa-fast`, `parallel-turbo`, `perplexity-fast`) are separate ranked rows; the first two fetch with their parent.
+- Perplexity has no fetch API: its search returns each page's extracted text (query-focused excerpts), and the top 3 results' text is its fetch leg (0 ms, no fetch cost). On stable-read tasks it searches for the given URL.
+
+## Tracks (weights fixed before the run)
+
+| Track | Weight | Tasks | What it asks |
+|---|---|---|---|
+| **search** | 0.85 | 53 | Find the answer on the open web: docs and specs, multi-hop questions, official figures, long-tail and non-English facts, recent events, open-web live feeds |
+| **access** | 0.15 | 31 | Open a given page, or reach a named bot-walled site (X, Instagram, Facebook, TikTok, LinkedIn, Reddit, Amazon, eBay, Zillow, Airbnb…) |
+
+Why: agents mostly search. Some vendors keep site-specific scrapers (e.g. Reddit) off by
+default for legal reasons; site access is still measured and published, but it can't
+dominate the board. Assignment: `trackOf()` in `src/lib/tasks.ts`.
 
 ## Task tiers
 
 | Tier | Count | Answer key | How it's graded | Reproducible? |
 |---|---|---|---|---|
 | **stable-read** | 10 | Key facts on a given URL | Regex per fact on the reader's answers | Yes |
-| **stable-lookup** | 12 | Fixed answer, written in the task file | Regex / numeric tolerance / allowed variants | Yes |
+| **stable-lookup** | 46 | Fixed answer, written in the task file | Regex / numeric tolerance / allowed variants | Yes |
 | **live-feed** | 12 | Captured at run time from an official feed or API | Overlap with the captured top items, or match the newest item | Re-gradable snapshot |
 | **live-judge** | 16 | None possible (X, Instagram, marketplaces…) | Panel checks yes/no constraints, plus auto-added on-site and freshness checks | Re-gradable snapshot |
 
@@ -56,10 +68,11 @@ Notes from building it:
 
 - Per-task score in [0, 1] with partial credit (facts matched, overlap share, constraints met). Empty/error bundle = 0.
 - **Pass** = score ≥ 0.8 **and**, for live tasks, on-site and fresh. Correct answers taken from a mirror or aggregator fail, but are counted in their own "right, via mirror" column.
-- Weights: quality 0.50 (mean score) / reliability 0.35 (pass rate) / speed 0.15 (p50 vs. fastest).
-- `quota` / `rate_limit` are NON-SCORING; coverage guard ≥ 80%.
+- Per track: quality 0.50 (mean score) / reliability 0.35 (pass rate) / speed 0.15 (p50 vs. the fastest row in that track).
+- **Overall = 0.85 × search + 0.15 × access** (`TRACK_WEIGHTS` in `src/lib/scoring.ts`). Both track scores are published.
+- `quota` / `rate_limit` are NON-SCORING; coverage guard ≥ 80% of each track's tasks.
 - **Repeats**: live tasks run 3× per run (score = mean over rounds); stable tasks run once.
-- **Uncertainty**: paired bootstrap over tasks → 95% CI on each composite; tie groups against the leader.
+- **Uncertainty**: paired bootstrap over tasks, resampled within each track → 95% CI on overall; tie groups against each group's head.
 - **Cost column** (not scored): `$ per 1k passed tasks` from real call counts × `src/lib/pricing.ts`.
 
 ## Judge calibration
@@ -81,13 +94,14 @@ without calling any provider.
 
 - **live-judge tasks have no ground truth.** The judge checks constraints, not that the item is *the* newest.
 - **Live tasks aren't comparable across runs.** Compare providers within a run.
-- **50 tasks is small.** Pairwise CIs often overlap; ties are reported as ties.
+- **84 tasks is small.** Pairwise CIs often overlap; ties are reported as ties.
+- **Recent-event and "current limit" keys age.** `s-new-*` test index freshness only for a few weeks; `s-doc-6` (Lambda limits) and `s-doc-7` (Actions limits) must be re-checked the morning of each run (last: 2026-10-25, both unchanged) and the key edited if a page has moved.
 - **Verbatim queries** favor natural-language search APIs over keyword engines.
 - **Public content only.** No logged-in sessions.
 - **One round of tool use**, not a multi-step agent loop.
 
 ## Remaining work
 
-- [ ] Human verification of all 50 answer keys (second person spot-checks).
+- [ ] Human verification of all 84 answer keys (second person spot-checks).
 - [ ] Human calibration of the judge panel (~60 bundles).
 - [ ] Archive evidence pages (archive.org) for every stable key.

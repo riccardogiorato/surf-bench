@@ -200,6 +200,35 @@ const parallelTurboSearch = defineSearchProvider("parallel-turbo", async (query,
   }));
 });
 
+// Perplexity has no fetch API: its search returns each page's extracted text,
+// and that text is the fetch leg (SEARCH_CONTENT below). 10k tokens per page
+// is about the reader's 40k-character window.
+function perplexitySearchFor(name: string, searchType?: "fast") {
+  return defineSearchProvider(name, async (query, numResults) => {
+    const res = await fetch("https://api.perplexity.ai/search", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query,
+        max_results: numResults,
+        max_tokens_per_page: 10000,
+        max_tokens: 50000,
+        ...(searchType ? { search_type: searchType } : {}),
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    const body: any = await res.json();
+    return (body.results ?? []).map((item: any) => ({
+      title: item.title || "",
+      url: item.url || "",
+      snippet: (item.snippet || "").slice(0, 500),
+      content: item.snippet || "",
+    }));
+  });
+}
+const perplexitySearch = perplexitySearchFor("perplexity");
+const perplexityFastSearch = perplexitySearchFor("perplexity-fast", "fast");
+
 function gateOnKey(
   key: string | undefined,
   name: string,
@@ -222,11 +251,16 @@ const gated: (SearchClient | null)[] = [
   gateOnKey(process.env.KEENABLE_API_KEY, "keenable", keenableSearch),
   gateOnKey(process.env.EXA_API_KEY, "exa-fast", exaFastSearch),
   gateOnKey(process.env.PARALLEL_API_KEY, "parallel-turbo", parallelTurboSearch),
+  gateOnKey(process.env.PERPLEXITY_API_KEY, "perplexity", perplexitySearch),
+  gateOnKey(process.env.PERPLEXITY_API_KEY, "perplexity-fast", perplexityFastSearch),
 ];
 
 // Fast modes have no fetch mode of their own: they fetch with the parent.
 export const FETCH_PROVIDER: Record<string, string> = { "exa-fast": "exa", "parallel-turbo": "parallel" };
 export const fetchProviderOf = (name: string) => FETCH_PROVIDER[name] ?? name;
+// Providers whose search results carry the page text: the top 3 results'
+// text is their fetch leg. A direct-URL task becomes a search for that URL.
+export const SEARCH_CONTENT = new Set(["perplexity", "perplexity-fast"]);
 
 export const searchClients: SearchClient[] = gated.filter(
   (c): c is SearchClient => c !== null,

@@ -6,7 +6,15 @@ export const WEIGHTS = {
   speed: 0.15, // end-to-end p50, relative to the fastest provider
 } as const;
 
-// A provider needs this share of tasks scorable before it gets a number.
+// Overall = weighted sum of per-track composites. Search is what agents mostly
+// do; access (opening named pages and bot-walled sites) is a smaller share so
+// a vendor's legal stance on one site cannot dominate the board.
+export const TRACK_WEIGHTS = {
+  search: 0.85,
+  access: 0.15,
+} as const;
+
+// A provider needs this share of tasks scorable (in every track) before it gets a number.
 // Below it the provider is withheld, so a 402'd billing key is never
 // published as a damning 0.
 export const MIN_COVERAGE = 0.8;

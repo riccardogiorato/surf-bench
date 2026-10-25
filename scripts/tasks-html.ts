@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { TRACK_WEIGHTS } from "../src/lib/scoring.js";
 import { AGENT_DRAFT, TASKS } from "../src/lib/tasks.js";
 import { faviconDataUri, providerLabel as L } from "./favicons.js";
 
@@ -73,7 +74,10 @@ async function main() {
   const bestReach = [...providers].sort((a, b) => reach[b] - reach[a])[0];
   const fastest = by("p50_ms", 1);
   const cheapest = by("usd_per_1k_passed", 1);
-  const accurate = by("quality", -1);
+  const searcher = by("search_score", -1);
+  const W_SEARCH = Math.round(TRACK_WEIGHTS.search * 100);
+  const W_ACCESS = Math.round(TRACK_WEIGHTS.access * 100);
+  const weightsLabel = `search ${W_SEARCH} · access ${W_ACCESS}`;
 
   const drafts = TASKS.filter((t) => t.verified.by === AGENT_DRAFT).length;
   const banner = drafts ? `DRAFT: ${drafts}/${TASKS.length} answer keys not yet verified` : "";
@@ -134,17 +138,19 @@ async function main() {
     ${tied.length > 1
       ? `<div class="card"><b>Tied for #1</b><div class="big">${tied.map((b) => esc(L(b.provider))).join(" · ")}</div>${tied.map((b) => `${esc(L(b.provider))} ${b.overall} (${b.ci_low}–${b.ci_high})`).join(" · ")}: the 95% CIs overlap, so no single winner</div>`
       : `<div class="card"><b>Best overall</b><div class="big">${esc(L(board[0].provider))}</div>${board[0].overall} pts (${board[0].ci_low}–${board[0].ci_high}) · clear of the field</div>`}
-    <div class="card"><b>Most accurate</b><div class="big">${esc(L(accurate.provider))}</div>quality ${accurate.quality} · pass rate ${accurate.pass_rate}%</div>
+    <div class="card"><b>Best at search</b><div class="big">${esc(L(searcher.provider))}</div>search track ${searcher.search_score} · ${W_SEARCH}% of the score</div>
     <div class="card"><b>Fastest</b><div class="big">${esc(L(fastest.provider))}</div>p50 ${(num(fastest, "p50_ms") / 1000).toFixed(1)}s for search + 3 fetches</div>
     <div class="card"><b>Cheapest per success</b><div class="big">${esc(L(cheapest.provider))}</div>$${cheapest.usd_per_1k_passed} per 1,000 passed tasks</div>
     <div class="card"><b>Widest web access</b><div class="big">${esc(L(bestReach))}</div>reaches ${reach[bestReach]}/${famous.length} famous hard sites</div>
   </div>
 </div></div>
 
-<div class="win"><div class="bar-title"><span>LEADERBOARD</span><span>quality 50 · reliability 35 · speed 15</span></div><div class="body scroll">
-  <table><thead><tr><th>group</th><th>provider</th><th>overall (95% CI)</th><th>accuracy (quality)</th><th>pass rate</th><th>speed p50</th><th>$ / 1k passed</th><th>famous sites reached</th><th>right, but via mirror</th></tr></thead><tbody>
+<div class="win"><div class="bar-title"><span>LEADERBOARD</span><span>${weightsLabel}</span></div><div class="body scroll">
+  <table><thead><tr><th>group</th><th>provider</th><th>overall (95% CI)</th><th>search (${W_SEARCH}%)</th><th>access (${W_ACCESS}%)</th><th>accuracy (quality)</th><th>pass rate</th><th>speed p50</th><th>$ / 1k passed</th><th>famous sites reached</th><th>right, but via mirror</th></tr></thead><tbody>
   ${board.map((b) => `<tr><td><span class="grp">${b.rank_group}</span></td><td><b>${esc(L(b.provider))}</b></td>
     <td class="n">${b.overall} <small>(${b.ci_low}–${b.ci_high})</small>${bar(num(b, "overall"), 100)}</td>
+    <td class="n">${b.search_score}</td>
+    <td class="n">${b.access_score}</td>
     <td class="n">${b.quality}${bar(num(b, "quality"), 100)}</td>
     <td class="n">${b.pass_rate}%</td>
     <td class="n">${(num(b, "p50_ms") / 1000).toFixed(1)}s${bar(num(b, "p50_ms"), maxMs, "speed")}</td>
@@ -152,7 +158,7 @@ async function main() {
     <td class="n">${reach[b.provider]}/${famous.length}</td>
     <td class="n">${mirror[b.provider]}</td></tr>`).join("")}
   </tbody></table>
-  <p class="note">Same group = the 95% paired-bootstrap CI of the gap includes 0, so the order inside a group is not meaningful. Cost = list price × billable calls, published as a column, not scored. "Right, but via mirror" counts live answers that were correct but read from a mirror or aggregator (nitter, redlib, twiscan, airdna…) instead of the site itself; they are scored as fails, because the benchmark asks whether the provider can reach the site.</p>
+  <p class="note">Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access. Search tasks ask for an answer found on the open web; access tasks ask to open a given page or reach a named bot-walled site. Each track scores 0.50 quality + 0.35 pass rate + 0.15 speed. Same group = the 95% paired-bootstrap CI of the gap includes 0, so the order inside a group is not meaningful. Cost = list price × billable calls, published as a column, not scored. "Right, but via mirror" counts live answers that were correct but read from a mirror or aggregator (nitter, redlib, twiscan, airdna…) instead of the site itself; they are scored as fails, because the benchmark asks whether the provider can reach the site.</p>
 </div></div>
 
 <div class="win"><div class="bar-title"><span>WEB_ACCESS.MAP</span><span>passed / attempts · hardest first</span></div><div class="body scroll">
@@ -219,7 +225,7 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
     tied.length > 1
       ? ["TIED FOR #1", tied.map((b) => b.provider), [tied.map((b) => b.overall).join(" vs "), "CIs overlap"]]
       : ["BEST OVERALL", [board[0].provider], [`${board[0].overall} pts`, `CI ${board[0].ci_low}–${board[0].ci_high}`]],
-    ["MOST ACCURATE", [accurate.provider], [`quality ${accurate.quality}`, `pass rate ${accurate.pass_rate}%`]],
+    ["BEST AT SEARCH", [searcher.provider], [`search track ${searcher.search_score}`, `${W_SEARCH}% of the score`]],
     ["FASTEST", [fastest.provider], [`p50 ${(num(fastest, "p50_ms") / 1000).toFixed(1)}s`, "search + 3 fetches"]],
     ["CHEAPEST", [cheapest.provider], [`$${cheapest.usd_per_1k_passed}`, "per 1,000 passed tasks"]],
     ["WIDEST ACCESS", [bestReach], [`${reach[bestReach]}/${famous.length} famous`, "hard sites reached"]],
@@ -255,21 +261,21 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
   );
 
   // LEADERBOARD
-  const cols = { grp: 40, prov: 92, overall: 280, quality: 560, pass: 740, p50: 820, cost: 905, reach: 1025, mirror: 1100 };
+  const cols = { grp: 40, prov: 92, overall: 290, search: 570, access: 660, pass: 750, p50: 825, cost: 905, reach: 1025, mirror: 1100 };
   const rowH = 44;
   const top = 108;
   const barW = 110;
   const lbBar = (bx: number, by: number, v: number, max: number, fill: string) =>
     `<rect x="${bx}" y="${by}" width="${barW}" height="10" fill="#eeeeee" stroke="#999999"/>` +
     `<rect x="${bx}" y="${by}" width="${Math.max(2, (barW * v) / max).toFixed(1)}" height="10" fill="${fill}"/>`;
-  const lbH = top + board.length * rowH + 80;
+  const lbH = top + board.length * rowH + 98;
   const header = (
-    [["GROUP", cols.grp], ["PROVIDER", cols.prov], ["OVERALL (95% CI)", cols.overall], ["ACCURACY", cols.quality], ["PASS", cols.pass], ["P50", cols.p50], ["$/1K PASSED", cols.cost], ["REACH", cols.reach], ["MIRROR", cols.mirror]] as [string, number][]
+    [["GROUP", cols.grp], ["PROVIDER", cols.prov], ["OVERALL (95% CI)", cols.overall], [`SEARCH ${W_SEARCH}%`, cols.search], [`ACCESS ${W_ACCESS}%`, cols.access], ["PASS", cols.pass], ["P50", cols.p50], ["$/1K PASSED", cols.cost], ["REACH", cols.reach], ["MIRROR", cols.mirror]] as [string, number][]
   ).map(([h, hx]) => `<text x="${hx}" y="${top - 14}" font-family="${PIXEL}" font-size="11" fill="#111111">${h}</text>`).join("");
   const leaderboard = windowSvg(
     lbH,
     "LEADERBOARD",
-    "quality 50 · reliability 35 · speed 15",
+    weightsLabel,
     sunken(32, top - 36, W - 64, board.length * rowH + 44) +
       `<rect x="34" y="${top - 34}" width="${W - 68}" height="28" fill="#e4e4e4"/>` +
       header +
@@ -286,8 +292,8 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
             text(cols.overall, mid, `${b.overall}`, 16, `font-weight="bold" fill="#111111"`) +
             text(cols.overall + 44, mid, `(${b.ci_low}–${b.ci_high})`, 12, `fill="#555555"`) +
             lbBar(cols.overall + 140, mid - 10, num(b, "overall"), 100, "#000080") +
-            text(cols.quality, mid, b.quality, 15, `fill="#111111"`) +
-            lbBar(cols.quality + 46, mid - 10, num(b, "quality"), 100, "#000080") +
+            text(cols.search, mid, b.search_score, 15, `font-weight="bold" fill="#111111"`) +
+            text(cols.access, mid, b.access_score, 15, `fill="#111111"`) +
             text(cols.pass, mid, `${b.pass_rate}%`, 15, `fill="#111111"`) +
             text(cols.p50, mid, `${(num(b, "p50_ms") / 1000).toFixed(1)}s`, 15, `fill="#111111"`) +
             text(cols.cost, mid, `$${b.usd_per_1k_passed}`, 15, `fill="#111111"`) +
@@ -296,6 +302,7 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
           );
         })
         .join("") +
+      text(40, lbH - 64, `Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access; each track = 0.50 quality + 0.35 pass rate + 0.15 speed.`, 12, `fill="#333333"`) +
       text(40, lbH - 46, "Same group = statistically tied (95% paired-bootstrap CI of the gap includes 0). Reach = famous hard sites passed on ≥ half the attempts.", 12, `fill="#333333"`) +
       text(40, lbH - 28, "Mirror = live answers that were right but read from a mirror/aggregator (nitter, redlib…), scored as fails. Cost is a column, not scored.", 12, `fill="#333333"`),
   );

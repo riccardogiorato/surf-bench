@@ -1,7 +1,7 @@
 # SurfBench
 
-Benchmark comparing web-access API providers for AI agents. One event: 50 checked
-tasks, each run through the same fixed pipeline — the request goes verbatim to the
+Benchmark comparing web-access API providers for AI agents. One event: 84 checked
+tasks in two tracks (search 85%, access 15%), each run through the same fixed pipeline — the request goes verbatim to the
 provider's search (top 5), the provider fetches the top 3, and one pinned reader
 model answers only from those pages. Answers are graded against answer keys, a
 same-minute official feed, or yes/no constraints checked by a judge panel. Method
@@ -28,7 +28,7 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 
 ## Structure
 
-- `src/lib/tasks.ts` — the 50 tasks: request, tier, answer key or constraints, verification record.
+- `src/lib/tasks.ts` — the 84 tasks: request, tier, answer key or constraints, verification record; `trackOf()` assigns search / access (access is an explicit list, everything else is search).
 - `src/lib/references.ts` — live-feed reference capture (RSS / official APIs), same round as the provider calls.
 - `src/lib/taskGrading.ts` — reader prompts and graders (facts, overlap, latest, numeric, constraints).
 - `src/lib/taskScoring.ts` + `scoring.ts` — per-task score, pass gate, bootstrap CIs, tie groups, composite.
@@ -41,7 +41,7 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 ## Conventions
 
 - All providers are key-gated: absent `*_API_KEY` in `.env` → provider skipped, no errors.
-- Providers: parallel, exa, tavily, firecrawl, keenable, linkup. A provider runs only if it has both a search and a fetch adapter.
+- Providers: parallel, exa, tavily, firecrawl, keenable, linkup, perplexity. A provider runs only if it has both a search and a fetch adapter, or is in `SEARCH_CONTENT` (`searchClients.ts`): perplexity and perplexity-fast have no fetch API, so the top 3 search results' extracted text is their fetch leg (fetchMs 0, no fetch cost) and stable-read tasks search for the URL.
 - Fast modes are their own ranked rows, never merged into the default row (a provider must not pick its best mode per task): `exa-fast` (search `type:"fast"`) and `parallel-turbo` (search `mode:"turbo"`). They have no fast fetch mode, so they fetch with the parent (`FETCH_PROVIDER` in `searchClients.ts`). `exa-fast` shares exa's request pacer because the org cap is shared.
 - Reader: `MiniMaxAI/MiniMax-M3`, temperature 0. Judge panel: Kimi K3 + GLM-5.3 via Together AI REST (case-sensitive slugs `moonshotai/Kimi-K3`, `zai-org/GLM-5.3`). Together rate-limits aggressively — calls are throttled (4 in flight) with backoff; verdicts cached by content hash; judge-error verdicts are never cached.
 - Wipeout rule: >30s per leg = DNF.
@@ -53,7 +53,9 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 
 ## Scoring
 
-Three axes (`src/lib/scoring.ts`), weighted **quality 0.50 / reliability 0.35 /
+**Overall = 0.85 × search track + 0.15 × access track** (`TRACK_WEIGHTS`); each track is
+scored separately (own speed anchor, ≥80% coverage per track), and the bootstrap resamples
+within tracks. Within a track, three axes (`src/lib/scoring.ts`), weighted **quality 0.50 / reliability 0.35 /
 speed 0.15**: quality = mean task score, reliability = pass rate, speed = end-to-end
 p50 relative to the fastest row (floored at 25).
 
