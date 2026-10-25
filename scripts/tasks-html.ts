@@ -139,7 +139,7 @@ async function main() {
       ? `<div class="card"><b>Tied for #1</b><div class="big">${tied.map((b) => esc(L(b.provider))).join(" · ")}</div>${tied.map((b) => `${esc(L(b.provider))} ${b.overall} (${b.ci_low}–${b.ci_high})`).join(" · ")}: the 95% CIs overlap, so no single winner</div>`
       : `<div class="card"><b>Best overall</b><div class="big">${esc(L(board[0].provider))}</div>${board[0].overall} pts (${board[0].ci_low}–${board[0].ci_high}) · clear of the field</div>`}
     <div class="card"><b>Best at search</b><div class="big">${esc(L(searcher.provider))}</div>search track ${searcher.search_score} · ${W_SEARCH}% of the score</div>
-    <div class="card"><b>Fastest</b><div class="big">${esc(L(fastest.provider))}</div>p50 ${(num(fastest, "p50_ms") / 1000).toFixed(1)}s for search + 3 fetches</div>
+    <div class="card"><b>Fastest</b><div class="big">${esc(L(fastest.provider))}</div>p50 ${(num(fastest, "p50_ms") / 1000).toFixed(1)}s from request to page text</div>
     <div class="card"><b>Cheapest per success</b><div class="big">${esc(L(cheapest.provider))}</div>$${cheapest.usd_per_1k_passed} per 1,000 passed tasks</div>
     <div class="card"><b>Widest web access</b><div class="big">${esc(L(bestReach))}</div>reaches ${reach[bestReach]}/${famous.length} famous hard sites</div>
   </div>
@@ -226,7 +226,7 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
       ? ["TIED FOR #1", tied.map((b) => b.provider), [tied.map((b) => b.overall).join(" vs "), "CIs overlap"]]
       : ["BEST OVERALL", [board[0].provider], [`${board[0].overall} pts`, `CI ${board[0].ci_low}–${board[0].ci_high}`]],
     ["BEST AT SEARCH", [searcher.provider], [`search track ${searcher.search_score}`, `${W_SEARCH}% of the score`]],
-    ["FASTEST", [fastest.provider], [`p50 ${(num(fastest, "p50_ms") / 1000).toFixed(1)}s`, "search + 3 fetches"]],
+    ["FASTEST", [fastest.provider], [`p50 ${(num(fastest, "p50_ms") / 1000).toFixed(1)}s`, "request to page text"]],
     ["CHEAPEST", [cheapest.provider], [`$${cheapest.usd_per_1k_passed}`, "per 1,000 passed tasks"]],
     ["WIDEST ACCESS", [bestReach], [`${reach[bestReach]}/${famous.length} famous`, "hard sites reached"]],
   ];
@@ -311,7 +311,7 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
   const siteW = 210;
   const colW = (W - 80 - siteW) / providers.length;
   const cellH = 30;
-  const mTop = 110;
+  const mTop = 130;
   const heatFill = (c: { p: number; a: number; r: number }) =>
     c.a === 0 ? "#bbbbbb" : c.r >= 0.99 ? "#2e8b57" : c.r >= 0.5 ? "#c9a227" : c.r > 0 ? "#d2691e" : "#aa3333";
   const mapH = mTop + famous.length * (cellH + 4) + 60;
@@ -322,12 +322,12 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
     providers
       .map((p, j) => {
         const hx = 40 + siteW + j * colW + colW / 2;
-        // "parallel (turbo)" does not fit one column: the mode goes on a second line.
+        // Columns are ~90px with 10 rows: favicon, name and mode each get a centred line.
         const [main, mode] = L(p).split(/ (?=\()/);
         return (
-          favicon(p, hx - 50, mTop - 44) +
-          `<text x="${hx - 26}" y="${mTop - 30}" font-family="${PIXEL}" font-size="12" fill="#111111">${x(main)}</text>` +
-          (mode ? `<text x="${hx - 26}" y="${mTop - 14}" font-family="${PIXEL}" font-size="12" fill="#555555">${x(mode)}</text>` : "")
+          favicon(p, hx - 9, mTop - 62) +
+          `<text x="${hx}" y="${mTop - 26}" text-anchor="middle" font-family="${PIXEL}" font-size="11" fill="#111111">${x(main)}</text>` +
+          (mode ? `<text x="${hx}" y="${mTop - 11}" text-anchor="middle" font-family="${PIXEL}" font-size="11" fill="#555555">${x(mode)}</text>` : "")
         );
       })
       .join("") +

@@ -1,0 +1,2021 @@
+[
+  {
+    "provider": "parallel-turbo",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel-turbo",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel-turbo",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112604875452223824",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 18:00:27 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel-turbo",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112560723603632217",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 15:05:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel-turbo",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112553116390269175",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 14:34:46 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112604875452223824",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 18:00:27 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112560723603632217",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 15:05:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112553116390269175",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 14:34:46 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "r-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "source": "youtube oembed",
+    "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+    "match": true
+  },
+  {
+    "provider": "parallel-turbo",
+    "task": "r-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "source": "youtube oembed",
+    "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "r-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "source": "youtube oembed",
+    "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+    "match": true
+  },
+  {
+    "provider": "perplexity-fast",
+    "task": "s-loc-5",
+    "round": 1,
+    "url": "http://www.youtube.com/watch?v=r4Ce6M5j-gE",
+    "source": "youtube oembed",
+    "title": "Museo del Violino di Cremona. I saluti di Oreste Perri e di Giovanni Arvedi arvedi",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113776971603689874",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 23:37:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113693409772761305",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 18:05:54 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113655288687431819",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 15:34:25 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "perplexity",
+    "task": "s-loc-5",
+    "round": 1,
+    "url": "http://www.youtube.com/watch?v=r4Ce6M5j-gE",
+    "source": "youtube oembed",
+    "title": "Museo del Violino di Cremona. I saluti di Oreste Perri e di Giovanni Arvedi arvedi",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113776971603689874",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 23:37:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113693409772761305",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 18:05:54 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113655288687431819",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 15:34:25 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "r-x",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "linkup",
+    "task": "r-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "source": "youtube oembed",
+    "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+    "match": true
+  },
+  {
+    "provider": "perplexity-fast",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "r-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "source": "youtube oembed",
+    "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "l-so",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=TtlvcfzrxUo",
+    "source": "youtube oembed",
+    "title": "Sorting an array of objects by property values - Stack Overflow JavaScript Problem (Solved)",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "l-de",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=6NUQn0TmYfc",
+    "source": "youtube oembed",
+    "title": "Zugspitze - auf Deutschlands höchstem Berg | Hin & weg",
+    "match": true
+  },
+  {
+    "provider": "perplexity",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "r-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "source": "youtube oembed",
+    "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "s-hop-1",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=yAyuipqM5uQ",
+    "source": "youtube oembed",
+    "title": "Fields Medals 2022 Maryna Viazovska",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "l-openai",
+    "round": 1,
+    "url": "https://x.com/sama/status/2112652656602923366",
+    "source": "fxtwitter",
+    "author": "sama",
+    "postedAt": "Tue Oct 20 21:10:19 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "l-openai",
+    "round": 1,
+    "url": "https://x.com/sama/status/2111139227761266699",
+    "source": "fxtwitter",
+    "author": "sama",
+    "postedAt": "Fri Oct 16 16:56:29 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "l-openai",
+    "round": 1,
+    "url": "https://x.com/sama/status/2111131677351432197",
+    "source": "fxtwitter",
+    "author": "sama",
+    "postedAt": "Fri Oct 16 16:26:29 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "l-openai",
+    "round": 1,
+    "url": "https://x.com/sama/status/2111130577789493706",
+    "source": "fxtwitter",
+    "author": "sama",
+    "postedAt": "Fri Oct 16 16:22:07 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "l-openai",
+    "round": 1,
+    "url": "https://x.com/sama/status/2107924408597950702",
+    "source": "fxtwitter",
+    "author": "sama",
+    "postedAt": "Wed Oct 07 20:01:57 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "s-loc-1",
+    "round": 1,
+    "url": "https://x.com/jstm135e/status/2112336619152031787",
+    "source": "fxtwitter",
+    "author": "jstm135e",
+    "postedAt": "Tue Oct 20 00:14:29 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "s-loc-1",
+    "round": 1,
+    "url": "https://x.com/jstm135e/status/2110894911734390933",
+    "source": "fxtwitter",
+    "author": "jstm135e",
+    "postedAt": "Fri Oct 16 00:45:40 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "s-loc-1",
+    "round": 1,
+    "url": "https://x.com/jstm135e/status/2110550723847143880",
+    "source": "fxtwitter",
+    "author": "jstm135e",
+    "postedAt": "Thu Oct 15 01:57:59 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "f-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=nM21hVqvhmk",
+    "source": "youtube oembed",
+    "title": "If You Escape, You Win $1,000,000",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "s-new-1",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=hY1epQDmhGQ",
+    "source": "youtube oembed",
+    "title": "Alexander Zverev vs. Ben Shelton Highlights | 2026 US Open Final",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2106785883902874034",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 04 16:37:51 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2100304047035089303",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Wed Sep 16 19:21:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/1941802940768850033",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Jul 06 10:14:32 +0000 2025",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112604875452223824",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 18:00:27 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112560723603632217",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 15:05:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112553116390269175",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 14:34:46 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/FelixSchlang/status/2113228042449400318",
+    "source": "fxtwitter",
+    "author": "FelixSchlang",
+    "postedAt": "Thu Oct 22 11:16:41 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "f-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=gVE2t-LRK-s",
+    "source": "youtube oembed",
+    "title": "Whatever You Hide As, You Keep!",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "f-yt",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=Af6i6ChAVTw&vl=en",
+    "source": "youtube oembed",
+    "title": "Last To Leave Mansion, Keeps It",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/1941802940768850033",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Jul 06 10:14:32 +0000 2025",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/mrbeast_update/status/2101020004225253539",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Sep 18 18:46:18 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/mrbeast_update/status/2114308012341153861",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sun Oct 25 10:48:06 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/mrbeast_update/status/2113737799262196068",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Oct 23 21:02:17 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/mrbeast_update/status/2113674075717484792",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Oct 23 16:49:04 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "s-new-1",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=7wW0m-lTNRw",
+    "source": "youtube oembed",
+    "title": "Ben Shelton & Alexander Zverev Walk-Out | Final | 2026 US Open",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113776971603689874",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 23:37:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113693409772761305",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 18:05:54 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113655288687431819",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 15:34:25 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2100672440208650562",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Sep 17 19:45:13 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/GtrianaNews/status/2100673479683047558",
+    "source": "fxtwitter",
+    "author": "GtrianaNews",
+    "postedAt": "Thu Sep 17 19:49:20 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/ger_t56442/status/2100682003029053647",
+    "source": "fxtwitter",
+    "author": "ger_t56442",
+    "postedAt": "Thu Sep 17 20:23:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/InterestingRadR/status/2100675919857795221",
+    "source": "fxtwitter",
+    "author": "InterestingRadR",
+    "postedAt": "Thu Sep 17 19:59:02 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "s-new-6",
+    "round": 1,
+    "url": "https://www.youtube.com/watch?v=RJjHROJh-FI",
+    "source": "youtube oembed",
+    "title": "Announcement of the 2026 Sveriges Riksbank Prize in Economic Sciences in Memory of Alfred Nobel",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 1,
+    "url": "https://x.com/MrBeast/status/2108696909418578012",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Fri Oct 09 23:11:35 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113776971603689874",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 23:37:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113693409772761305",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 18:05:54 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113655288687431819",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 15:34:25 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2113778040161423834",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 23 23:42:11 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2113638070658404498",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 23 14:26:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2112571542890500458",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Tue Oct 20 15:48:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2112272032247304485",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Mon Oct 19 19:57:51 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2111095822255267964",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 16 14:04:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2112571542890500458",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Tue Oct 20 15:48:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2112272032247304485",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Mon Oct 19 19:57:51 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2111095822255267964",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 16 14:04:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2110733433756381521",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Thu Oct 15 14:04:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "tavily",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAGoddard/status/2110371044200460536",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Wed Oct 14 14:04:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "linkup",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/NASAWatch/status/1931086470313378158",
+    "source": "fxtwitter",
+    "author": "NASAWatch",
+    "postedAt": "Fri Jun 06 20:31:07 +0000 2025",
+    "match": true
+  },
+  {
+    "provider": "linkup",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/SpacesFuture/status/1904021538598199626",
+    "source": "fxtwitter",
+    "author": "SpacesFuture",
+    "postedAt": "Mon Mar 24 04:04:44 +0000 2025",
+    "match": true
+  },
+  {
+    "provider": "linkup",
+    "task": "j-x2",
+    "round": 1,
+    "url": "https://x.com/SpacesFuture/status/1438293754478170115",
+    "source": "fxtwitter",
+    "author": "SpacesFuture",
+    "postedAt": "Thu Sep 16 00:08:47 +0000 2021",
+    "match": false
+  },
+  {
+    "provider": "firecrawl",
+    "task": "f-yt",
+    "round": 2,
+    "url": "https://www.youtube.com/watch?v=gVE2t-LRK-s",
+    "source": "youtube oembed",
+    "title": "Whatever You Hide As, You Keep!",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "f-yt",
+    "round": 2,
+    "url": "https://www.youtube.com/watch?v=Af6i6ChAVTw&vl=en",
+    "source": "youtube oembed",
+    "title": "Last To Leave Mansion, Keeps It",
+    "match": true
+  },
+  {
+    "provider": "perplexity-fast",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "perplexity",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2106785883902874034",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 04 16:37:51 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2100304047035089303",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Wed Sep 16 19:21:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/1941802940768850033",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Jul 06 10:14:32 +0000 2025",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2112604875452223824",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 18:00:27 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2112560723603632217",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 15:05:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2112553116390269175",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 14:34:46 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/FelixSchlang/status/2113228042449400318",
+    "source": "fxtwitter",
+    "author": "FelixSchlang",
+    "postedAt": "Thu Oct 22 11:16:41 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2108696909418578012",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Fri Oct 09 23:11:35 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113776971603689874",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 23:37:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113693409772761305",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 18:05:54 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113655288687431819",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 15:34:25 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASAGoddard/status/2113778040161423834",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 23 23:42:11 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASAGoddard/status/2113638070658404498",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 23 14:26:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASAGoddard/status/2112571542890500458",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Tue Oct 20 15:48:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASAGoddard/status/2112272032247304485",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Mon Oct 19 19:57:51 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASAGoddard/status/2111095822255267964",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 16 14:04:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/1941802940768850033",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Jul 06 10:14:32 +0000 2025",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/mrbeast_update/status/2101020004225253539",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Sep 18 18:46:18 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/mrbeast_update/status/2114308012341153861",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sun Oct 25 10:48:06 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/mrbeast_update/status/2113737799262196068",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Oct 23 21:02:17 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 2,
+    "url": "https://x.com/mrbeast_update/status/2113674075717484792",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Oct 23 16:49:04 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113776971603689874",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 23:37:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113693409772761305",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 18:05:54 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113655288687431819",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 15:34:25 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/NASA/status/2100672440208650562",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Sep 17 19:45:13 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/GtrianaNews/status/2100673479683047558",
+    "source": "fxtwitter",
+    "author": "GtrianaNews",
+    "postedAt": "Thu Sep 17 19:49:20 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/ger_t56442/status/2100682003029053647",
+    "source": "fxtwitter",
+    "author": "ger_t56442",
+    "postedAt": "Thu Sep 17 20:23:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 2,
+    "url": "https://x.com/InterestingRadR/status/2100675919857795221",
+    "source": "fxtwitter",
+    "author": "InterestingRadR",
+    "postedAt": "Thu Sep 17 19:59:02 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "f-yt",
+    "round": 3,
+    "url": "https://www.youtube.com/watch?v=gVE2t-LRK-s",
+    "source": "youtube oembed",
+    "title": "Whatever You Hide As, You Keep!",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "f-yt",
+    "round": 3,
+    "url": "https://www.youtube.com/watch?v=Af6i6ChAVTw&vl=en",
+    "source": "youtube oembed",
+    "title": "Last To Leave Mansion, Keeps It",
+    "match": true
+  },
+  {
+    "provider": "perplexity-fast",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "perplexity",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2108696909418578012",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Fri Oct 09 23:11:35 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2106785883902874034",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 04 16:37:51 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2100304047035089303",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Wed Sep 16 19:21:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/1941802940768850033",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Jul 06 10:14:32 +0000 2025",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2112604875452223824",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 18:00:27 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2112560723603632217",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 15:05:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2112553116390269175",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Tue Oct 20 14:34:46 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "parallel",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/FelixSchlang/status/2113228042449400318",
+    "source": "fxtwitter",
+    "author": "FelixSchlang",
+    "postedAt": "Thu Oct 22 11:16:41 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113776971603689874",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 23:37:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113693409772761305",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 18:05:54 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113655288687431819",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 15:34:25 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASAGoddard/status/2113778040161423834",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 23 23:42:11 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASAGoddard/status/2113638070658404498",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 23 14:26:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASAGoddard/status/2112571542890500458",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Tue Oct 20 15:48:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASAGoddard/status/2112272032247304485",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Mon Oct 19 19:57:51 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "firecrawl",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASAGoddard/status/2111095822255267964",
+    "source": "fxtwitter",
+    "author": "NASAGoddard",
+    "postedAt": "Fri Oct 16 14:04:00 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/1941802940768850033",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Jul 06 10:14:32 +0000 2025",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111971177313055137",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Mon Oct 19 00:02:21 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111860420692803970",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sun Oct 18 16:42:15 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111606364200116603",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 23:52:43 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/MrBeast/status/2111552312196120900",
+    "source": "fxtwitter",
+    "author": "MrBeast",
+    "postedAt": "Sat Oct 17 20:17:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/mrbeast_update/status/2101020004225253539",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Sep 18 18:46:18 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/mrbeast_update/status/2114308012341153861",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sun Oct 25 10:48:06 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/mrbeast_update/status/2113992317870686363",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Sat Oct 24 13:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/mrbeast_update/status/2113737799262196068",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Oct 23 21:02:17 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x1",
+    "round": 3,
+    "url": "https://x.com/mrbeast_update/status/2113674075717484792",
+    "source": "fxtwitter",
+    "author": "mrbeast_update",
+    "postedAt": "Fri Oct 23 16:49:04 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113776971603689874",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 23:37:56 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113693409772761305",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 18:05:54 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113655288687431819",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Fri Oct 23 15:34:25 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2113358139999265160",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Oct 22 19:53:39 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2112959650551173522",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Wed Oct 21 17:30:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/NASA/status/2100672440208650562",
+    "source": "fxtwitter",
+    "author": "NASA",
+    "postedAt": "Thu Sep 17 19:45:13 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/GtrianaNews/status/2100673479683047558",
+    "source": "fxtwitter",
+    "author": "GtrianaNews",
+    "postedAt": "Thu Sep 17 19:49:20 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/ger_t56442/status/2100682003029053647",
+    "source": "fxtwitter",
+    "author": "ger_t56442",
+    "postedAt": "Thu Sep 17 20:23:12 +0000 2026",
+    "match": true
+  },
+  {
+    "provider": "keenable",
+    "task": "j-x2",
+    "round": 3,
+    "url": "https://x.com/InterestingRadR/status/2100675919857795221",
+    "source": "fxtwitter",
+    "author": "InterestingRadR",
+    "postedAt": "Thu Sep 17 19:59:02 +0000 2026",
+    "match": true
+  }
+]

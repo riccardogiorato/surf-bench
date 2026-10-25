@@ -35,8 +35,10 @@ function getJson(url: string): any | null {
   return out;
 }
 
+// Markdown links keep only their visible text: "[@NASAAdmin](/NASAAdmin)" would
+// otherwise normalise to the handle twice and break the word sequence.
 const norm = (s: string) =>
-  s.toLowerCase().normalize("NFKC").replace(/https?:\/\/\S+/g, " ").replace(/&amp;/g, "&").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  s.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").toLowerCase().normalize("NFKC").replace(/https?:\/\/\S+/g, " ").replace(/&amp;/g, "&").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
 // The first 12 words of a post are enough to prove it is the same text, and
 // survive the page truncating long posts with "Show more". A reply's leading

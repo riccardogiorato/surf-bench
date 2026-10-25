@@ -43,7 +43,7 @@ const PATTERNS: Array<[ErrorClass, RegExp]> = [
   ["rate_limit", /\b429\b|rate.?limit|too many requests|requests per second|slow down|excessive requests|reduce the rate/i],
   [
     "quota",
-    /\b402\b|insufficient credit|insufficient_quota|payment required|out of credits?|quota exceeded|credit limit|plan and billing|billing details|\b401\b|\b403 .*(api key|unauthorized)|invalid api key|unauthorized/i,
+    /\b402\b|insufficient credit|insufficient_quota|payment required|out of credits?|quota exceeded|credit limit|usage limit|exceeds your plan|plan and billing|billing details|\b401\b|\b403 .*(api key|unauthorized)|invalid api key|unauthorized/i,
   ],
   ["timeout", /timed? ?out|timeout|etimedout|deadline exceeded|aborted/i],
   [

@@ -1,0 +1,954 @@
+{
+  "labelledRun": "2026-10-22T11-29",
+  "note": "Blind labels were made on bundles from run 2026-10-22T11-29; the judge models and rubric (TASK_RUBRIC_ID) are unchanged in this run, so the agreement figures still describe this panel.",
+  "method": "24 live-judge records (8 with judge disagreement, 16 random), labelled blind from the fetched documents by an independent agent (not a human). Judges' verdicts compared per constraint.",
+  "constraints": 76,
+  "judges": {
+    "kimi-k3": {
+      "agree": 63,
+      "lenient": 12,
+      "strict": 1,
+      "n": 76
+    },
+    "glm-5.3": {
+      "agree": 61,
+      "lenient": 8,
+      "strict": 7,
+      "n": 76
+    }
+  },
+  "items": [
+    {
+      "round": 1,
+      "provider": "firecrawl",
+      "taskId": "j-amz2",
+      "constraints": [
+        "A specific product listing is shown (not just a search page)",
+        "The product is a USB-C charger",
+        "Its price is under $30",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        false,
+        true,
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "All 3 docs are Amazon search/category pages ('1-24 of over 10,000 results', '/s?k=usb-c+charger'); no product page",
+        "Result tile: '[2-Pack] USB C Charger Block 40W Max Output Type C Fast Charging Wall Plug'",
+        "Same tile: 'Price, product page $8.99'",
+        "Same tile: 'FREE delivery Tomorrow, Oct 23 ... Add to cart'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "provider": "exa",
+      "taskId": "j-amz2",
+      "constraints": [
+        "A specific product listing is shown (not just a search page)",
+        "The product is a USB-C charger",
+        "Its price is under $30",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "labelEvidence": [
+        "Doc 1 is a product page (amazon.com/.../dp/B0FB9N5ZLL): 'NOCO XGrid X30: 30W USB-C Charger'",
+        "'30W USB-C Charger – Single Port GaN Power Adapter'; Category: Wall Chargers",
+        "'Price: 11.16 USD.' (also Belkin 18.95 USD, UGREEN 9.99 USD)",
+        "Structured extracts show only price/rating; no in-stock, add-to-cart, or availability signal on any of the 3 pages"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "provider": "parallel",
+      "taskId": "j-li",
+      "constraints": [
+        "At least 1 software engineering job posting at Stripe is shown",
+        "The items shown are dated within 30 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "startup.jobs/dreamworkhq (not LinkedIn): '[Staff Software Engineer, Radar] ... Stripe'; '66 open roles' SWE table",
+        "'Staff Software Engineer, Radar ... 2026-10-20 16:07:32 UTC New'; dreamwork rows 'Posted yesterday'/'Updated today' (updated October 21, 2026)"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "provider": "exa",
+      "taskId": "j-amz1",
+      "constraints": [
+        "The product shown is a Kindle Paperwhite (not another Kindle model)",
+        "A specific price in USD is shown for it",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        true,
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "basketprice: 'Amazon Kindle Paperwhite 16GB (newest model) ... Black'",
+        "'$199.99 ... Price at Amazon Verified Oct 22, 1:45 AM UTC'; readertechhub 'Kindle Paperwhite 16GB (2024) $199.99 as of Oct 22'",
+        "readertechhub: 'Kindle Paperwhite 16GB (2024) — The previous model, while Amazon still has stock. $199.99' with 'Buy on Amazon'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "linkup",
+      "taskId": "j-x2",
+      "constraints": [
+        "At least 1 post by @NASA is shown with its text",
+        "The items shown are dated within 7 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        false,
+        false
+      ],
+      "labelEvidence": [
+        "All 3 docs are LinkedIn posts by individuals (Kristina Parmenter, Nate Loewentheil, Muhammad Ramzan); no @NASA post on X",
+        "Posts are dated 2d–6d, but none is an @NASA X post, so no relevant item is dated in the window"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            false,
+            false
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "provider": "parallel",
+      "taskId": "j-amz1",
+      "constraints": [
+        "The product shown is a Kindle Paperwhite (not another Kindle model)",
+        "A specific price in USD is shown for it",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        true,
+        true,
+        false
+      ],
+      "labelEvidence": [
+        "camelcamelcamel: 'Amazon Kindle Paperwhite 16GB (2024 model) – 7\" glare-free display ... Black (B0CFPJYX7P)'",
+        "'Current Amazon Price $199.99 As of Oct 08, 2026'",
+        "Price tracker only; price is 14 days old; only stock note is 'Out of Stock' for 3rd Party Used; 2026 model article says availability starts Oct 28 (news, not a listing)"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "provider": "tavily",
+      "taskId": "j-ebay",
+      "constraints": [
+        "A specific active eBay listing is shown",
+        "The item is a Nintendo Switch OLED",
+        "The item is used or pre-owned",
+        "A price is shown"
+      ],
+      "label": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "labelEvidence": [
+        "Docs are a YouTube video and two Business Insider articles; no eBay listing",
+        "No listing exists; BI review discusses Switch OLED in general, not an eBay item",
+        "No listing exists to be used/pre-owned",
+        "Only MSRP mentions in articles ('$349.99'), not a listing price"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "provider": "tavily",
+      "taskId": "j-bby",
+      "constraints": [
+        "The product shown is a 13-inch MacBook Air with M5 chip",
+        "A specific Best Buy price is shown",
+        "Availability or stock status is stated"
+      ],
+      "label": [
+        true,
+        false,
+        false
+      ],
+      "labelEvidence": [
+        "YouTube review of the M5 MacBook Air: 'The display is both 13 inches'; Apple doc URL is 13-inch M5 but page body is FAQ only",
+        "No Best Buy price anywhere; only Apple/YouTube prices ('It now costs $1,300')",
+        "Only generic Apple FAQ text ('check in-stock availability'); no stock status stated for the product"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            false,
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "provider": "parallel",
+      "taskId": "j-zil",
+      "constraints": [
+        "A specific property listing is shown",
+        "It is in Austin, TX",
+        "It has 2 bedrooms",
+        "It is for sale (not rent) at under $500,000",
+        "The items shown are dated within 30 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        false,
+        true,
+        true,
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "All 3 docs are search-results pages (Zillow 'Homes for Sale Under 400K in Austin TX — 1,584 results', homes.com list, Zillow 2-bedrooms p5)",
+        "Card: '9525 Capital Of Tx Hwy #636, Austin, TX 78759'",
+        "Same card: '**2** bds'",
+        "Same card: '$268,999 ... Active' on a For-sale results page",
+        "Same card: 'Price cut: $7,000 (9/24)' — 28 days before run date"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true,
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "parallel",
+      "taskId": "j-li",
+      "constraints": [
+        "At least 1 software engineering job posting at Stripe is shown",
+        "The items shown are dated within 30 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "reach.jobs (not LinkedIn): '[Staff Software Engineer, Radar] Stripe · San Francisco, Seattle'",
+        "'Stripe · San Francisco, Seattle · yesterday'; other SWE roles '2 days ago'–'4 days ago'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "exa",
+      "taskId": "j-ml",
+      "constraints": [
+        "A specific iPhone 16 listing is shown (not iPhone 15 or 16 Pro)",
+        "A price in MXN is shown",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        false,
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "Doc 1 is an official-store page of product tiles (store/nuevoiphone); doc 2 is a login wall; doc 3 is a June 2025 article. No individual listing page",
+        "Tile 'Apple iPhone 16 (128 Gb) - Rosa ... $ 19,999 / $ 16,999 15% OFF' on mercadolibre.com.mx (pesos)",
+        "Store header 'YA DISPONIBLE' above the iPhone 16 tiles, plus '12 meses sin intereses'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "parallel",
+      "taskId": "j-x2",
+      "constraints": [
+        "At least 1 post by @NASA is shown with its text",
+        "The items shown are dated within 7 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "Doc 3 x.com/NASA: '@NASA: Did you know we have a newsletter? We send out weekly updates...'",
+        "@NASA post '6:22 PM · Oct 15, 2026' — exactly 7 days before run date (boundary, counted inclusive); NASAScience_ post Oct 20"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "provider": "parallel",
+      "taskId": "j-amz2",
+      "constraints": [
+        "A specific product listing is shown (not just a search page)",
+        "The product is a USB-C charger",
+        "Its price is under $30",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "labelEvidence": [
+        "Docs 1-2 are third-party review articles; doc 3 is an Amazon collection page (clp) of cables; no product page",
+        "Article pick: 'Anker Nano 30W GaN' USB-C charger",
+        "Article: 'Anker Nano 30W GaN $15.99' (article 'Updated April 2026', not an Amazon page price)",
+        "Articles only link 'See Current Price on Amazon'; Amazon doc's 'Add to cart' items are USB-A/USB-C cables, not chargers"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            false,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            false,
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "provider": "keenable",
+      "taskId": "j-cl",
+      "constraints": [
+        "A specific rental listing is shown",
+        "It is in Brooklyn",
+        "It has 1 bedroom",
+        "The items shown are dated within 7 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "labelEvidence": [
+        "Doc 2 is a Craigslist search-results page; docs 1 and 3 show 'no results found'",
+        "Result '1 Bedroom Renovated Apartment $1,950 Brooklyn'",
+        "Same result: '1 Bedroom'",
+        "No posting dates shown on any result"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "firecrawl",
+      "taskId": "j-bby",
+      "constraints": [
+        "The product shown is a 13-inch MacBook Air with M5 chip",
+        "A specific Best Buy price is shown",
+        "Availability or stock status is stated"
+      ],
+      "label": [
+        true,
+        false,
+        false
+      ],
+      "labelEvidence": [
+        "Best Buy product page: 'Apple - MacBook Air 13-inch Laptop - M5 chip with 10-core CPU and 8-core GPU - 16GB Memory - 512GB SSD - Midnight'",
+        "No price shown for the MacBook; visible prices are only for sponsored other laptops (Dell $799.99 etc.)",
+        "No stock/pickup/shipping status for the MacBook; only 'Sold by Best Buy'; doc 3 is a country-selector page"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "keenable",
+      "taskId": "j-ml",
+      "constraints": [
+        "A specific iPhone 16 listing is shown (not iPhone 15 or 16 Pro)",
+        "A price in MXN is shown",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        true,
+        true,
+        false
+      ],
+      "labelEvidence": [
+        "mandafacilusa reference view of the Mercado Libre listing: 'Apple iPhone 16 (128 GB) - Negro'",
+        "'$14,700 MXN at Mercado Libre'",
+        "Page says 'you cannot buy from this view' and prices 'may change ... based on availability'; no in-stock/add-to-cart signal for the listing (reacondi is an offer aggregator)"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "provider": "exa",
+      "taskId": "j-ebay",
+      "constraints": [
+        "A specific active eBay listing is shown",
+        "The item is a Nintendo Switch OLED",
+        "The item is used or pre-owned",
+        "A price is shown"
+      ],
+      "label": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "Doc 3 ebay.co.uk/itm/177240495008 listing page with '3 available'",
+        "'Nintendo Switch OLED Video Game Console 64GB Working Great Condition HEG-001 V1'",
+        "'Condition: Used'",
+        "'US $182.94 (Approximately £135.62)'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "provider": "linkup",
+      "taskId": "j-amz2",
+      "constraints": [
+        "A specific product listing is shown (not just a search page)",
+        "The product is a USB-C charger",
+        "Its price is under $30",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        false,
+        true,
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "All 3 docs are Amazon search-results pages (/s?k=...)",
+        "Tile: 'Belkin 30W Compact USB C Charger Block, Fast Charging for Travel'",
+        "Same tile: 'Price, product page $23.99'",
+        "Same tile: 'FREE delivery Tomorrow, Oct 23 ... Add to cart'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            false,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "exa",
+      "taskId": "j-espn",
+      "constraints": [
+        "Final scores for at least 2 NBA games are shown",
+        "The items shown are dated within 2 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "ESPN/CBS/exa: 'Atlanta Hawks 132 - Orlando Magic 125 | Final'; 'Milwaukee Bucks 116 - Washington Wizards 128 | Final' (11 games, 11 final)",
+        "'Wednesday, October 21, 2026'; 'NBA results for October 21, 2026'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "linkup",
+      "taskId": "j-ig",
+      "constraints": [
+        "At least 2 posts by @natgeo are shown with their captions",
+        "The items shown are dated within 14 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        false,
+        false
+      ],
+      "labelEvidence": [
+        "Fox News article on the 100M-follower milestone plus a 2015 blog post; only an empty '[View this post on Instagram]' embed, no captions",
+        "'Published February 26, 2019' and 'May 5, 2015'; nothing within 14 days"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            false,
+            false
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "provider": "keenable",
+      "taskId": "j-cl",
+      "constraints": [
+        "A specific rental listing is shown",
+        "It is in Brooklyn",
+        "It has 1 bedroom",
+        "The items shown are dated within 7 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        false,
+        true,
+        true,
+        false
+      ],
+      "labelEvidence": [
+        "Identical to item-14: doc 2 is a Craigslist search-results page; docs 1 and 3 show 'no results found'",
+        "Result '1 Bedroom Renovated Apartment $1,950 Brooklyn'",
+        "Same result: '1 Bedroom'",
+        "No posting dates shown on any result"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "linkup",
+      "taskId": "j-amz1",
+      "constraints": [
+        "The product shown is a Kindle Paperwhite (not another Kindle model)",
+        "A specific price in USD is shown for it",
+        "The listing looks currently purchasable (in stock, add to cart or similar), not discontinued or unavailable"
+      ],
+      "label": [
+        true,
+        false,
+        false
+      ],
+      "labelEvidence": [
+        "Doc 3 product page: 'Amazon Kindle Paperwhite (8 GB) ... Kindle Paperwhite (11th Generation) - 2021 release'",
+        "Product page shows no price; search tiles for Paperwhite show only 'See options'; $149.99 on the page is for the basic 'Amazon Kindle 16 GB (2024 model)'",
+        "'Currently unavailable. We don't know when or if this item will be back in stock.'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "provider": "tavily",
+      "taskId": "j-abnb",
+      "constraints": [
+        "A specific Airbnb listing is shown",
+        "It is in Lisbon",
+        "It fits at least 2 guests",
+        "A nightly price under $120 is shown"
+      ],
+      "label": [
+        false,
+        true,
+        true,
+        true
+      ],
+      "labelEvidence": [
+        "Airbnb doc is the Lisbon landing page ('Vacation rentals in Lisbon', no prices); cozycozy and AirDNA are aggregators; no specific Airbnb listing page",
+        "cozycozy card 'Appartement Au Centre Ville Ideal Pour Couples ... in Lisbon's Alfama district'",
+        "Same card: 'This pet-friendly rental accommodates two guests'",
+        "Same card: 'From $89/night'"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "provider": "linkup",
+      "taskId": "j-x1",
+      "constraints": [
+        "At least 3 distinct posts by @MrBeast are shown with their text",
+        "The items shown are dated within 14 days before the run date (2026-10-22)"
+      ],
+      "label": [
+        true,
+        false
+      ],
+      "labelEvidence": [
+        "xholic 'Recent posts by MrBeast': 'Can I have one of those Flying Roadsters...', 'I am not giving away money on discord...', '192,000,000 views in 5 days is insane'",
+        "Recent-post list has no per-post dates (only 'as of October 18, 2026' snapshot and weekday 'Posted Sat'); dated posts on superx are 2019–2025"
+      ],
+      "verdicts": [
+        {
+          "judge": "kimi-k3",
+          "met": [
+            true,
+            true
+          ]
+        },
+        {
+          "judge": "glm-5.3",
+          "met": [
+            true,
+            false
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -32,6 +32,9 @@ describe("errorClass", () => {
         'Together HTTP 402: {"error":{"message":"Credit limit exceeded, please add credits"}}',
       ),
     ).toBe("quota");
+    expect(
+      classifyError("This request exceeds your plan's set usage limit. Please upgrade your plan or contact support@tavily.com"),
+    ).toBe("quota");
   });
 
   it("keeps quota and rate_limit out of scoring, but scores real failures", () => {

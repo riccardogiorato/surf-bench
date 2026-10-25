@@ -36,7 +36,7 @@ Live tasks run 3 rounds. Each leg has a 30-second limit, and going over it is a 
 
 ## Leaderboard
 
-**Live site: [surf-bench.vercel.app](https://surf-bench.vercel.app)**: the [recap](https://surf-bench.vercel.app/results/runs/2026-10-22T16-00-frozen/recap.html), the [task inspector](https://surf-bench.vercel.app/results/runs/2026-10-22T16-00-frozen/inspect.html) (every provider × task cell with its search results, fetched pages, reader answer and verdict), and the [methodology page](https://surf-bench.vercel.app/results/runs/2026-10-22T16-00-frozen/methodology.html), which shows every prompt, rubric and answer key verbatim, generated from the code that ran. Full run package in the repo: [`results/runs/2026-10-22T16-00-frozen/`](results/runs/2026-10-22T16-00-frozen/REPORT.md).
+**Live site: [surf-bench.vercel.app](https://surf-bench.vercel.app)**: the [recap](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/recap.html), the [task inspector](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/inspect.html) (every provider × task cell with its search results, fetched pages, reader answer and verdict), and the [methodology page](https://surf-bench.vercel.app/results/runs/2026-10-25T12-30/methodology.html), which shows every prompt, rubric and answer key verbatim, generated from the code that ran. Full run package in the repo: [`results/runs/2026-10-25T12-30/`](results/runs/2026-10-25T12-30/REPORT.md).
 
 ![SurfBench leaderboard](assets/v2-leaderboard.svg)
 
