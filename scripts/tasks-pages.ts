@@ -134,6 +134,7 @@ ${stale ? `<div class="banner">The code has changed since this run was graded (c
   <li>Fast modes are separate rows: ${Object.entries(FETCH_PROVIDER).map(([fast, parent]) => `<span class="mono">${esc(fast)}</span> searches in its fast mode and fetches with <span class="mono">${esc(parent)}</span>`).join("; ")}.</li>
   <li>${[...SEARCH_CONTENT].map((p) => `<span class="mono">${esc(p)}</span>`).join(" and ")} have no fetch API: their search returns each page's extracted text, and the top 3 results' text is their fetch leg (fetch time 0, no fetch cost). On stable-read tasks they search for the given URL.</li>
   <li>Reader: <span class="mono">${esc(READER_MODEL)}</span>, temperature 0, sees each fetched page up to ${DOC_CHARS.toLocaleString("en-US")} characters. Judges: ${JUDGE_MODELS.map((m) => `<span class="mono">${esc(m)}</span>`).join(" and ")}, temperature 0. Neither ever sees the provider's name.</li>
+  <li>Answers must come from the pages. A reader answer that matches the key but is not in the documents it was given (the reader knew it by heart) earns nothing: the part the key matched has to appear in the pages, numbers as their own number (thousands separators, markdown escapes and million→billion conversions allowed) and text after normalization. The same check applies to feed headlines, latest versions and live numbers.</li>
   <li>Live tasks (live-feed, live-judge) run ${LIVE_ROUNDS} rounds; a task's score and pass are averaged over its rounds.</li>
 </ul>
 

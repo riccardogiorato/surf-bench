@@ -37,7 +37,7 @@
 <div class="win"><div class="bar-title"><span>METHODOLOGY.TXT</span><span>SurfBench methodology — 2026-10-25T12-30</span></div><div class="body">
 
 <h1>Methodology</h1>
-<p class="sub">Generated from the code that grades the benchmark: every prompt below is produced by <span class="mono">buildPrompt()</span> in <span class="mono">src/lib/taskGrading.ts</span>, the same function <span class="mono">tasks:grade</span> calls. Run <b>2026-10-25T12-30</b> · commit <span class="mono">b8cc2eb</span> · grade stamp <span class="mono">MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:a4f55603:g2</span>.</p>
+<p class="sub">Generated from the code that grades the benchmark: every prompt below is produced by <span class="mono">buildPrompt()</span> in <span class="mono">src/lib/taskGrading.ts</span>, the same function <span class="mono">tasks:grade</span> calls. Run <b>2026-10-25T12-30</b> · commit <span class="mono">2bf2a39</span> · grade stamp <span class="mono">MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:a4f55603:g4</span>.</p>
 <p class="sub">The grade stamp hashes the reader model, both prompts and every task's answer contract, so it matching the run proves the tasks below are exactly the ones this run was graded against.</p>
 
 <h2>Pipeline</h2>
@@ -48,13 +48,14 @@
   <li>Fast modes are separate rows: <span class="mono">exa-fast</span> searches in its fast mode and fetches with <span class="mono">exa</span>; <span class="mono">parallel-turbo</span> searches in its fast mode and fetches with <span class="mono">parallel</span>.</li>
   <li><span class="mono">perplexity</span> and <span class="mono">perplexity-fast</span> have no fetch API: their search returns each page's extracted text, and the top 3 results' text is their fetch leg (fetch time 0, no fetch cost). On stable-read tasks they search for the given URL.</li>
   <li>Reader: <span class="mono">MiniMaxAI/MiniMax-M3</span>, temperature 0, sees each fetched page up to 40,000 characters. Judges: <span class="mono">moonshotai/Kimi-K3</span> and <span class="mono">zai-org/GLM-5.3</span>, temperature 0. Neither ever sees the provider's name.</li>
+  <li>Answers must come from the pages. A reader answer that matches the key but is not in the documents it was given (the reader knew it by heart) earns nothing: the part the key matched has to appear in the pages, numbers as their own number (thousands separators, markdown escapes and million→billion conversions allowed) and text after normalization. The same check applies to feed headlines, latest versions and live numbers.</li>
   <li>Live tasks (live-feed, live-judge) run 3 rounds; a task's score and pass are averaged over its rounds.</li>
 </ul>
 
 <h2>Scoring</h2>
 <ul>
   <li>Two tracks: <b>search</b> (53 tasks: find the answer on the open web) and <b>access</b> (31 tasks: open a given page, or reach a named bot-walled site such as X, Instagram, Amazon or Zillow). <b>Overall = 0.85 × search + 0.15 × access.</b> The weights were fixed before the run.</li>
-  <li>Each track's score: <b>quality</b> (0.5) = mean task score × 100; <b>reliability</b> (0.35) = share of tasks passed; <b>speed</b> (0.15) = the fastest row's end-to-end median in that track ÷ this row's, floored at 25.</li>
+  <li>Each track's score: <b>quality</b> (0.55) = mean task score × 100; <b>reliability</b> (0.35) = share of tasks passed; <b>speed</b> (0.1) = the fastest row's end-to-end median in that track ÷ this row's, floored at 25.</li>
   <li>A provider needs ≥ 80% of each track's tasks scorable (not quota / rate-limited) to get a number.</li>
   <li>95% confidence intervals from a paired bootstrap over tasks, resampled within each track; providers whose gap to a group's leader has an interval including 0 share its tie group.</li>
   <li>Cost is published, never scored: list price × the calls each provider actually made, per 1,000 passed tasks. Reader and judge calls are excluded.</li>

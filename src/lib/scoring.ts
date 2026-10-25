@@ -1,9 +1,9 @@
 // Scoring constants and helpers shared by taskScoring.ts.
 
 export const WEIGHTS = {
-  quality: 0.5, // graded answer quality
+  quality: 0.55, // graded answer quality
   reliability: 0.35, // share of tasks passed
-  speed: 0.15, // end-to-end p50, relative to the fastest provider
+  speed: 0.1, // end-to-end p50, relative to the fastest provider
 } as const;
 
 // Overall = weighted sum of per-track composites. Search is what agents mostly

@@ -81,6 +81,73 @@ export function titlesMatch(a: string, b: string): boolean {
   return inter >= 5 && inter / Math.min(ta.size, tb.size) >= 0.55;
 }
 
+// The reader is told to answer only from the documents, but it knows a lot of
+// these facts by heart; a correct answer the pages never state is a leak and
+// earns nothing. Words compare on normalized text, numbers on their digits
+// (thousands separators and units dropped, never a digit run inside another).
+function plain(s: string, links = "$1"): string {
+  return s
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/\\([\\`*_{}[\]()#+\-.!|])/g, "$1")
+    .replace(/\[([^\]]*)\]\(([^)]*)\)/g, links)
+    .replace(/[\u2018\u2019\u2032]/g, "'")
+    .replace(/[\u201c\u201d\u2033]/g, '"')
+    .replace(/[\u2010-\u2015\u2212]/g, "-")
+    .replace(/(?<=\d)[,\u00a0\u202f'](?=\d{3}(?!\d))/g, "")
+    .replace(/(?<=\b\d{1,2}):(?=\d{2}\b)/g, ".")
+    .replace(/\s+/g, " ");
+}
+
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u;
+
+function hasNumber(h: string, x: string): boolean {
+  const decimal = /^\d+\.\d+$/.test(x);
+  const core = decimal ? x.replace(/0+$/, "").replace(/\.$/, "") : x;
+  const tail = !decimal ? "" : core.includes(".") ? "0*" : "(?:\\.0+)?";
+  return new RegExp(`(?<![\\d.])${escapeRe(core)}${tail}(?!\\d|\\.\\d)`).test(h);
+}
+
+// "120.1 billion" read off a table in millions ("$120,067").
+function hasInMillions(h: string, x: string): boolean {
+  const places = x.split(".")[1]?.length ?? 0;
+  return [...h.matchAll(/(?<![\d.])(\d{4,7})(?![\d]|\.\d)/g)].some((m) => (Number(m[1]) / 1000).toFixed(places) === Number(x).toFixed(places));
+}
+
+// A markdown link counts by its text and, separately, by its target.
+export function groundedIn(needle: string, haystack: string): boolean {
+  return groundedInText(needle, plain(haystack)) || groundedInText(needle, plain(haystack, "$1 $2"));
+}
+
+function groundedInText(needle: string, h: string): boolean {
+  let n = plain(needle).trim();
+  if (!n) return false;
+  // Pages link their own site by path ("/questions/979256/…").
+  const url = n.match(/^(?:https?:\/\/)?(?:www\.)?[\w-]+(?:\.[\w-]+)+(\/\S+)$/);
+  if (url) n = url[1];
+  // Dates, amounts and versions: every number must be in the documents as its own number.
+  if (/\d/.test(n) && n.replace(/[^\p{L}]/gu, "").length <= 12) {
+    const scaled = /\d\s*(?:billion|bn|b)\b/.test(n);
+    return (n.match(/\d+(?:\.\d+)*/g) ?? []).every((x) => hasNumber(h, x) || (scaled && hasInMillions(h, x)));
+  }
+  const nn = normalize(n);
+  const hh = normalize(h);
+  if (!nn) return false;
+  // Long titles may run into the next token on a scraped page ("…Lab55m ago").
+  return CJK.test(nn) || nn.length >= 15 ? hh.includes(nn) : ` ${hh} `.includes(` ${nn} `);
+}
+
+// The part of a correct answer the documents must contain: what the key
+// matched, or each term a lookahead-only key requires.
+export function factNeedles(pattern: RegExp, answer: string): string[] {
+  const m = answer.match(pattern);
+  if (!m) return [];
+  if (m[0].trim()) return [m[0]];
+  const terms = [...pattern.source.matchAll(/\(\?=\[\\s\\S\]\*(?:\\b)?([\p{L}\d][\p{L}\d ]*)/gu)].map((x) => x[1]);
+  return terms.length ? terms : [answer];
+}
+
 const versionOf = (s: string) => s.match(/\d+\.\d+(\.\d+)?/)?.[0] ?? null;
 
 export function parseNumber(v: unknown): number | null {
@@ -102,31 +169,46 @@ export interface Grade {
   error?: string; // grading failed — the record must be re-graded, never scored
 }
 
-export function gradeFacts(task: Task, answers: string[]): Pick<Grade, "score" | "detail"> {
+// `pages` is the text the reader saw; without it the answers are graded on the key alone.
+export function gradeFacts(task: Task, answers: string[], pages?: string): Pick<Grade, "score" | "detail"> {
   const facts = task.facts ?? [];
-  const hits = facts.map((f, i) => f.pattern.test(String(answers[i] ?? "")));
+  const marks = facts.map((f, i) => {
+    const a = String(answers[i] ?? "");
+    if (!f.pattern.test(a)) return "✗";
+    return pages === undefined || factNeedles(f.pattern, a).every((n) => groundedIn(n, pages)) ? "✓" : "✗ not in the pages:";
+  });
   return {
-    score: facts.length ? hits.filter(Boolean).length / facts.length : 0,
-    detail: hits.map((h, i) => `${h ? "✓" : "✗"} ${facts[i].q}`).join(" | "),
+    score: facts.length ? marks.filter((m) => m === "✓").length / facts.length : 0,
+    detail: marks.map((m, i) => `${m} ${facts[i].q}`).join(" | "),
   };
 }
 
 // Spiegel teasers end in an author line the feed title never has.
 const stripByline = (s: string) => s.replace(/\s+von\s+\p{Lu}[\p{L}-]+(\s+\p{Lu}[\p{L}-]+){0,2}\s*$/u, "");
 
-export function gradeOverlap(items: string[], ref: ReferenceCapture): Pick<Grade, "score" | "detail"> {
-  const picked = items.slice(0, 5).map(stripByline);
+export function gradeOverlap(items: string[], ref: ReferenceCapture, pages?: string): Pick<Grade, "score" | "detail"> {
+  const listed = items.slice(0, 5);
+  const picked = listed.filter((it) => pages === undefined || groundedIn(it, pages)).map(stripByline);
+  const unread = listed.length - picked.length;
   // A homepage may show an item's summary line instead of its headline (NYT to crawlers).
   const matched = picked.filter((it) =>
     ref.items.some((r, i) => titlesMatch(it, r) || (ref.alts?.[i] ?? []).some((a) => titlesMatch(it, a))),
   );
   return {
     score: matched.length / 5,
-    detail: `${matched.length}/5 items found in the reference top ${ref.items.length}`,
+    detail: `${matched.length}/5 items found in the reference top ${ref.items.length}${unread ? `; ${unread} not in the pages` : ""}`,
   };
 }
 
-export function gradeLatest(answer: string, ref: ReferenceCapture): Pick<Grade, "score" | "detail"> {
+export function gradeLatest(answer: string, ref: ReferenceCapture, pages?: string): Pick<Grade, "score" | "detail"> {
+  const g = matchLatest(answer, ref);
+  if (g.score > 0 && pages !== undefined && !groundedIn(versionOf(answer) ?? answer, pages)) {
+    return { score: 0, detail: `${answer} is not in the pages (newest: ${ref.items[0]})` };
+  }
+  return g;
+}
+
+function matchLatest(answer: string, ref: ReferenceCapture): Pick<Grade, "score" | "detail"> {
   const [newest, ...older] = ref.items;
   const same = (r: string) => {
     const va = versionOf(answer);
@@ -146,7 +228,15 @@ export function gradeLatest(answer: string, ref: ReferenceCapture): Pick<Grade, 
   return { score: 0, detail: `expected ${newest ?? "?"}` };
 }
 
-export function gradeNumeric(value: number | null, ref: ReferenceCapture, tolerance: number): Pick<Grade, "score" | "detail"> {
+export function gradeNumeric(value: number | null, ref: ReferenceCapture, tolerance: number, pages?: string): Pick<Grade, "score" | "detail"> {
+  const g = matchNumeric(value, ref, tolerance);
+  if (g.score > 0 && pages !== undefined && !groundedIn(String(value), pages)) {
+    return { score: 0, detail: `${value} is not in the pages (expected ${ref.values?.[0]})` };
+  }
+  return g;
+}
+
+function matchNumeric(value: number | null, ref: ReferenceCapture, tolerance: number): Pick<Grade, "score" | "detail"> {
   const vals = ref.values ?? [];
   if (value === null) return { score: 0, detail: `no number (expected ${vals[0]})` };
   const near = (v: number) => Math.abs(value - v) / v <= tolerance;
@@ -216,13 +306,14 @@ export async function gradeTask(input: {
 }): Promise<Grade> {
   const { task, docs, onSite, runDate, reference } = input;
   if (docs.length === 0) return { score: 0, pass: false, detail: "no content returned" };
-  const built = buildPrompt(task, runDate, formatBundle(docs));
+  const pages = formatBundle(docs);
+  const built = buildPrompt(task, runDate, pages);
 
   try {
     if (task.tier === "stable-read" || task.tier === "stable-lookup") {
       const reader = await cachedReader(built.prompt);
       const answers: string[] = Array.isArray(reader.answers) ? reader.answers.map(String) : [];
-      const g = gradeFacts(task, answers);
+      const g = gradeFacts(task, answers, pages);
       return { ...g, pass: g.score >= PASS_SCORE, reader };
     }
 
@@ -234,10 +325,10 @@ export async function gradeTask(input: {
       const reader = await cachedReader(built.prompt);
       const g =
         ref.kind === "overlap"
-          ? gradeOverlap(Array.isArray(reader.items) ? reader.items.map(String) : [], reference)
+          ? gradeOverlap(Array.isArray(reader.items) ? reader.items.map(String) : [], reference, pages)
           : ref.kind === "latest"
-            ? gradeLatest(String(reader.answer ?? ""), reference)
-            : gradeNumeric(parseNumber(reader.answer), reference, ref.tolerance);
+            ? gradeLatest(String(reader.answer ?? ""), reference, pages)
+            : gradeNumeric(parseNumber(reader.answer), reference, ref.tolerance, pages);
       const gated = task.site ? onSite : true;
       return { ...g, pass: g.score >= PASS_SCORE && gated, reader, detail: gated ? g.detail : `${g.detail}; not from ${task.site}` };
     }

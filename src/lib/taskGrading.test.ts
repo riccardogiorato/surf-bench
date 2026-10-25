@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatBundle, gradeFacts, gradeLatest, gradeNumeric, gradeOverlap, parseNumber, titlesMatch } from "./taskGrading.js";
-import { TASKS, hostMatches, trackOf } from "./tasks.js";
+import { factNeedles, formatBundle, gradeFacts, gradeLatest, gradeNumeric, gradeOverlap, groundedIn, parseNumber, titlesMatch } from "./taskGrading.js";
+import { TASKS, groupOf, hostMatches, trackOf } from "./tasks.js";
 
 const ref = (items: string[], values?: number[]) => ({ taskId: "t", capturedAt: "", items, values });
 
@@ -74,6 +74,44 @@ describe("gradeFacts", () => {
   });
 });
 
+describe("groundedIn", () => {
+  it("finds answers written differently on the page", () => {
+    expect(groundedIn("92.3M", "[92\\.3M Followers](https://x.com/NASA/verified_followers)")).toBe(true);
+    expect(groundedIn("20:30", "most are open until 20.30 on Fridays")).toBe(true);
+    expect(groundedIn("3.0%", "| Sep'25 | 3.0 | 3.0 |")).toBe(true);
+    expect(groundedIn("120.1 billion", "| Net income | | $120,067 |")).toBe(true);
+    expect(groundedIn("24.22.0", "| [24.22.0](https://github.com/nodejs/node) (14 Oct 2026) |")).toBe(true);
+    expect(groundedIn("September 11, 2008", "on 11 September 2008 the paper")).toBe(true);
+    expect(groundedIn("1960年6月10日", "開業は1960年6月10日です")).toBe(true);
+    expect(groundedIn("Criteria in the Criticism of West African Fiction", "thesis was on “Criteria in the [Criticism](https://m-w.com/c) of West African Fiction”")).toBe(true);
+    expect(groundedIn("stackoverflow.com/questions/979256", "[Return to Answer](/questions/979256/sorting-an-array)")).toBe(true);
+    expect(groundedIn("UK to invest £100m in 'world first' AI Biosecurity Lab", "1. UK to invest £100m in 'world first' AI Biosecurity Lab55m ago")).toBe(true);
+  });
+  it("rejects answers the pages never state", () => {
+    expect(groundedIn("1926", "the Bica funicular opened in 1927")).toBe(false);
+    expect(groundedIn("2017", "arXiv:1706.03762 Attention Is All You Need")).toBe(false);
+    expect(groundedIn("24.22.1", "latest 24.22.0 and 24.22.10")).toBe(false);
+    expect(groundedIn("Kagan", "Kaganovich was a politician")).toBe(false);
+  });
+  it("takes each required term from a lookahead-only key", () => {
+    expect(factNeedles(/^(?=[\s\S]*kagan)(?=[\s\S]*soai)/i, "Henri B. Kagan and Kenso Soai")).toEqual(["kagan", "soai"]);
+    expect(factNeedles(/\b19\d\d\b/, "opened in 1926")).toEqual(["1926"]);
+  });
+  it("gives no credit for a correct fact that is not in the pages", () => {
+    const task = { facts: [{ q: "year?", pattern: /\b1926\b/ }, { q: "operator?", pattern: /carris/i }] } as any;
+    const g = gradeFacts(task, ["1926", "Carris"], "Operated by Carris since 1927.");
+    expect(g.score).toBe(0.5);
+    expect(g.detail).toContain("not in the pages");
+    expect(gradeFacts(task, ["1926", "Carris"]).score).toBe(1);
+  });
+  it("drops feed items and latest answers the pages do not contain", () => {
+    expect(gradeOverlap(["Fed holds rates steady", "Invented headline about Mars"], ref(["Fed holds rates steady", "Invented headline about Mars"]), "Fed holds rates steady").score).toBe(0.2);
+    expect(gradeLatest("v24.22.1", ref(["v24.22.1"]), "Node 24.22.0 is out").score).toBe(0);
+    expect(gradeNumeric(6712.5, ref([], [6712.5]), 0.001, "S&P 500 closed at 6,712.50").score).toBe(1);
+    expect(gradeNumeric(6712.5, ref([], [6712.5]), 0.001, "S&P 500 closed at 6,700").score).toBe(0);
+  });
+});
+
 describe("task set", () => {
   it("has 84 unique tasks with a grading contract each, 53 search / 31 access", () => {
     expect(TASKS).toHaveLength(84);
@@ -84,6 +122,7 @@ describe("task set", () => {
       if (t.tier === "stable-read") expect(t.url, t.id).toBeTruthy();
       if (t.tier === "live-feed") expect(t.reference, t.id).toBeTruthy();
       if (t.tier === "live-judge") expect(t.constraints?.length, t.id).toBeGreaterThan(0);
+      expect(() => groupOf(t), t.id).not.toThrow();
     }
   });
   it("treats twitter.com as x.com and subdomains as on-site", () => {

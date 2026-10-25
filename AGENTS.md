@@ -12,7 +12,7 @@ details: `PLAN.md`; every prompt verbatim: `results/runs/<runId>/methodology.htm
 ```bash
 bun run tasks          # run: search top 5 → fetch top 3 per provider; live tasks × 3 rounds
 bun run tasks:grade    # reader (MiniMax M3) vs answer keys; judge panel for live-judge constraints
-bun run tasks:report   # results/runs/<runId>/ REPORT.md, leaderboard.csv, access.csv, evidence.json, manifest.json
+bun run tasks:report   # results/runs/<runId>/ REPORT.md, leaderboard.csv, groups.csv, access.csv, evidence.json, manifest.json
 bun run tasks:html     # recap.html, inspect.html, methodology.html + assets/v2-*.svg (README panels)
 bun run tasks:audit    # publish gate: blocks on agent-draft answer keys, ungraded runs, missing references
 bun run test           # unit tests (Vitest)
@@ -28,7 +28,7 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 
 ## Structure
 
-- `src/lib/tasks.ts` — the 84 tasks: request, tier, answer key or constraints, verification record; `trackOf()` assigns search / access (access is an explicit list, everything else is search).
+- `src/lib/tasks.ts` — the 84 tasks: request, tier, answer key or constraints, verification record; `trackOf()` assigns search / access (access is an explicit list, everything else is search); `groupOf()` maps each task to a skill group by id prefix (breakdown only, not scored).
 - `src/lib/references.ts` — live-feed reference capture (RSS / official APIs), same round as the provider calls.
 - `src/lib/taskGrading.ts` — reader prompts and graders (facts, overlap, latest, numeric, constraints).
 - `src/lib/taskScoring.ts` + `scoring.ts` — per-task score, pass gate, bootstrap CIs, tie groups, composite.
@@ -44,6 +44,7 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 - Providers: parallel, exa, tavily, firecrawl, keenable, linkup, perplexity. A provider runs only if it has both a search and a fetch adapter, or is in `SEARCH_CONTENT` (`searchClients.ts`): perplexity and perplexity-fast have no fetch API, so the top 3 search results' extracted text is their fetch leg (fetchMs 0, no fetch cost) and stable-read tasks search for the URL.
 - Fast modes are their own ranked rows, never merged into the default row (a provider must not pick its best mode per task): `exa-fast` (search `type:"fast"`) and `parallel-turbo` (search `mode:"turbo"`). They have no fast fetch mode, so they fetch with the parent (`FETCH_PROVIDER` in `searchClients.ts`). `exa-fast` shares exa's request pacer because the org cap is shared.
 - Reader: `MiniMaxAI/MiniMax-M3`, temperature 0. Judge panel: Kimi K3 + GLM-5.3 via Together AI REST (case-sensitive slugs `moonshotai/Kimi-K3`, `zai-org/GLM-5.3`). Together rate-limits aggressively — calls are throttled (4 in flight) with backoff; verdicts cached by content hash; judge-error verdicts are never cached.
+- Answers must be grounded: a reader answer that matches the key but is not in the pages it was given earns nothing (`groundedIn()` / `factNeedles()` in `taskGrading.ts`, applied to facts, feed items, latest versions and live numbers). The matcher allows markdown escapes, link targets, thousands separators, `20:30` = `20.30` and million→billion conversions; extend it with a test when a real grounded answer is flagged.
 - Wipeout rule: >30s per leg = DNF.
 - Grades are stamped with reader model + prompt hashes + a hash of every task's answer contract (`GRADE_STAMP` in `tasks-grade.ts`) and the record's `startedAt`. Editing a key, a prompt or a rubric re-grades automatically; stale grades are ignored by report and audit.
 - Records dedupe by (run, round, provider, task) keeping the LAST line in the jsonl.
@@ -55,8 +56,8 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 
 **Overall = 0.85 × search track + 0.15 × access track** (`TRACK_WEIGHTS`); each track is
 scored separately (own speed anchor, ≥80% coverage per track), and the bootstrap resamples
-within tracks. Within a track, three axes (`src/lib/scoring.ts`), weighted **quality 0.50 / reliability 0.35 /
-speed 0.15**: quality = mean task score, reliability = pass rate, speed = end-to-end
+within tracks. Within a track, three axes (`src/lib/scoring.ts`), weighted **quality 0.55 / reliability 0.35 /
+speed 0.10**: quality = mean task score, reliability = pass rate, speed = end-to-end
 p50 relative to the fastest row (floored at 25).
 
 - **Pass**: score ≥ 0.8. live-judge also needs every constraint met by at least one judge, the evidence on the target site itself (not a mirror or aggregator), and the freshness window met.

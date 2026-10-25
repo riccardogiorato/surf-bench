@@ -11,8 +11,10 @@
 1. **Few tasks, each checked.** 84 tasks, each with an answer key or explicit
    constraints, the evidence for it, who checked it, and when.
 2. **Graded against a key, not vibes.** A fixed reader model turns every bundle into a
-   short answer, and that answer is checked against the key. The judge panel only
-   handles tasks with no possible key, and answers yes/no constraints, not a 0–10 opinion.
+   short answer, and that answer is checked against the key. The answer must also be in
+   the pages the reader was given: a correct answer it knew by heart earns nothing. The
+   judge panel only handles tasks with no possible key, and answers yes/no constraints,
+   not a 0–10 opinion.
 3. **Reproducible where the web allows it.** Stable tasks give the same score on every
    re-run. Live tasks are dated snapshots with the true answer captured in the same
    round, so anyone can re-grade them, but nobody should compare them across runs.
@@ -68,7 +70,7 @@ Notes from building it:
 
 - Per-task score in [0, 1] with partial credit (facts matched, overlap share, constraints met). Empty/error bundle = 0.
 - **Pass** = score ≥ 0.8 **and**, for live tasks, on-site and fresh. Correct answers taken from a mirror or aggregator fail, but are counted in their own "right, via mirror" column.
-- Per track: quality 0.50 (mean score) / reliability 0.35 (pass rate) / speed 0.15 (p50 vs. the fastest row in that track).
+- Per track: quality 0.55 (mean score) / reliability 0.35 (pass rate) / speed 0.10 (p50 vs. the fastest row in that track).
 - **Overall = 0.85 × search + 0.15 × access** (`TRACK_WEIGHTS` in `src/lib/scoring.ts`). Both track scores are published.
 - `quota` / `rate_limit` are NON-SCORING; coverage guard ≥ 80% of each track's tasks.
 - **Repeats**: live tasks run 3× per run (score = mean over rounds); stable tasks run once.
@@ -84,7 +86,7 @@ human; if agreement on a constraint is < 85%, that constraint becomes diagnostic
 ## Run package
 
 Every run publishes `results/runs/<runId>/`: `REPORT.md`, `leaderboard.csv`,
-`access.csv`, `evidence.json` (per-task verdicts, source URLs, redacted excerpts),
+`groups.csv` (quality and pass rate per task group), `access.csv`, `evidence.json` (per-task verdicts, source URLs, redacted excerpts),
 `manifest.json` (task set version and contract hash, provider configs, reader and judge
 models, prompts, captured references), `recap.html`, `inspect.html` and
 `methodology.html`. `bun run tasks:grade --run <id>` re-grades a snapshot offline

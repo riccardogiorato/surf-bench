@@ -78,6 +78,27 @@ const ACCESS_TASKS = new Set([
 ]);
 export const trackOf = (t: Task | string): Track => (ACCESS_TASKS.has(typeof t === "string" ? t : t.id) ? "access" : "search");
 
+// What a task tests, for the per-group breakdown (not scored separately).
+// `category` is the topic; a group is the skill, keyed on the id prefix.
+export const TASK_GROUPS = [
+  { id: "docs", label: "Docs & specs", prefix: "s-doc-" },
+  { id: "multi-hop", label: "Multi-hop", prefix: "s-hop-" },
+  { id: "numbers", label: "Numbers & stats", prefix: "s-num-" },
+  { id: "local", label: "Local & non-English", prefix: "s-loc-" },
+  { id: "news", label: "Recent news", prefix: "s-new-" },
+  { id: "lookups", label: "Classic lookups", prefix: "l-" },
+  { id: "feeds", label: "Live feeds", prefix: "f-" },
+  { id: "pages", label: "Hard-site pages", prefix: "r-" },
+  { id: "walled", label: "Live on walled sites", prefix: "j-" },
+] as const;
+export type TaskGroup = (typeof TASK_GROUPS)[number]["id"];
+export const groupOf = (t: Task | string): TaskGroup => {
+  const id = typeof t === "string" ? t : t.id;
+  const g = TASK_GROUPS.find((x) => id.startsWith(x.prefix));
+  if (!g) throw new Error(`task ${id} has no group`);
+  return g.id;
+};
+
 export const TASKS: Task[] = [
   // ---------------- stable-read: can it open this page and pull the facts? ----------------
   {

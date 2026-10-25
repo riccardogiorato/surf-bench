@@ -1,7 +1,7 @@
 {
   "runId": "2026-10-25T12-30",
   "taskSet": "tasks-v2.1",
-  "commit": "b8cc2eb",
+  "commit": "2bf2a39",
   "liveRounds": 3,
   "pipeline": {
     "searchResults": 5,
@@ -20,7 +20,7 @@
     ],
     "rubricId": "64284cafe991"
   },
-  "gradeStamp": "MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:a4f55603:g2",
+  "gradeStamp": "MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:a4f55603:g4",
   "passScore": 0.8,
   "tracks": [
     {

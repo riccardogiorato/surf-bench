@@ -15,7 +15,7 @@ request ─▶ provider search (top 5) ─▶ provider fetch (top 3) ─▶ fixe
 ```
 
 - The request is sent **verbatim**: no rewriting, no `site:` filters. Finding the right site is part of the test.
-- A single pinned reader model (MiniMax M3, temperature 0) answers **only from the fetched pages**, so no provider gets credit for model knowledge.
+- A single pinned reader model (MiniMax M3, temperature 0) answers **only from the fetched pages**, so no provider gets credit for model knowledge. This is enforced: a correct answer that is not in the pages the reader was given earns nothing.
 - The 84 tasks are split into two tracks, weighted before the run:
 
 | track | weight | tasks | what it asks |
@@ -40,7 +40,9 @@ Live tasks run 3 rounds. Each leg has a 30-second limit, and going over it is a 
 
 ![SurfBench leaderboard](assets/v2-leaderboard.svg)
 
-![SurfBench web access map](assets/v2-access.svg)
+How each provider did per group of tasks (quality and pass rate; [`groups.csv`](results/runs/2026-10-25T12-30/groups.csv)):
+
+![SurfBench task groups map](assets/v2-groups.svg)
 
 ### Scoring
 
@@ -48,9 +50,9 @@ Live tasks run 3 rounds. Each leg has a 30-second limit, and going over it is a 
 
 | axis | weight | what it measures |
 |---|---|---|
-| **quality** | 0.50 | mean task score (0–1, partial credit) |
+| **quality** | 0.55 | mean task score (0–1, partial credit) |
 | **reliability** | 0.35 | share of tasks passed (score ≥ 0.8; live tasks also on-site and fresh) |
-| **speed** | 0.15 | end-to-end median, relative to the fastest row in that track (floored at 25) |
+| **speed** | 0.10 | end-to-end median, relative to the fastest row in that track (floored at 25) |
 
 - **Error bars, not just ranks.** A paired bootstrap over tasks gives each provider a 95% CI. Providers whose CI overlaps the leader's share a tie group.
 - **Cost is a column, not a score**: $ per 1,000 passed tasks, from real call counts × list prices ([`src/lib/pricing.ts`](src/lib/pricing.ts), each with its source and date).
@@ -81,3 +83,9 @@ bun run tasks:audit     # publish gate
 ```
 
 Providers: parallel · exa · tavily · firecrawl · keenable · linkup · perplexity, all key-gated (a missing key skips that provider). License: MIT.
+
+## Web access map
+
+Which famous hard sites each provider actually reached (passed / attempts, hardest first):
+
+![SurfBench web access map](assets/v2-access.svg)

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { WEIGHTS } from "./scoring.js";
 import { scoreProviders, type RunOutcome } from "./taskScoring.js";
 
 const ids = Array.from({ length: 20 }, (_, i) => `t${i}`);
@@ -59,11 +60,12 @@ describe("scoreProviders", () => {
     );
     const s = out.find((p) => p.provider === "searcher")!;
     const o = out.find((p) => p.provider === "opener")!;
-    // Both have equal speed (100); composite is 100 on the strong track, 15 on the weak one.
+    // Both have equal speed (100); a failed track keeps only its speed share.
+    const weak = WEIGHTS.speed * 100;
     expect(s.tracks.search.score).toBeCloseTo(100);
-    expect(s.tracks.access.score).toBeCloseTo(15);
-    expect(s.overall).toBeCloseTo(0.85 * 100 + 0.15 * 15);
-    expect(o.overall).toBeCloseTo(0.85 * 15 + 0.15 * 100);
+    expect(s.tracks.access.score).toBeCloseTo(weak);
+    expect(s.overall).toBeCloseTo(0.85 * 100 + 0.15 * weak);
+    expect(o.overall).toBeCloseTo(0.85 * weak + 0.15 * 100);
   });
 
   it("withholds a provider missing most of one track even if the other is complete", () => {

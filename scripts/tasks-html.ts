@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
-import { TRACK_WEIGHTS } from "../src/lib/scoring.js";
-import { AGENT_DRAFT, TASKS } from "../src/lib/tasks.js";
+import { TRACK_WEIGHTS, WEIGHTS } from "../src/lib/scoring.js";
+import { AGENT_DRAFT, TASK_GROUPS, TASKS, TRACKS, groupOf, trackOf } from "../src/lib/tasks.js";
 import { faviconDataUri, providerLabel as L } from "./favicons.js";
 
 // One-page recap of a run: leaderboard, speed, cost, accuracy and site access.
@@ -158,7 +158,7 @@ async function main() {
     <td class="n">${reach[b.provider]}/${famous.length}</td>
     <td class="n">${mirror[b.provider]}</td></tr>`).join("")}
   </tbody></table>
-  <p class="note">Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access. Search tasks ask for an answer found on the open web; access tasks ask to open a given page or reach a named bot-walled site. Each track scores 0.50 quality + 0.35 pass rate + 0.15 speed. Same group = the 95% paired-bootstrap CI of the gap includes 0, so the order inside a group is not meaningful. Cost = list price × billable calls, published as a column, not scored. "Right, but via mirror" counts live answers that were correct but read from a mirror or aggregator (nitter, redlib, twiscan, airdna…) instead of the site itself; they are scored as fails, because the benchmark asks whether the provider can reach the site.</p>
+  <p class="note">Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access. Search tasks ask for an answer found on the open web; access tasks ask to open a given page or reach a named bot-walled site. Each track scores ${WEIGHTS.quality} quality + ${WEIGHTS.reliability} pass rate + ${WEIGHTS.speed} speed. Same group = the 95% paired-bootstrap CI of the gap includes 0, so the order inside a group is not meaningful. Cost = list price × billable calls, published as a column, not scored. "Right, but via mirror" counts live answers that were correct but read from a mirror or aggregator (nitter, redlib, twiscan, airdna…) instead of the site itself; they are scored as fails, because the benchmark asks whether the provider can reach the site.</p>
 </div></div>
 
 <div class="win"><div class="bar-title"><span>WEB_ACCESS.MAP</span><span>passed / attempts · hardest first</span></div><div class="body scroll">
@@ -241,18 +241,20 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
         .map(([label, ids, lines], i) => {
           const cx = 40 + i * (cw + 14);
           const names = ids.map(L);
-          const size = names.length > 1 || names[0].length > 12 ? 20 : 24;
+          const many = names.length > 2;
+          const size = many ? 16 : names.length > 1 || names[0].length > 12 ? 20 : 24;
           // A tie lists every name on one line when it fits, else stacked with
-          // a single detail line below.
+          // a single detail line below (just "CIs overlap" when three or more).
           const oneLine = names.join(" · ");
           const stacked = names.length > 1 && oneLine.length > 14;
+          const step = many ? 19 : 24;
           return (
             sunken(cx, 148, cw, 118) +
             ids.map((id, k) => favicon(id, cx + 12 + k * 22, 160)).join("") +
             `<text x="${cx + 14 + ids.length * 22}" y="174" font-family="${PIXEL}" font-size="12" fill="#000080">${x(label)}</text>` +
             (stacked
-              ? names.slice(0, 2).map((n, k) => text(cx + 12, 200 + k * 24, n, size, `font-weight="bold" fill="#111111"`)).join("") +
-                text(cx + 12, 254, lines.join(" · "), 13, `fill="#333333"`)
+              ? names.slice(0, 3).map((n, k) => text(cx + 12, (many ? 196 : 200) + k * step, n, size, `font-weight="bold" fill="#111111"`)).join("") +
+                text(cx + 12, 256, many ? lines[lines.length - 1] : lines.join(" · "), 13, `fill="#333333"`)
               : text(cx + 12, 210, oneLine, size, `font-weight="bold" fill="#111111"`) +
                 lines.map((l, j) => text(cx + 12, 236 + j * 18, l, 13, `fill="#333333"`)).join(""))
           );
@@ -302,7 +304,7 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
           );
         })
         .join("") +
-      text(40, lbH - 64, `Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access; each track = 0.50 quality + 0.35 pass rate + 0.15 speed.`, 12, `fill="#333333"`) +
+      text(40, lbH - 64, `Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access; each track = ${WEIGHTS.quality} quality + ${WEIGHTS.reliability} pass rate + ${WEIGHTS.speed} speed.`, 12, `fill="#333333"`) +
       text(40, lbH - 46, "Same group = statistically tied (95% paired-bootstrap CI of the gap includes 0). Reach = famous hard sites passed on ≥ half the attempts.", 12, `fill="#333333"`) +
       text(40, lbH - 28, "Mirror = live answers that were right but read from a mirror/aggregator (nitter, redlib…), scored as fails. Cost is a column, not scored.", 12, `fill="#333333"`),
   );
@@ -352,11 +354,68 @@ ${spot.length ? `<div class="win"><div class="bar-title"><span>PROOF.TXT</span><
       text(40, mapH - 30, "A pass needs the page fetched from the site itself (mirrors and aggregators don't count) and the task answered correctly.", 12, `fill="#333333"`),
   );
 
+  // TASK_GROUPS.MAP — quality per task group, providers in leaderboard order
+  const gRows = readCsv(await fs.readFile(path.join(dir, "groups.csv"), "utf8"));
+  const groups = TASK_GROUPS.filter((g) => gRows.some((r) => r.group === g.id));
+  const gCell = (g: string, p: string) => gRows.find((r) => r.group === g && r.provider === p)!;
+  const gFill = (q: string) => {
+    if (q === "n/a" || q === "") return "#bbbbbb";
+    const v = Number(q);
+    return v >= 90 ? "#2e8b57" : v >= 75 ? "#6f9a2a" : v >= 60 ? "#c9a227" : v >= 40 ? "#d2691e" : "#aa3333";
+  };
+  const gLabelW = 230;
+  const gColW = (W - 80 - gLabelW) / providers.length;
+  const gCellH = 40;
+  const gH = mTop + groups.length * (gCellH + 4) + 64;
+  const groupMap = windowSvg(
+    gH,
+    "TASK_GROUPS.MAP",
+    "quality · pass rate per group",
+    providers
+      .map((p, j) => {
+        const hx = 40 + gLabelW + j * gColW + gColW / 2;
+        const [main, mode] = L(p).split(/ (?=\()/);
+        return (
+          favicon(p, hx - 9, mTop - 62) +
+          `<text x="${hx}" y="${mTop - 26}" text-anchor="middle" font-family="${PIXEL}" font-size="11" fill="#111111">${x(main)}</text>` +
+          (mode ? `<text x="${hx}" y="${mTop - 11}" text-anchor="middle" font-family="${PIXEL}" font-size="11" fill="#555555">${x(mode)}</text>` : "")
+        );
+      })
+      .join("") +
+      groups
+        .map((g, i) => {
+          const ry = mTop + i * (gCellH + 4);
+          const ids = TASKS.filter((t) => groupOf(t) === g.id);
+          const tracks = TRACKS.filter((tr) => ids.some((t) => trackOf(t) === tr)).join(" + ");
+          const best = Math.max(...providers.map((p) => Number(gCell(g.id, p).quality) || 0));
+          return (
+            text(40, ry + 18, g.label, 14, `font-weight="bold" fill="#111111"`) +
+            text(40, ry + 34, `${ids.length} tasks · ${tracks}`, 11, `fill="#555555"`) +
+            providers
+              .map((p, j) => {
+                const c = gCell(g.id, p);
+                const cx = 40 + gLabelW + j * gColW;
+                const top1 = Number(c.quality) === best;
+                return (
+                  `<rect x="${cx + 2}" y="${ry}" width="${gColW - 4}" height="${gCellH}" fill="${gFill(c.quality)}"${top1 ? ` stroke="#000080" stroke-width="3"` : ""}/>` +
+                  `<text x="${cx + gColW / 2}" y="${ry + 19}" text-anchor="middle" font-family="${SANS}" font-size="14" font-weight="bold" fill="#ffffff">${x(c.quality)}</text>` +
+                  `<text x="${cx + gColW / 2}" y="${ry + 34}" text-anchor="middle" font-family="${SANS}" font-size="11" fill="#ffffff">${c.pass_rate === "n/a" ? "" : `${c.pass_rate}% pass`}</text>`
+                );
+              })
+              .join("")
+          );
+        })
+        .join("") +
+      text(40, gH - 40, "Quality = mean task score (0–100, partial credit), live tasks averaged over their rounds; pass = share of tasks passed. Blue outline = best in the row.", 12, `fill="#333333"`) +
+      text(40, gH - 22, "Groups are a breakdown of the same tasks, not extra scoring: the overall stays search 85% + access 15%.", 12, `fill="#333333"`),
+  );
+
   await fs.mkdir("assets", { recursive: true });
   await fs.writeFile("assets/v2-summary.svg", summary);
   await fs.writeFile("assets/v2-leaderboard.svg", leaderboard);
+  await fs.writeFile("assets/v2-groups.svg", groupMap);
   await fs.writeFile("assets/v2-access.svg", accessMap);
-  console.log("wrote assets/v2-summary.svg, assets/v2-leaderboard.svg, assets/v2-access.svg");
+  console.log("wrote assets/v2-summary.svg, assets/v2-leaderboard.svg, assets/v2-groups.svg, assets/v2-access.svg");
 }
 
 main().catch((e) => {

@@ -5,9 +5,9 @@ import { NON_SCORING, classifyError, type ErrorClass } from "../src/lib/errorCla
 import { READER_ID, TASK_RUBRIC_ID } from "../src/lib/judge/rubrics.js";
 import { PRICES } from "../src/lib/pricing.js";
 import { PASS_SCORE, READER_MODEL } from "../src/lib/taskGrading.js";
-import { TRACK_WEIGHTS } from "../src/lib/scoring.js";
+import { TRACK_WEIGHTS, WEIGHTS } from "../src/lib/scoring.js";
 import { scoreProviders, type RunOutcome } from "../src/lib/taskScoring.js";
-import { AGENT_CHECK, AGENT_DRAFT, LIVE_ROUNDS, TASKS, TRACKS, trackOf, type TaskTier, type Track } from "../src/lib/tasks.js";
+import { AGENT_CHECK, AGENT_DRAFT, LIVE_ROUNDS, TASK_GROUPS, TASKS, TRACKS, groupOf, trackOf, type TaskTier, type Track } from "../src/lib/tasks.js";
 import { GRADE_STAMP, gradeIsCurrent, onSite, readJsonl, runKey } from "./tasks-grade.js";
 
 // Builds the v2 run package: results/runs/<runId>/ with the leaderboard
@@ -106,6 +106,19 @@ async function main() {
     return per.length ? (per.reduce((a, b) => a + b, 0) / per.length) * 100 : null;
   };
 
+  // Per task group, the same task-averaged quality and pass rate as the tracks.
+  const groupRows = TASK_GROUPS.flatMap((g) => {
+    const ids = taskIds.filter((id) => groupOf(id) === g.id);
+    return providers.map((p) => {
+      const per = ids
+        .map((id) => outcomes.filter((o) => o.provider === p && o.taskId === id && !o.nonScoring))
+        .filter((os) => os.length)
+        .map((os) => ({ score: os.reduce((s, o) => s + o.score, 0) / os.length, pass: os.filter((o) => o.pass).length / os.length }));
+      const mean = (f: (x: (typeof per)[number]) => number) => (per.length ? (per.reduce((s, x) => s + f(x), 0) / per.length) * 100 : null);
+      return [g.id, g.label, ids.length, p, per.length, fmt(mean((x) => x.score)), fmt(mean((x) => x.pass))];
+    });
+  });
+
   // Access matrix: per target site, passes / attempts across its tasks and rounds.
   const sites = [...new Set(taskIds.map((id) => taskById.get(id)!.site).filter(Boolean))] as string[];
   const access = sites.map((site) => {
@@ -164,6 +177,10 @@ async function main() {
     ]),
   );
   await fs.writeFile(
+    path.join(dir, "groups.csv"),
+    csv([["group", "label", "tasks", "provider", "tasks_scored", "quality", "pass_rate"], ...groupRows]),
+  );
+  await fs.writeFile(
     path.join(dir, "access.csv"),
     csv([["site", "tasks", ...providers], ...access.map((a) => [a.site, a.tasks.join(" "), ...providers.map((p) => `${a.cells[p].passed}/${a.cells[p].attempts}`)])]),
   );
@@ -203,7 +220,7 @@ async function main() {
     "## How to read this",
     "",
     `- **quality** = mean task score (0–100, partial credit); **pass rate** = share of tasks scoring ≥ ${PASS_SCORE * 100}% (live tasks must also come from the named site, and live-judge tasks must be fresh). Repeated rounds are averaged per task.`,
-    `- **Tracks.** ${trackDefs.map((t) => `${t.name} (${t.taskIds.length} tasks)`).join(", ")}. Search = find the answer on the open web; access = open a given page or reach a named bot-walled site. Each track's score = 0.50 quality + 0.35 pass rate + 0.15 speed (p50 vs. the fastest provider in that track, floored at 25).`,
+    `- **Tracks.** ${trackDefs.map((t) => `${t.name} (${t.taskIds.length} tasks)`).join(", ")}. Search = find the answer on the open web; access = open a given page or reach a named bot-walled site. Each track's score = ${WEIGHTS.quality} quality + ${WEIGHTS.reliability} pass rate + ${WEIGHTS.speed} speed (p50 vs. the fastest provider in that track, floored at 25).`,
     `- **overall** = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access. quality and pass rate above are track-weighted the same way. A provider needs ≥ 80% of each track's tasks scorable to get a number.`,
     "- **$ / 1k passed tasks** = list-price spend for one pass over the task set ÷ tasks passed × 1000. Not part of the score. Prices and sources are in `manifest.json`.",
     "- **Live tasks are a snapshot.** Compare providers within this run, never across runs. live-judge tasks have no ground truth: the panel checks explicit constraints.",
@@ -213,7 +230,7 @@ async function main() {
   await fs.writeFile("results/v2-latest.json", JSON.stringify({ runId, dir, board }, null, 2));
 
   console.log(lines.slice(0, 40).join("\n"));
-  console.log(`\nwrote ${dir}/ {REPORT.md, leaderboard.csv, access.csv, evidence.json, manifest.json}`);
+  console.log(`\nwrote ${dir}/ {REPORT.md, leaderboard.csv, groups.csv, access.csv, evidence.json, manifest.json}`);
 }
 
 main().catch((e) => {
