@@ -138,7 +138,7 @@ async function main() {
   ${banner ? `<div class="banner">${esc(banner)}</div>` : ""}
   <div class="tldr">
     ${tied.length > 1
-      ? `<div class="card"><b>Tied for #1</b><div class="big">${tied.map((b) => esc(L(b.provider))).join(" · ")}</div>${tied.map((b) => `${esc(L(b.provider))} ${b.overall} (${b.ci_low}–${b.ci_high})`).join(" · ")}: the 95% CIs overlap, so no single winner</div>`
+      ? `<div class="card"><b>Tied for #1</b><div class="big">${tied.map((b) => esc(L(b.provider))).join(" · ")}</div>${tied[tied.length - 1].overall}–${tied[0].overall}, statistically tied</div>`
       : `<div class="card"><b>Best overall</b><div class="big">${esc(L(board[0].provider))}</div>${board[0].overall} pts (${board[0].ci_low}–${board[0].ci_high}) · clear of the field</div>`}
     <div class="card"><b>Best at search</b><div class="big">${esc(L(searcher.provider))}</div>search track ${searcher.search_score} · ${W_SEARCH}% of the score</div>
     <div class="card"><b>Fastest</b><div class="big">${esc(L(fastest.provider))}</div>p50 ${(num(fastest, "p50_ms") / 1000).toFixed(1)}s from request to page text</div>
