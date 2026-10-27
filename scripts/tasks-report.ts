@@ -4,6 +4,7 @@ import { execSync } from "child_process";
 import { NON_SCORING, classifyError, type ErrorClass } from "../src/lib/errorClass.js";
 import { READER_ID, TASK_RUBRIC_ID } from "../src/lib/judge/rubrics.js";
 import { PRICES } from "../src/lib/pricing.js";
+import { RETIRED } from "../src/lib/searchClients.js";
 import { PASS_SCORE, READER_MODEL } from "../src/lib/taskGrading.js";
 import { TRACK_WEIGHTS, WEIGHTS } from "../src/lib/scoring.js";
 import { scoreProviders, type RunOutcome } from "../src/lib/taskScoring.js";
@@ -33,7 +34,7 @@ async function main() {
   const runId = arg("run") ?? records[records.length - 1]?.runId;
   if (!runId) throw new Error("no runs recorded");
   const runs = new Map<string, any>();
-  for (const r of records.filter((r) => r.runId === runId)) runs.set(runKey(r), r);
+  for (const r of records.filter((r) => r.runId === runId && !RETIRED.has(r.provider))) runs.set(runKey(r), r);
   const grades = new Map<string, any>();
   for (const g of await readJsonl(`${RAW}/tasks-graded.jsonl`)) if (g.runId === runId) grades.set(runKey(g), g);
   const refs = (await readJsonl(`${RAW}/tasks-refs.jsonl`)).filter((r) => r.runId === runId);
@@ -74,6 +75,7 @@ async function main() {
       score: gradedOk ? Number(g.score.toFixed(3)) : null,
       pass: gradedOk ? g.pass : null,
       detail: g?.detail ?? null,
+      offSiteScore: gradedOk ? g.offSiteScore ?? null : null,
       reader: g?.reader ?? null,
       constraints: g?.constraints ?? null,
       judgeEvidence: g?.verdicts?.map((v: any) => ({ judge: v.judge, met: v.met, evidence: v.evidence, error: v.error })) ?? null,
@@ -96,7 +98,8 @@ async function main() {
   const providers = board.map((b) => b.provider);
 
   // Per-tier quality sub-scores (task-averaged, same rules as the main score).
-  const tiers: TaskTier[] = ["stable-read", "stable-lookup", "live-feed", "live-judge"];
+  const tiers = (["stable-read", "stable-lookup", "live-feed", "live-judge"] as TaskTier[]).filter((t) => taskIds.some((id) => taskById.get(id)!.tier === t));
+  const judged = tiers.includes("live-judge");
   const tierScore = (p: string, tier: TaskTier) => {
     const ids = taskIds.filter((id) => taskById.get(id)!.tier === tier);
     const per = ids
@@ -193,7 +196,7 @@ async function main() {
   }
   if (ungraded) lines.push(`> ${ungraded} runs have no valid grade yet and are excluded (re-run \`bun run tasks:grade\`).`, "");
   lines.push(
-    `${taskIds.length} tasks · ${providers.length} providers · live tasks × ${LIVE_ROUNDS} rounds · fixed pipeline: search top 5 → fetch top 3 · reader \`${READER_MODEL}\` · judges Kimi K3 + GLM-5.3 (live-judge constraints only).`,
+    `${taskIds.length} tasks · ${providers.length} providers · live tasks × ${LIVE_ROUNDS} rounds · fixed pipeline: search top 5 → fetch top 3 · reader \`${READER_MODEL}\`${judged ? " · judges Kimi K3 + GLM-5.3 (live-judge constraints only)" : " · no LLM judge: every task has an answer key or an official same-round reference"}.`,
     "",
     "## Leaderboard",
     "",
@@ -219,12 +222,12 @@ async function main() {
     "",
     "## How to read this",
     "",
-    `- **quality** = mean task score (0–100, partial credit); **pass rate** = share of tasks scoring ≥ ${PASS_SCORE * 100}% (live tasks must also come from the named site, and live-judge tasks must be fresh). Repeated rounds are averaged per task.`,
+    `- **quality** = mean task score (0–100, partial credit); **pass rate** = share of tasks scoring ≥ ${PASS_SCORE * 100}% (live tasks must also come from the named site${judged ? ", and live-judge tasks must be fresh" : ""}). Repeated rounds are averaged per task.`,
     `- **Tracks.** ${trackDefs.map((t) => `${t.name} (${t.taskIds.length} tasks)`).join(", ")}. Search = find the answer on the open web; access = open a given page or reach a named bot-walled site. Each track's score = ${WEIGHTS.quality} quality + ${WEIGHTS.reliability} pass rate + ${WEIGHTS.speed} speed (p50 vs. the fastest provider in that track, floored at 25).`,
     `- **overall** = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access. quality and pass rate above are track-weighted the same way. A provider needs ≥ 80% of each track's tasks scorable to get a number.`,
     "- **$ / 1k passed tasks** = list-price spend for one pass over the task set ÷ tasks passed × 1000. Not part of the score. Prices and sources are in `manifest.json`.",
-    "- **Live tasks are a snapshot.** Compare providers within this run, never across runs. live-judge tasks have no ground truth: the panel checks explicit constraints.",
-    "- Every task's verdict, reader answer, judge evidence, source URLs and a redacted excerpt are in `evidence.json`.",
+    `- **Live tasks are a snapshot.** Compare providers within this run, never across runs.${judged ? " live-judge tasks have no ground truth: the panel checks explicit constraints." : ""}`,
+    "- Every task's verdict, reader answer, source URLs and a redacted excerpt are in `evidence.json`.",
   );
   await fs.writeFile(path.join(dir, "REPORT.md"), lines.join("\n") + "\n");
   await fs.writeFile("results/v2-latest.json", JSON.stringify({ runId, dir, board }, null, 2));

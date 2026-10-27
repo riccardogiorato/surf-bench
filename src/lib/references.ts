@@ -97,7 +97,7 @@ async function capture(source: FeedSource, pool: number, at: Date): Promise<Omit
       // "Last night" = the most recent US game day before the round's own day.
       for (let back = 1; back <= 10; back++) {
         const day = easternDay(new Date(at.getTime() - back * 86400000));
-        const data = JSON.parse(await get(`https://site.api.espn.com/apis/site/v2/sports/basketball/${source.league}/scoreboard?dates=${day.replace(/-/g, "")}`));
+        const data = JSON.parse(await get(`https://site.api.espn.com/apis/site/v2/sports/${source.sport}/${source.league}/scoreboard?dates=${day.replace(/-/g, "")}`));
         const games: GameResult[] = (data.events ?? [])
           .map((e: any) => e.competitions?.[0])
           .filter((c: any) => c?.status?.type?.completed)
@@ -109,6 +109,69 @@ async function capture(source: FeedSource, pool: number, at: Date): Promise<Omit
         if (games.length) return { items: games.map((g) => `${g.teams[0][0]} ${g.scores[0]}, ${g.teams[1][0]} ${g.scores[1]} (${day})`), games };
       }
       throw new Error("no completed games in the last 10 days");
+    }
+    case "espn-standings": {
+      const data = JSON.parse(await get(`https://site.api.espn.com/apis/v2/sports/soccer/${source.league}/standings`));
+      const stat = (e: any, name: string) => e.stats?.find((s: any) => s.name === name)?.value;
+      const table = [...(data.children?.[0]?.standings?.entries ?? [])].sort((a, b) => stat(a, "rank") - stat(b, "rank")).slice(0, pool);
+      return { items: table.map((e) => e.team.displayName), alts: table.map((e) => [e.team.shortDisplayName, e.team.abbreviation].filter(Boolean)) };
+    }
+    case "npm-latest": {
+      const doc = JSON.parse(await get(`https://registry.npmjs.org/${source.pkg}/latest`));
+      return { items: [doc.version] };
+    }
+    case "pypi-latest": {
+      const doc = JSON.parse(await get(`https://pypi.org/pypi/${source.pkg}/json`));
+      return { items: [doc.info.version] };
+    }
+    case "itunes-version": {
+      const app = JSON.parse(await get(`https://itunes.apple.com/lookup?id=${source.appId}&country=us`)).results?.[0];
+      if (!app?.version) throw new Error("app not found");
+      return { items: [app.version] };
+    }
+    case "crypto-spot": {
+      const [cb, cg] = await Promise.all([
+        get("https://api.coinbase.com/v2/prices/BTC-USD/spot").then((t) => Number(JSON.parse(t).data.amount)),
+        get(`https://api.coingecko.com/api/v3/simple/price?ids=${source.coin}&vs_currencies=usd`).then((t) => Number(JSON.parse(t)[source.coin].usd)),
+      ]);
+      const mean = (cb + cg) / 2;
+      return { items: [`BTC-USD ${mean.toFixed(2)} (Coinbase ${cb}, CoinGecko ${cg})`], values: [mean] };
+    }
+    case "bluesky-feed": {
+      const data = JSON.parse(await get(`https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=${source.actor}&limit=${Math.min(100, pool)}&filter=posts_no_replies`));
+      const own = (data.feed ?? []).filter((f: any) => !f.reason && f.post?.record?.text);
+      return {
+        items: own.map((f: any) => f.post.record.text.trim()),
+        alts: own.map((f: any) => [f.post.embed?.external?.title].filter(Boolean)),
+      };
+    }
+    case "polymarket-events": {
+      const events: any[] = JSON.parse(await get(`https://gamma-api.polymarket.com/events?limit=${pool}&active=true&closed=false&order=volume24hr&ascending=false`));
+      return { items: events.map((e) => e.title), alts: events.map((e) => (e.markets ?? []).slice(0, 3).map((m: any) => m.question).filter(Boolean)) };
+    }
+    case "yahoo-quote": {
+      const meta = JSON.parse(await get(`https://query1.finance.yahoo.com/v8/finance/chart/${source.symbol}?range=1d&interval=1d`)).chart?.result?.[0]?.meta;
+      if (!meta?.regularMarketPrice) throw new Error("no quote");
+      const at = new Date(meta.regularMarketTime * 1000).toISOString();
+      return { items: [`${source.symbol} ${meta.regularMarketPrice} at ${at} (previous close ${meta.chartPreviousClose})`], values: [meta.regularMarketPrice, meta.chartPreviousClose] };
+    }
+    case "steam-price": {
+      const p = JSON.parse(await get(`https://store.steampowered.com/api/appdetails?appids=${source.appId}&cc=us&filters=price_overview`))[source.appId]?.data?.price_overview;
+      if (!p) throw new Error("no price");
+      const values = [p.final / 100, ...(p.initial !== p.final ? [p.initial / 100] : [])];
+      return { items: [`$${(p.final / 100).toFixed(2)}${p.discount_percent ? ` (${p.discount_percent}% off $${(p.initial / 100).toFixed(2)})` : ""}`], values };
+    }
+    case "f1-last-winner": {
+      const race = JSON.parse(await get("https://api.jolpi.ca/ergast/f1/current/last/results.json")).MRData?.RaceTable?.Races?.[0];
+      const d = race?.Results?.[0]?.Driver;
+      if (!d) throw new Error("no race result");
+      return { items: [`${d.givenName} ${d.familyName}`], accept: [d.familyName], note: `${race.raceName}, ${race.date}` };
+    }
+    case "ecb-rate": {
+      const data = JSON.parse(await get(`https://api.frankfurter.dev/v1/latest?from=${source.from}&to=${source.to}`));
+      const rate = Number(data.rates?.[source.to]);
+      if (!rate) throw new Error("no rate");
+      return { items: [`${source.from}/${source.to} ${rate} (ECB, ${data.date})`], values: [rate] };
     }
     case "rss": {
       // Sequential: Reddit 429s concurrent feed requests.

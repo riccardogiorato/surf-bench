@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SurfBench recap — 2026-10-26T16-07</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#008080; --win:#c0c0c0; --hi:#fff; --lo:#808080; --dk:#000; --title:#000080; --ok:#2e8b57; --mid:#c9a227; --low:#d2691e; --no:#a33; }
+  * { box-sizing:border-box }
+  body { margin:0; padding:24px; background:var(--bg); font:14px/1.45 "IBM Plex Sans",system-ui,sans-serif; color:#111 }
+  .win { background:var(--win); border:2px solid; border-color:var(--hi) var(--dk) var(--dk) var(--hi); box-shadow:inset -1px -1px var(--lo), inset 1px 1px #dfdfdf; max-width:1100px; margin:0 auto 20px }
+  .bar-title { background:linear-gradient(90deg,var(--title),#1084d0); color:#fff; padding:4px 8px; font:12px Silkscreen,monospace; letter-spacing:.5px; display:flex; justify-content:space-between }
+  .body { padding:14px 18px }
+  h1 { font:22px Silkscreen,monospace; margin:0 0 4px }
+  h2 { font:15px Silkscreen,monospace; margin:0 0 10px }
+  .sub { color:#333; margin:0 0 10px }
+  .banner { background:#ffffe1; border:1px solid #000; padding:6px 10px; margin:8px 0 0; font-weight:600 }
+  .tldr { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-top:12px }
+  .card { background:#fff; border:2px solid; border-color:var(--lo) var(--hi) var(--hi) var(--lo); padding:10px }
+  .card b { display:block; font:11px Silkscreen,monospace; color:var(--title); margin-bottom:4px }
+  .card .big { font-size:20px; font-weight:600 }
+  table { border-collapse:collapse; width:100%; background:#fff; border:2px solid; border-color:var(--lo) var(--hi) var(--hi) var(--lo) }
+  th, td { padding:5px 8px; text-align:left; border-bottom:1px solid #ddd; white-space:nowrap }
+  th { background:#e4e4e4; font:11px Silkscreen,monospace; position:sticky; top:0 }
+  td.n { text-align:right; font-variant-numeric:tabular-nums }
+  .bar { width:110px; height:10px; background:#eee; border:1px solid #999; display:inline-block; vertical-align:middle; margin-left:6px }
+  .bar span { display:block; height:100%; background:var(--title) }
+  .bar.cost span { background:#8b4513 } .bar.speed span { background:#555 }
+  .grp { font:11px Silkscreen,monospace; padding:1px 5px; border:1px solid #000; background:#ffffe1 }
+  td.h { text-align:center; font-variant-numeric:tabular-nums; color:#fff; font-weight:600 }
+  td.ok { background:var(--ok) } td.mid { background:var(--mid) } td.low { background:var(--low) } td.no { background:var(--no) } td.na { background:#bbb }
+  .scroll { overflow-x:auto }
+  .note { color:#333; font-size:13px; margin:8px 0 0 }
+  ul { margin:6px 0 0 18px; padding:0 }
+</style></head><body>
+
+<div class="win"><div class="bar-title"><span>SURFBENCH.EXE</span><span>v2 · 2026-10-26T16-07</span></div><div class="body">
+  <h1>SurfBench recap</h1>
+  <p class="sub">80 checked tasks · 10 providers · every provider runs the same pipeline: search top 5 → fetch top 3 → one fixed reader answers from the pages · live tasks × 3 rounds · 95% bootstrap CIs.</p>
+  <p class="sub">Audit any number: <a href="inspect.html">inspect.html</a> (every provider × task cell, with search results, fetched pages, the reader's answer and the verdict) · <a href="methodology.html">methodology.html</a> (every prompt and answer key, verbatim).</p>
+  
+  <div class="tldr">
+    <div class="card"><b>Tied for #1</b><div class="big">perplexity (fast) · exa (lite) · exa · parallel</div>perplexity (fast) 80.4 (72.6–87.4) · exa (lite) 79.3 (73.4–84.8) · exa 77.9 (71.4–83.6) · parallel 76.6 (69.5–83.1): the 95% CIs overlap, so no single winner</div>
+    <div class="card"><b>Best at search</b><div class="big">perplexity (fast)</div>search track 84.8 · 85% of the score</div>
+    <div class="card"><b>Fastest</b><div class="big">tavily</div>p50 0.0s from request to page text</div>
+    <div class="card"><b>Cheapest per success</b><div class="big">perplexity (fast)</div>$1.44 per 1,000 passed tasks</div>
+    <div class="card"><b>Widest web access</b><div class="big">parallel</div>reaches 11/18 famous hard sites</div>
+  </div>
+</div></div>
+
+<div class="win"><div class="bar-title"><span>LEADERBOARD</span><span>search 85 · access 15</span></div><div class="body scroll">
+  <table><thead><tr><th>group</th><th>provider</th><th>overall (95% CI)</th><th>search (85%)</th><th>access (15%)</th><th>accuracy (quality)</th><th>pass rate</th><th>speed p50</th><th>$ / 1k passed</th><th>famous sites reached</th><th>right, but via mirror</th></tr></thead><tbody>
+  <tr><td><span class="grp">1</span></td><td><b>perplexity (fast)</b></td>
+    <td class="n">80.4 <small>(72.6–87.4)</small><div class="bar "><span style="width:80.4%"></span></div></td>
+    <td class="n">84.8</td>
+    <td class="n">55.8</td>
+    <td class="n">80.5<div class="bar "><span style="width:80.5%"></span></div></td>
+    <td class="n">74.7%</td>
+    <td class="n">0.3s<div class="bar speed"><span style="width:4.6%"></span></div></td>
+    <td class="n">$1.44<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">9/18</td>
+    <td class="n">6</td></tr><tr><td><span class="grp">1</span></td><td><b>exa (lite)</b></td>
+    <td class="n">79.3 <small>(73.4–84.8)</small><div class="bar "><span style="width:79.3%"></span></div></td>
+    <td class="n">83.9</td>
+    <td class="n">53.7</td>
+    <td class="n">86.4<div class="bar "><span style="width:86.4%"></span></div></td>
+    <td class="n">83.4%</td>
+    <td class="n">1.4s<div class="bar speed"><span style="width:18.9%"></span></div></td>
+    <td class="n">$8.41<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">10/18</td>
+    <td class="n">12</td></tr><tr><td><span class="grp">1</span></td><td><b>exa</b></td>
+    <td class="n">77.9 <small>(71.4–83.6)</small><div class="bar "><span style="width:77.9%"></span></div></td>
+    <td class="n">82.2</td>
+    <td class="n">53.8</td>
+    <td class="n">84.8<div class="bar "><span style="width:84.8%"></span></div></td>
+    <td class="n">81.9%</td>
+    <td class="n">2.3s<div class="bar speed"><span style="width:31.5%"></span></div></td>
+    <td class="n">$12.17<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">10/18</td>
+    <td class="n">12</td></tr><tr><td><span class="grp">1</span></td><td><b>parallel</b></td>
+    <td class="n">76.6 <small>(69.5–83.1)</small><div class="bar "><span style="width:76.6%"></span></div></td>
+    <td class="n">79.2</td>
+    <td class="n">61.6</td>
+    <td class="n">84.6<div class="bar "><span style="width:84.6%"></span></div></td>
+    <td class="n">78.7%</td>
+    <td class="n">3.9s<div class="bar speed"><span style="width:53.2%"></span></div></td>
+    <td class="n">$9.98<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">11/18</td>
+    <td class="n">10</td></tr><tr><td><span class="grp">2</span></td><td><b>perplexity</b></td>
+    <td class="n">75.9 <small>(67.1–83.8)</small><div class="bar "><span style="width:75.9%"></span></div></td>
+    <td class="n">79.9</td>
+    <td class="n">52.8</td>
+    <td class="n">78.4<div class="bar "><span style="width:78.4%"></span></div></td>
+    <td class="n">72.1%</td>
+    <td class="n">0.5s<div class="bar speed"><span style="width:6.5%"></span></div></td>
+    <td class="n">$7.41<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">9/18</td>
+    <td class="n">6</td></tr><tr><td><span class="grp">2</span></td><td><b>keenable</b></td>
+    <td class="n">73.3 <small>(65.8–79.6)</small><div class="bar "><span style="width:73.3%"></span></div></td>
+    <td class="n">77.9</td>
+    <td class="n">46.8</td>
+    <td class="n">81.1<div class="bar "><span style="width:81.1%"></span></div></td>
+    <td class="n">74.8%</td>
+    <td class="n">3.6s<div class="bar speed"><span style="width:48.7%"></span></div></td>
+    <td class="n">$20.69<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">8/18</td>
+    <td class="n">7</td></tr><tr><td><span class="grp">2</span></td><td><b>firecrawl</b></td>
+    <td class="n">67.1 <small>(58.7–75.0)</small><div class="bar "><span style="width:67.1%"></span></div></td>
+    <td class="n">69.7</td>
+    <td class="n">52.4</td>
+    <td class="n">75.0<div class="bar "><span style="width:75.0%"></span></div></td>
+    <td class="n">66.7%</td>
+    <td class="n">2.5s<div class="bar speed"><span style="width:33.5%"></span></div></td>
+    <td class="n">$6.45<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">9/18</td>
+    <td class="n">6</td></tr><tr><td><span class="grp">2</span></td><td><b>linkup</b></td>
+    <td class="n">66.7 <small>(58.4–74.5)</small><div class="bar "><span style="width:66.7%"></span></div></td>
+    <td class="n">69.0</td>
+    <td class="n">53.5</td>
+    <td class="n">74.1<div class="bar "><span style="width:74.1%"></span></div></td>
+    <td class="n">67.0%</td>
+    <td class="n">7.3s<div class="bar speed"><span style="width:100.0%"></span></div></td>
+    <td class="n">$24.82<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">9/18</td>
+    <td class="n">8</td></tr><tr><td><span class="grp">3</span></td><td><b>parallel (turbo)</b></td>
+    <td class="n">66.3 <small>(57.5–74.4)</small><div class="bar "><span style="width:66.3%"></span></div></td>
+    <td class="n">68.1</td>
+    <td class="n">56.1</td>
+    <td class="n">73.3<div class="bar "><span style="width:73.3%"></span></div></td>
+    <td class="n">67.1%</td>
+    <td class="n">2.5s<div class="bar speed"><span style="width:34.1%"></span></div></td>
+    <td class="n">$5.75<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">10/18</td>
+    <td class="n">10</td></tr><tr><td><span class="grp"></span></td><td><b>tavily</b></td>
+    <td class="n">n/a <small>(n/a–n/a)</small><div class="bar "><span style="width:NaN%"></span></div></td>
+    <td class="n">n/a</td>
+    <td class="n">n/a</td>
+    <td class="n">n/a<div class="bar "><span style="width:NaN%"></span></div></td>
+    <td class="n">n/a%</td>
+    <td class="n">0.0s<div class="bar speed"><span style="width:2.0%"></span></div></td>
+    <td class="n">$n/a<div class="bar cost"><span style="width:NaN%"></span></div></td>
+    <td class="n">0/18</td>
+    <td class="n">0</td></tr>
+  </tbody></table>
+  <p class="note">Overall = 0.85 × search + 0.15 × access. Search tasks ask for an answer found on the open web; access tasks ask to open a given page or reach a named bot-walled site. Each track scores 0.55 quality + 0.35 pass rate + 0.1 speed. Same group = the 95% paired-bootstrap CI of the gap includes 0, so the order inside a group is not meaningful. Cost = list price × billable calls, published as a column, not scored. "Right, but via mirror" counts live answers that were correct but read from a mirror or aggregator (nitter, redlib, twiscan, airdna…) instead of the site itself; they are scored as fails, because the benchmark asks whether the provider can reach the site.</p>
+</div></div>
+
+<div class="win"><div class="bar-title"><span>WEB_ACCESS.MAP</span><span>passed / attempts · hardest first</span></div><div class="body scroll">
+  <table><thead><tr><th>site</th><th>perplexity (fast)</th><th>exa (lite)</th><th>exa</th><th>parallel</th><th>perplexity</th><th>keenable</th><th>firecrawl</th><th>linkup</th><th>parallel (turbo)</th><th>tavily</th></tr></thead><tbody>
+  <tr><td><b>reddit.com</b></td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h low">1/6</td><td class="h na">–</td></tr><tr><td><b>espn.com</b></td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h no">0/6</td><td class="h low">1/6</td><td class="h no">0/6</td><td class="h mid">5/6</td><td class="h no">0/6</td><td class="h na">–</td></tr><tr><td><b>nytimes.com</b></td><td class="h no">0/4</td><td class="h mid">3/4</td><td class="h mid">3/4</td><td class="h no">0/4</td><td class="h no">0/4</td><td class="h no">0/4</td><td class="h no">0/4</td><td class="h low">1/4</td><td class="h no">0/4</td><td class="h na">–</td></tr><tr><td><b>target.com</b></td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h na">–</td></tr><tr><td><b>homedepot.com</b></td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h na">–</td></tr><tr><td><b>store.steampowered.com</b></td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h no">0/3</td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h no">0/3</td><td class="h no">0/3</td><td class="h no">0/3</td><td class="h na">–</td></tr><tr><td><b>youtube.com</b></td><td class="h no">0/4</td><td class="h no">0/4</td><td class="h no">0/4</td><td class="h ok">4/4</td><td class="h no">0/4</td><td class="h low">1/4</td><td class="h ok">4/4</td><td class="h low">1/4</td><td class="h low">1/4</td><td class="h na">–</td></tr><tr><td><b>bsky.app</b></td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h low">1/3</td><td class="h no">0/3</td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h low">1/3</td><td class="h na">–</td></tr><tr><td><b>instagram.com</b></td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h na">–</td></tr><tr><td><b>x.com</b></td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h no">0/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h na">–</td></tr><tr><td><b>nfl.com</b></td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h na">–</td></tr><tr><td><b>finance.yahoo.com</b></td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h na">–</td></tr><tr><td><b>npmjs.com</b></td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h na">–</td></tr><tr><td><b>apps.apple.com</b></td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h no">0/3</td><td class="h ok">3/3</td><td class="h low">1/3</td><td class="h ok">3/3</td><td class="h na">–</td></tr><tr><td><b>linkedin.com</b></td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h no">0/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h na">–</td></tr><tr><td><b>amazon.com</b></td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h na">–</td></tr><tr><td><b>walmart.com</b></td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h ok">1/1</td><td class="h na">–</td></tr><tr><td><b>coinmarketcap.com</b></td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h ok">3/3</td><td class="h na">–</td></tr>
+  </tbody></table>
+  <p class="note">A pass needs the page fetched from the site itself (mirrors and aggregators don't count) and the task answered correctly. "Reached" in the leaderboard = passed at least half the attempts on that site.</p>
+</div></div>
+
+
+
+</body></html>

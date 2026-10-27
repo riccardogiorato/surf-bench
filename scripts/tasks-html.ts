@@ -24,6 +24,8 @@ const FAMOUS = new Set([
   "x.com", "instagram.com", "facebook.com", "tiktok.com", "reddit.com", "linkedin.com", "youtube.com",
   "amazon.com", "ebay.com", "walmart.com", "bestbuy.com", "target.com", "homedepot.com",
   "zillow.com", "airbnb.com", "craigslist.org", "nytimes.com", "espn.com",
+  "nfl.com", "npmjs.com", "coinmarketcap.com", "bsky.app", "finance.yahoo.com",
+  "store.steampowered.com", "apps.apple.com",
 ]);
 
 async function main() {
@@ -40,7 +42,7 @@ async function main() {
   const SITE_CHECK = "The items that satisfy the constraints above are shown on a";
   const viaMirror = (e: any) => {
     if (e.pass || e.error) return false;
-    if (e.taskId.startsWith("f-")) return !e.onSite && e.score >= 0.8;
+    if (/^[fa]-/.test(e.taskId)) return (e.offSiteScore ?? 0) >= 0.8 || (!e.onSite && e.score >= 0.8);
     if (!e.taskId.startsWith("j-") || !e.constraints) return false;
     const site = e.constraints.find((c: any) => c.text.startsWith(SITE_CHECK));
     const rest = e.constraints.filter((c: any) => c !== site);
@@ -132,7 +134,7 @@ async function main() {
 <div class="win"><div class="bar-title"><span>SURFBENCH.EXE</span><span>v2 · ${esc(runId)}</span></div><div class="body">
   <h1>SurfBench recap</h1>
   <p class="sub">${TASKS.length} checked tasks · ${providers.length} providers · every provider runs the same pipeline: search top 5 → fetch top 3 → one fixed reader answers from the pages · live tasks × 3 rounds · 95% bootstrap CIs.</p>
-  <p class="sub">Audit any number: <a href="inspect.html">inspect.html</a> (every provider × task cell, with search results, fetched pages, the reader's answer and the judges' evidence) · <a href="methodology.html">methodology.html</a> (every prompt, rubric and answer key, verbatim).</p>
+  <p class="sub">Audit any number: <a href="inspect.html">inspect.html</a> (every provider × task cell, with search results, fetched pages, the reader's answer and the verdict) · <a href="methodology.html">methodology.html</a> (every prompt and answer key, verbatim).</p>
   ${banner ? `<div class="banner">${esc(banner)}</div>` : ""}
   <div class="tldr">
     ${tied.length > 1

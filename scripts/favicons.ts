@@ -12,7 +12,7 @@ const PROVIDER_DOMAINS: Record<string, string> = {
   firecrawl: "firecrawl.dev",
   exa: "exa.ai",
   linkup: "linkup.so",
-  "exa-fast": "exa.ai",
+  "exa-lite": "exa.ai",
   "parallel-turbo": "parallel.ai",
   keenable: "keenable.ai",
   perplexity: "perplexity.ai",
@@ -43,5 +43,5 @@ export function faviconDataUri(provider: string): string {
   }
 }
 // Fast modes are ranked rows of their own; this is how they are shown.
-const LABELS: Record<string, string> = { "exa-fast": "exa (fast)", "parallel-turbo": "parallel (turbo)", "perplexity-fast": "perplexity (fast)" };
+const LABELS: Record<string, string> = { "exa-lite": "exa (lite)", "parallel-turbo": "parallel (turbo)", "perplexity-fast": "perplexity (fast)" };
 export const providerLabel = (provider: string) => LABELS[provider] ?? provider;

@@ -171,21 +171,26 @@ const parallelSearch = defineSearchProvider("parallel", async (query, numResults
 
 const keenableSearch = defineSearchProvider("keenable", keenableSearchResults);
 
-// Fast modes, ranked as their own rows ("exa (fast)", "parallel (turbo)") and
+// Fast modes, ranked as their own rows ("exa (lite)", "parallel (turbo)") and
 // never merged into the default row: a provider must not pick its best mode
-// per task. exa-fast shares exa's pacer because the org cap is shared.
-const exaFastSearch = defineSearchProvider(
-  "exa-fast",
-  async (query, numResults) => {
-    const response = await exaClientFactory().search(query, { numResults, type: "fast" });
-    return (response.results ?? []).map((item: any) => ({
-      title: item.title || "",
-      url: item.url || "",
-      snippet: item.text || item.snippet || "",
-    }));
-  },
-  exaPaced,
-);
+// per task. exa-lite shares exa's pacer because the org cap is shared.
+function exaSearchFor(name: string, type: "lite") {
+  return defineSearchProvider(
+    name,
+    async (query, numResults) => {
+      // exa-js 2.25 does not type "lite"; lite rejects any parameter outside
+      // query/numResults/contents.text, which is all the SDK sends here.
+      const response = await exaClientFactory().search(query, { numResults, type: type as any });
+      return (response.results ?? []).map((item: any) => ({
+        title: item.title || "",
+        url: item.url || "",
+        snippet: item.text || item.snippet || "",
+      }));
+    },
+    exaPaced,
+  );
+}
+const exaLiteSearch = exaSearchFor("exa-lite", "lite");
 
 const parallelTurboSearch = defineSearchProvider("parallel-turbo", async (query, numResults) => {
   const response = await parallelClientFactory().search({
@@ -249,14 +254,18 @@ const gated: (SearchClient | null)[] = [
   gateOnKey(process.env.TAVILY_API_KEY, "tavily", tavilySearch),
   gateOnKey(process.env.PARALLEL_API_KEY, "parallel", parallelSearch),
   gateOnKey(process.env.KEENABLE_API_KEY, "keenable", keenableSearch),
-  gateOnKey(process.env.EXA_API_KEY, "exa-fast", exaFastSearch),
+  gateOnKey(process.env.EXA_API_KEY, "exa-lite", exaLiteSearch),
   gateOnKey(process.env.PARALLEL_API_KEY, "parallel-turbo", parallelTurboSearch),
   gateOnKey(process.env.PERPLEXITY_API_KEY, "perplexity", perplexitySearch),
   gateOnKey(process.env.PERPLEXITY_API_KEY, "perplexity-fast", perplexityFastSearch),
 ];
 
 // Fast modes have no fetch mode of their own: they fetch with the parent.
-export const FETCH_PROVIDER: Record<string, string> = { "exa-fast": "exa", "parallel-turbo": "parallel" };
+export const FETCH_PROVIDER: Record<string, string> = { "exa-lite": "exa", "parallel-turbo": "parallel" };
+// Rows no longer benchmarked; report and audit skip their records. exa's
+// legacy "fast" type returned the same top 5 as "lite" on 118 of 131 calls
+// (run 2026-10-26T16-07), so lite replaced it.
+export const RETIRED = new Set(["exa-fast"]);
 export const fetchProviderOf = (name: string) => FETCH_PROVIDER[name] ?? name;
 // Providers whose search results carry the page text: the top 3 results'
 // text is their fetch leg. A direct-URL task becomes a search for that URL.

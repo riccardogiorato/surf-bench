@@ -1,17 +1,17 @@
 # SurfBench
 
-Benchmark comparing web-access API providers for AI agents. One event: 84 checked
+Benchmark comparing web-access API providers for AI agents. One event: 80 checked
 tasks in two tracks (search 85%, access 15%), each run through the same fixed pipeline — the request goes verbatim to the
 provider's search (top 5), the provider fetches the top 3, and one pinned reader
-model answers only from those pages. Answers are graded against answer keys, a
-same-minute official feed, or yes/no constraints checked by a judge panel. Method
+model answers only from those pages. Answers are graded against answer keys or a
+same-round official feed or API; no task is LLM-judged. Method
 details: `PLAN.md`; every prompt verbatim: `results/runs/<runId>/methodology.html`.
 
 ## Commands
 
 ```bash
 bun run tasks          # run: search top 5 → fetch top 3 per provider; live tasks × 3 rounds
-bun run tasks:grade    # reader (MiniMax M3) vs answer keys; judge panel for live-judge constraints
+bun run tasks:grade    # reader (MiniMax M3) vs answer keys and same-round references
 bun run tasks:report   # results/runs/<runId>/ REPORT.md, leaderboard.csv, groups.csv, access.csv, evidence.json, manifest.json
 bun run tasks:html     # recap.html, inspect.html, methodology.html + assets/v2-*.svg (README panels)
 bun run tasks:audit    # publish gate: blocks on agent-draft answer keys, ungraded runs, missing references
@@ -28,7 +28,7 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 
 ## Structure
 
-- `src/lib/tasks.ts` — the 84 tasks: request, tier, answer key or constraints, verification record; `trackOf()` assigns search / access (access is an explicit list, everything else is search); `groupOf()` maps each task to a skill group by id prefix (breakdown only, not scored).
+- `src/lib/tasks.ts` — the 80 tasks: request, tier, answer key or reference source, verification record; `trackOf()` assigns search / access (access is an explicit list, everything else is search); `groupOf()` maps each task to a skill group by id prefix (breakdown only, not scored).
 - `src/lib/references.ts` — live-feed reference capture (RSS / official APIs), same round as the provider calls.
 - `src/lib/taskGrading.ts` — reader prompts and graders (facts, overlap, latest, numeric, constraints).
 - `src/lib/taskScoring.ts` + `scoring.ts` — per-task score, pass gate, bootstrap CIs, tie groups, composite.
@@ -42,8 +42,8 @@ pages (`tasks:html`) → verify (`tasks:audit`).
 
 - All providers are key-gated: absent `*_API_KEY` in `.env` → provider skipped, no errors.
 - Providers: parallel, exa, tavily, firecrawl, keenable, linkup, perplexity. A provider runs only if it has both a search and a fetch adapter, or is in `SEARCH_CONTENT` (`searchClients.ts`): perplexity and perplexity-fast have no fetch API, so the top 3 search results' extracted text is their fetch leg (fetchMs 0, no fetch cost) and stable-read tasks search for the URL.
-- Fast modes are their own ranked rows, never merged into the default row (a provider must not pick its best mode per task): `exa-fast` (search `type:"fast"`) and `parallel-turbo` (search `mode:"turbo"`). They have no fast fetch mode, so they fetch with the parent (`FETCH_PROVIDER` in `searchClients.ts`). `exa-fast` shares exa's request pacer because the org cap is shared.
-- Reader: `MiniMaxAI/MiniMax-M3`, temperature 0. Judge panel: Kimi K3 + GLM-5.3 via Together AI REST (case-sensitive slugs `moonshotai/Kimi-K3`, `zai-org/GLM-5.3`). Together rate-limits aggressively — calls are throttled (4 in flight) with backoff; verdicts cached by content hash; judge-error verdicts are never cached.
+- Fast modes are their own ranked rows, never merged into the default row (a provider must not pick its best mode per task): `exa-lite` (search `type:"lite"`) and `parallel-turbo` (search `mode:"turbo"`). They have no fast fetch mode, so they fetch with the parent (`FETCH_PROVIDER` in `searchClients.ts`). `exa-lite` shares exa's request pacer because the org cap is shared. Retired rows (`RETIRED`: `exa-fast`, the legacy type that matched lite's results) are skipped by report and audit.
+- Reader: `MiniMaxAI/MiniMax-M3`, temperature 0. The judge panel (Kimi K3 + GLM-5.3, slugs `moonshotai/Kimi-K3`, `zai-org/GLM-5.3`) is only used by live-judge tasks, and the current set has none. Together rate-limits aggressively — calls are throttled (4 in flight) with backoff; verdicts cached by content hash; judge-error verdicts are never cached.
 - Answers must be grounded: a reader answer that matches the key but is not in the pages it was given earns nothing (`groundedIn()` / `factNeedles()` in `taskGrading.ts`, applied to facts, feed items, latest versions and live numbers). The matcher allows markdown escapes, link targets, thousands separators, `20:30` = `20.30` and million→billion conversions; extend it with a test when a real grounded answer is flagged.
 - Wipeout rule: >30s per leg = DNF.
 - Grades are stamped with reader model + prompt hashes + a hash of every task's answer contract (`GRADE_STAMP` in `tasks-grade.ts`) and the record's `startedAt`. Editing a key, a prompt or a rubric re-grades automatically; stale grades are ignored by report and audit.
@@ -60,7 +60,7 @@ within tracks. Within a track, three axes (`src/lib/scoring.ts`), weighted **qua
 speed 0.10**: quality = mean task score, reliability = pass rate, speed = end-to-end
 p50 relative to the fastest row (floored at 25).
 
-- **Pass**: score ≥ 0.8. A live-feed task with a `site` only counts answers found on that site's own fetched pages (a mirror fetched alongside earns nothing). live-judge also needs every constraint met by at least one judge, the evidence on the target site itself (not a mirror or aggregator), and the freshness window met.
+- **Pass**: score ≥ 0.8. A live-feed task with a `site` only counts answers found on that site's own fetched pages (a mirror fetched alongside earns nothing; it is recorded as `offSiteScore` for the "right, via mirror" column).
 - **Error taxonomy** (`errorClass.ts`): `quota` and `rate_limit` are NON-SCORING. A provider that never got a fair answer must publish as "no data", never as a low score — an unfunded key returning HTTP 402 on every task would otherwise render as a perfect 0 and read as a quality verdict. Order matters: `rate_limit` is matched before `quota` because providers link their billing docs inside 429 text. Error classes are recomputed from stored messages at report time, so taxonomy fixes apply retroactively. Covered by `errorClass.test.ts`.
 - **Coverage guard**: a provider needs ≥80% of tasks scorable to get a number, otherwise it is withheld as `n/a`.
 - **Uncertainty**: paired bootstrap over tasks; providers whose CIs overlap the leader's share a tie group.

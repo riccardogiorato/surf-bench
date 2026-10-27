@@ -1,0 +1,91 @@
+group,label,tasks,provider,tasks_scored,quality,pass_rate
+docs,Docs & specs,7,perplexity-fast,7,85.7,85.7
+docs,Docs & specs,7,exa-lite,7,92.9,85.7
+docs,Docs & specs,7,exa,7,92.9,85.7
+docs,Docs & specs,7,parallel,7,78.6,71.4
+docs,Docs & specs,7,perplexity,7,85.7,85.7
+docs,Docs & specs,7,keenable,7,78.6,71.4
+docs,Docs & specs,7,firecrawl,7,92.9,85.7
+docs,Docs & specs,7,linkup,7,71.4,57.1
+docs,Docs & specs,7,parallel-turbo,7,64.3,57.1
+docs,Docs & specs,7,tavily,0,n/a,n/a
+multi-hop,Multi-hop,7,perplexity-fast,7,64.3,42.9
+multi-hop,Multi-hop,7,exa-lite,7,85.7,71.4
+multi-hop,Multi-hop,7,exa,7,85.7,71.4
+multi-hop,Multi-hop,7,parallel,7,78.6,57.1
+multi-hop,Multi-hop,7,perplexity,7,64.3,42.9
+multi-hop,Multi-hop,7,keenable,7,92.9,85.7
+multi-hop,Multi-hop,7,firecrawl,7,64.3,57.1
+multi-hop,Multi-hop,7,linkup,7,52.4,28.6
+multi-hop,Multi-hop,7,parallel-turbo,7,71.4,42.9
+multi-hop,Multi-hop,7,tavily,0,n/a,n/a
+numbers,Numbers & stats,7,perplexity-fast,7,100.0,100.0
+numbers,Numbers & stats,7,exa-lite,7,100.0,100.0
+numbers,Numbers & stats,7,exa,7,85.7,85.7
+numbers,Numbers & stats,7,parallel,7,85.7,85.7
+numbers,Numbers & stats,7,perplexity,7,85.7,85.7
+numbers,Numbers & stats,7,keenable,7,100.0,100.0
+numbers,Numbers & stats,7,firecrawl,7,64.3,57.1
+numbers,Numbers & stats,7,linkup,7,85.7,85.7
+numbers,Numbers & stats,7,parallel-turbo,7,71.4,71.4
+numbers,Numbers & stats,7,tavily,0,n/a,n/a
+local,Local & non-English,7,perplexity-fast,7,85.7,71.4
+local,Local & non-English,7,exa-lite,7,100.0,100.0
+local,Local & non-English,7,exa,7,100.0,100.0
+local,Local & non-English,7,parallel,7,100.0,100.0
+local,Local & non-English,7,perplexity,7,85.7,71.4
+local,Local & non-English,7,keenable,7,78.6,57.1
+local,Local & non-English,7,firecrawl,7,71.4,42.9
+local,Local & non-English,7,linkup,7,78.6,57.1
+local,Local & non-English,7,parallel-turbo,7,92.9,85.7
+local,Local & non-English,7,tavily,0,n/a,n/a
+news,Recent news,6,perplexity-fast,6,100.0,100.0
+news,Recent news,6,exa-lite,6,100.0,100.0
+news,Recent news,6,exa,6,100.0,100.0
+news,Recent news,6,parallel,6,100.0,100.0
+news,Recent news,6,perplexity,6,100.0,100.0
+news,Recent news,6,keenable,6,100.0,100.0
+news,Recent news,6,firecrawl,6,100.0,100.0
+news,Recent news,6,linkup,6,100.0,100.0
+news,Recent news,6,parallel-turbo,6,100.0,100.0
+news,Recent news,6,tavily,0,n/a,n/a
+lookups,Classic lookups,12,perplexity-fast,12,91.7,91.7
+lookups,Classic lookups,12,exa-lite,12,100.0,100.0
+lookups,Classic lookups,12,exa,12,100.0,100.0
+lookups,Classic lookups,12,parallel,12,100.0,100.0
+lookups,Classic lookups,12,perplexity,12,91.7,91.7
+lookups,Classic lookups,12,keenable,12,88.9,83.3
+lookups,Classic lookups,12,firecrawl,12,91.7,91.7
+lookups,Classic lookups,12,linkup,12,100.0,100.0
+lookups,Classic lookups,12,parallel-turbo,12,91.7,91.7
+lookups,Classic lookups,12,tavily,0,n/a,n/a
+feeds,Live feeds,15,perplexity-fast,15,54.7,51.1
+feeds,Live feeds,15,exa-lite,15,55.6,60.0
+feeds,Live feeds,15,exa,15,55.1,60.0
+feeds,Live feeds,15,parallel,15,65.3,55.6
+feeds,Live feeds,15,perplexity,15,52.0,46.7
+feeds,Live feeds,15,keenable,15,56.0,53.3
+feeds,Live feeds,15,firecrawl,15,54.0,46.7
+feeds,Live feeds,15,linkup,15,41.6,40.0
+feeds,Live feeds,15,parallel-turbo,15,40.9,35.6
+feeds,Live feeds,15,tavily,0,n/a,n/a
+pages,Hard-site pages,10,perplexity-fast,10,80.0,70.0
+pages,Hard-site pages,10,exa-lite,10,61.7,40.0
+pages,Hard-site pages,10,exa,10,61.7,40.0
+pages,Hard-site pages,10,parallel,10,76.7,60.0
+pages,Hard-site pages,10,perplexity,10,80.0,70.0
+pages,Hard-site pages,10,keenable,10,66.7,50.0
+pages,Hard-site pages,10,firecrawl,10,61.7,50.0
+pages,Hard-site pages,10,linkup,10,75.0,70.0
+pages,Hard-site pages,10,parallel-turbo,10,76.7,60.0
+pages,Hard-site pages,10,tavily,0,n/a,n/a
+walled,Live on hard sites,9,perplexity-fast,9,44.4,33.3
+walled,Live on hard sites,9,exa-lite,9,71.1,66.7
+walled,Live on hard sites,9,exa,9,71.1,66.7
+walled,Live on hard sites,9,parallel,9,71.5,59.3
+walled,Live on hard sites,9,perplexity,9,44.4,33.3
+walled,Live on hard sites,9,keenable,9,51.9,48.1
+walled,Live on hard sites,9,firecrawl,9,65.6,55.6
+walled,Live on hard sites,9,linkup,9,55.6,55.6
+walled,Live on hard sites,9,parallel-turbo,9,61.5,59.3
+walled,Live on hard sites,9,tavily,0,n/a,n/a

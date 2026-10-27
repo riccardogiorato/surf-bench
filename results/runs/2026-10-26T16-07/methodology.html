@@ -1,0 +1,2066 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SurfBench methodology — 2026-10-26T16-07</title>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#008080; --win:#c0c0c0; --hi:#fff; --lo:#808080; --dk:#000; --title:#000080; --ok:#2e8b57; --mid:#c9a227; --low:#d2691e; --no:#a33; }
+  * { box-sizing:border-box }
+  body { margin:0; padding:24px; background:var(--bg); font:14px/1.45 "IBM Plex Sans",system-ui,sans-serif; color:#111 }
+  .win { background:var(--win); border:2px solid; border-color:var(--hi) var(--dk) var(--dk) var(--hi); box-shadow:inset -1px -1px var(--lo), inset 1px 1px #dfdfdf; max-width:1280px; margin:0 auto 20px }
+  .bar-title { background:linear-gradient(90deg,var(--title),#1084d0); color:#fff; padding:4px 8px; font:12px Silkscreen,monospace; letter-spacing:.5px; display:flex; justify-content:space-between }
+  .body { padding:14px 18px }
+  h1 { font:22px Silkscreen,monospace; margin:0 0 4px }
+  h2 { font:15px Silkscreen,monospace; margin:16px 0 8px }
+  h3 { font:13px Silkscreen,monospace; margin:12px 0 6px; color:var(--title) }
+  .sub { color:#333; margin:0 0 10px }
+  .banner { background:#ffffe1; border:1px solid #000; padding:6px 10px; margin:8px 0; font-weight:600 }
+  table { border-collapse:collapse; width:100%; background:#fff; border:2px solid; border-color:var(--lo) var(--hi) var(--hi) var(--lo) }
+  th, td { padding:4px 7px; text-align:left; border-bottom:1px solid #ddd; vertical-align:top }
+  th { background:#e4e4e4; font:11px Silkscreen,monospace; position:sticky; top:0; z-index:1 }
+  td.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+  td.h { text-align:center; font-variant-numeric:tabular-nums; color:#fff; font-weight:600; cursor:pointer; white-space:nowrap }
+  td.h:hover { outline:2px solid #000; outline-offset:-2px }
+  td.ok { background:var(--ok) } td.mid { background:var(--mid) } td.low { background:var(--low) } td.no { background:var(--no) } td.na { background:#bbb }
+  td.sel { outline:3px solid #ff0; outline-offset:-3px }
+  pre { background:#fff; border:2px solid; border-color:var(--lo) var(--hi) var(--hi) var(--lo); padding:8px; white-space:pre-wrap; word-break:break-word; font:12px/1.4 ui-monospace,Menlo,monospace; max-height:420px; overflow:auto; margin:4px 0 }
+  .pane { background:#fff; border:2px solid; border-color:var(--lo) var(--hi) var(--hi) var(--lo); padding:10px 12px; margin-top:12px }
+  .round { border-top:2px dashed #999; margin-top:12px; padding-top:8px }
+  .tag { font:11px Silkscreen,monospace; padding:1px 5px; border:1px solid #000; background:#ffffe1; margin-right:4px }
+  .pass { color:var(--ok); font-weight:600 } .fail { color:var(--no); font-weight:600 }
+  .scroll { overflow-x:auto } .mono { font-family:ui-monospace,Menlo,monospace; font-size:12px }
+  ul { margin:4px 0 0 18px; padding:0 } li { margin:2px 0 }
+  a { color:var(--title) }
+  details { margin:6px 0 } summary { cursor:pointer; font-weight:600 }
+  .task { border-top:1px solid #bbb; padding:8px 0 }
+</style></head><body>
+<div class="win"><div class="bar-title"><span>METHODOLOGY.TXT</span><span>SurfBench methodology — 2026-10-26T16-07</span></div><div class="body">
+
+<h1>Methodology</h1>
+<p class="sub">Generated from the code that grades the benchmark: every prompt below is produced by <span class="mono">buildPrompt()</span> in <span class="mono">src/lib/taskGrading.ts</span>, the same function <span class="mono">tasks:grade</span> calls. Run <b>2026-10-26T16-07</b> · commit <span class="mono">f63658a</span> · grade stamp <span class="mono">MiniMaxAI/MiniMax-M3:6ce7974c0df3:64284cafe991:f47ee62a:g7</span>.</p>
+<p class="sub">The grade stamp hashes the reader model, both prompts and every task's answer contract, so it matching the run proves the tasks below are exactly the ones this run was graded against.</p>
+
+<h2>Pipeline</h2>
+<ul>
+  <li>The task's request is sent <b>verbatim</b> to the provider's search API (no rewriting, no <span class="mono">site:</span> filters), asking for 5 results.</li>
+  <li>The provider's own fetch API retrieves the top 3 results as ranked. stable-read tasks skip search and fetch the given URL.</li>
+  <li>Each leg has a 30-second limit; going over is a DNF. Rate-limited calls are retried twice with backoff; survivors are excluded from scoring, never scored as 0.</li>
+  <li>Fast modes are separate rows: <span class="mono">exa-lite</span> searches in its fast mode and fetches with <span class="mono">exa</span>; <span class="mono">parallel-turbo</span> searches in its fast mode and fetches with <span class="mono">parallel</span>.</li>
+  <li><span class="mono">perplexity</span> and <span class="mono">perplexity-fast</span> have no fetch API: their search returns each page's extracted text, and the top 3 results' text is their fetch leg (fetch time 0, no fetch cost). On stable-read tasks they search for the given URL.</li>
+  <li>Reader: <span class="mono">MiniMaxAI/MiniMax-M3</span>, temperature 0, sees each fetched page up to 40,000 characters and never sees the provider's name. There is no LLM judge: every task has an answer key or an official same-round reference.</li>
+  <li>Answers must come from the pages. A reader answer that matches the key but is not in the documents it was given (the reader knew it by heart) earns nothing: the part the key matched has to appear in the pages, numbers as their own number (thousands separators, markdown escapes and million→billion conversions allowed) and text after normalization. The same check applies to feed headlines, latest versions and live numbers.</li>
+  <li>Live tasks (live-feed) run 3 rounds; a task's score and pass are averaged over its rounds.</li>
+</ul>
+
+<h2>Scoring</h2>
+<ul>
+  <li>Two tracks: <b>search</b> (56 tasks: find the answer on the open web) and <b>access</b> (24 tasks: open a given page, or get a live answer from a named bot-walled site such as X, Instagram, Amazon or ESPN). <b>Overall = 0.85 × search + 0.15 × access.</b> The weights were fixed before the run.</li>
+  <li>Each track's score: <b>quality</b> (0.55) = mean task score × 100; <b>reliability</b> (0.35) = share of tasks passed; <b>speed</b> (0.1) = the fastest row's end-to-end median in that track ÷ this row's, floored at 25.</li>
+  <li>A provider needs ≥ 80% of each track's tasks scorable (not quota / rate-limited) to get a number.</li>
+  <li>95% confidence intervals from a paired bootstrap over tasks, resampled within each track; providers whose gap to a group's leader has an interval including 0 share its tie group.</li>
+  <li>Cost is published, never scored: list price × the calls each provider actually made, per 1,000 passed tasks. Reader calls are excluded.</li>
+</ul>
+
+<h2>System prompts (verbatim)</h2>
+<h3>Reader system message</h3><pre>You read web documents fetched by a search tool and answer strictly from them. Never use your own knowledge: if the documents do not contain the answer, say NOT FOUND. Copy names, numbers, titles and URLs exactly as they appear in the documents. Reply with JSON only.</pre>
+
+
+<h2>Prices used for the cost column</h2>
+<table><thead><tr><th>provider</th><th>search</th><th>fetch</th><th>source</th><th>read</th><th>note</th></tr></thead><tbody>
+<tr><td><b>exa</b></td><td class="n">$7.00 / 1k</td><td class="n">$1.00 / 1k</td><td><a href="https://exa.ai/pricing">https://exa.ai/pricing</a></td><td>2026-09</td><td></td></tr><tr><td><b>parallel</b></td><td class="n">$5.00 / 1k</td><td class="n">$1.00 / 1k</td><td><a href="https://docs.parallel.ai/getting-started/pricing">https://docs.parallel.ai/getting-started/pricing</a></td><td>2026-09</td><td></td></tr><tr><td><b>exa-lite</b></td><td class="n">$4.00 / 1k</td><td class="n">$1.00 / 1k</td><td><a href="https://exa.ai/pricing">https://exa.ai/pricing</a></td><td>2026-10-26</td><td></td></tr><tr><td><b>parallel-turbo</b></td><td class="n">$1.00 / 1k</td><td class="n">$1.00 / 1k</td><td><a href="https://docs.parallel.ai/getting-started/pricing">https://docs.parallel.ai/getting-started/pricing</a></td><td>2026-10-22</td><td></td></tr><tr><td><b>perplexity</b></td><td class="n">$5.00 / 1k</td><td class="n">$0.00 / 1k</td><td><a href="https://docs.perplexity.ai/getting-started/pricing">https://docs.perplexity.ai/getting-started/pricing</a></td><td>2026-10-25</td><td></td></tr><tr><td><b>perplexity-fast</b></td><td class="n">$1.00 / 1k</td><td class="n">$0.00 / 1k</td><td><a href="https://docs.perplexity.ai/getting-started/pricing">https://docs.perplexity.ai/getting-started/pricing</a></td><td>2026-10-25</td><td></td></tr><tr><td><b>keenable</b></td><td class="n">$4.00 / 1k</td><td class="n">$4.00 / 1k</td><td><a href="https://keenable.ai/pricing">https://keenable.ai/pricing</a></td><td>2026-09</td><td>pay-as-you-go; the errored index attempt before a live fallback is assumed unbilled</td></tr><tr><td><b>firecrawl</b></td><td class="n">$1.66 / 1k</td><td class="n">$0.83 / 1k</td><td><a href="https://docs.firecrawl.dev/billing">https://docs.firecrawl.dev/billing</a></td><td>2026-10-22</td><td>Standard plan credit rate; X/Twitter URLs are routed via Grok at 1 + 29 credits; LinkedIn pages are provider-routed with unpublished pricing (billed here at 1 credit)</td></tr><tr><td><b>tavily</b></td><td class="n">$8.00 / 1k</td><td class="n">$3.20 / 1k</td><td><a href="https://docs.tavily.com/documentation/api-credits">https://docs.tavily.com/documentation/api-credits</a></td><td>2026-10-22</td><td></td></tr><tr><td><b>linkup</b></td><td class="n">$5.00 / 1k</td><td class="n">$5.00 / 1k</td><td><a href="https://docs.linkup.so/pages/documentation/platform/pricing">https://docs.linkup.so/pages/documentation/platform/pricing</a></td><td>2026-10-22</td><td></td></tr>
+</tbody></table>
+
+<h2>The 80 tasks</h2>
+<p class="sub">Each task: the request, how it is graded, the exact prompt (with the run date and documents left as placeholders), and the verification record for its key.</p>
+<h2>search · stable-lookup · 45</h2><div class="task" id="l-eiffel">
+  <div><span class="tag">l-eiffel</span><b>When was the Eiffel Tower completed?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>When was the Eiffel Tower completed?</td><td class="mono">/1889/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: When was the Eiffel Tower completed?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. When was the Eiffel Tower completed?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://en.wikipedia.org/wiki/Eiffel_Tower">https://en.wikipedia.org/wiki/Eiffel_Tower</a></li><li>blind check: https://en.wikipedia.org/wiki/Eiffel_Tower (completed 31 March 1889)</li></ul></details>
+</div><div class="task" id="l-imdb">
+  <div><span class="tag">l-imdb</span><b>Who plays the lead role in Oppenheimer (2023) according to IMDb?</b></div>
+  <div class="sub">site imdb.com · category media</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Who plays the lead role?</td><td class="mono">/cillian murphy/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Who plays the lead role in Oppenheimer (2023) according to IMDb?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Who plays the lead role?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://www.imdb.com/title/tt15398776/">https://www.imdb.com/title/tt15398776/</a></li><li>blind check: https://www.imdb.com/title/tt15398776/ (Cillian Murphy, top billed)</li></ul></details>
+</div><div class="task" id="l-delta">
+  <div><span class="tag">l-delta</span><b>What is Delta's carry-on bag size limit?</b></div>
+  <div class="sub">site delta.com · category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What are the maximum carry-on dimensions?</td><td class="mono">/22\D{1,8}14\D{1,8}9|56\D{1,8}35\D{1,8}23/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is Delta's carry-on bag size limit?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What are the maximum carry-on dimensions?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://www.delta.com/us/en/baggage/carry-on-baggage (22 x 14 x 9 in, checked 2026-10-22)">https://www.delta.com/us/en/baggage/carry-on-baggage (22 x 14 x 9 in, checked 2026-10-22)</a></li><li>blind check: https://www.delta.com/us/en/baggage/carry-on-baggage (22 x 14 x 9 in / 56 x 35 x 23 cm)</li></ul></details>
+</div><div class="task" id="l-bm">
+  <div><span class="tag">l-bm</span><b>What are the British Museum's regular opening hours?</b></div>
+  <div class="sub">site britishmuseum.org · category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What time does the museum open on a regular day?</td><td class="mono">/\b10([:.]00)?\s*(am|a\.m\.)?\b/i</td></tr><tr><td>What time does it close on a regular day?</td><td class="mono">/\b17[:.]00\b|\b5([:.]00)?\s*(pm|p\.m\.)/i</td></tr><tr><td>Until what time is it open on Fridays?</td><td class="mono">/\b20[:.]30\b|\b8[:.]30\s*(pm|p\.m\.)/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What are the British Museum's regular opening hours?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What time does the museum open on a regular day?
+2. What time does it close on a regular day?
+3. Until what time is it open on Fridays?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://www.britishmuseum.org/visit (daily 10.00–17.00, Fridays 20.30, checked 2026-10-22)">https://www.britishmuseum.org/visit (daily 10.00–17.00, Fridays 20.30, checked 2026-10-22)</a></li><li>blind check: https://www.britishmuseum.org/visit (daily 10:00-17:00, Fridays to 20:30)</li></ul></details>
+</div><div class="task" id="l-kyoto">
+  <div><span class="tag">l-kyoto</span><b>What is the fastest way to travel from Tokyo to Kyoto?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the fastest way to travel from Tokyo to Kyoto?</td><td class="mono">/shinkansen|bullet train|nozomi/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is the fastest way to travel from Tokyo to Kyoto?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the fastest way to travel from Tokyo to Kyoto?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://global.jr-central.co.jp/en/">https://global.jr-central.co.jp/en/</a></li><li>blind check: https://kyoto.travel/en/getting-to/ (Tokaido Shinkansen Nozomi, ~2h15)</li></ul></details>
+</div><div class="task" id="l-so">
+  <div><span class="tag">l-so</span><b>Find the Stack Overflow question about sorting an array of objects by a property value in JavaScript.</b></div>
+  <div class="sub">site stackoverflow.com · category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the URL of the Stack Overflow question?</td><td class="mono">/stackoverflow\.com\/questions\/(1129216|979256)\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Find the Stack Overflow question about sorting an array of objects by a property value in JavaScript.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the URL of the Stack Overflow question?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://stackoverflow.com/questions/1129216">https://stackoverflow.com/questions/1129216</a></li><li><a href="https://stackoverflow.com/questions/979256">https://stackoverflow.com/questions/979256</a></li><li>blind check: Stack Exchange API — 1129216 canonical, 979256 equally literal match</li></ul></details>
+</div><div class="task" id="l-gh">
+  <div><span class="tag">l-gh</span><b>What license is the microsoft/TypeScript repository on GitHub under?</b></div>
+  <div class="sub">site github.com · category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What license is the repository under?</td><td class="mono">/apache/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What license is the microsoft/TypeScript repository on GitHub under?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What license is the repository under?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://github.com/microsoft/TypeScript/blob/main/LICENSE.txt">https://github.com/microsoft/TypeScript/blob/main/LICENSE.txt</a></li><li>blind check: GitHub API license field (Apache-2.0)</li></ul></details>
+</div><div class="task" id="l-wiki">
+  <div><span class="tag">l-wiki</span><b>According to Wikipedia, when was Ada Lovelace born?</b></div>
+  <div class="sub">site wikipedia.org · category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>When was Ada Lovelace born?</td><td class="mono">/10(th)?\s+dec(ember)?\.?,?\s+1815|dec(ember)?\.?\s+10(th)?,?\s+1815|1815-12-10/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: According to Wikipedia, when was Ada Lovelace born?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. When was Ada Lovelace born?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://en.wikipedia.org/wiki/Ada_Lovelace">https://en.wikipedia.org/wiki/Ada_Lovelace</a></li><li>blind check: https://en.wikipedia.org/wiki/Ada_Lovelace (10 December 1815)</li></ul></details>
+</div><div class="task" id="l-openai">
+  <div><span class="tag">l-openai</span><b>Who is the current CEO of OpenAI?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Who is the current CEO of OpenAI?</td><td class="mono">/altman/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Who is the current CEO of OpenAI?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Who is the current CEO of OpenAI?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://www.politico.com/news/2026/10/05/sam-altman-ai-industry-political-spending-01106527">https://www.politico.com/news/2026/10/05/sam-altman-ai-industry-political-spending-01106527</a></li><li>blind check: https://www.theinformation.com/org-charts/openai (Sam Altman, 2026-10-14)</li></ul></details>
+</div><div class="task" id="l-de">
+  <div><span class="tag">l-de</span><b>Wie hoch ist die Zugspitze?</b></div>
+  <div class="sub">category general · lang de</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Wie hoch ist die Zugspitze (in Metern)?</td><td class="mono">/\b2[.,\s]?96[123]\b/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Wie hoch ist die Zugspitze?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Wie hoch ist die Zugspitze (in Metern)?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://de.wikipedia.org/wiki/Zugspitze (2962 m)">https://de.wikipedia.org/wiki/Zugspitze (2962 m)</a></li><li>blind check: https://de.wikipedia.org/wiki/Zugspitze (2962,06 m; 2961/2963 in other sources)</li></ul></details>
+</div><div class="task" id="l-ja">
+  <div><span class="tag">l-ja</span><b>東京スカイツリーの高さは？</b></div>
+  <div class="sub">category general · lang ja</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>東京スカイツリーの高さは何メートルですか？</td><td class="mono">/634/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: 東京スカイツリーの高さは？
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. 東京スカイツリーの高さは何メートルですか？
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://www.tokyo-skytree.jp/ (634 m)">https://www.tokyo-skytree.jp/ (634 m)</a></li><li>blind check: https://www.tokyo-skytree.jp/about/ (634 m)</li></ul></details>
+</div><div class="task" id="s-doc-1">
+  <div><span class="tag">s-doc-1</span><b>Per RFC 9112 (HTTP/1.1 message syntax), what is the minimum request-line length that all HTTP senders and recipients are recommended to support?</b></div>
+  <div class="sub">category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What minimum request-line length does RFC 9112 recommend all HTTP senders and recipients support?</td><td class="mono">/(?&lt;![\d,.])8[,.]?000(?![\d,])/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Per RFC 9112 (HTTP/1.1 message syntax), what is the minimum request-line length that all HTTP senders and recipients are recommended to support?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What minimum request-line length does RFC 9112 recommend all HTTP senders and recipients support?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.rfc-editor.org/rfc/rfc9112.txt">https://www.rfc-editor.org/rfc/rfc9112.txt</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc9112.html#section-3">https://www.rfc-editor.org/rfc/rfc9112.html#section-3</a></li><li>blind check 2026-10-25 (high): 8000 octets</li></ul></details>
+</div><div class="task" id="s-doc-2">
+  <div><span class="tag">s-doc-2</span><b>In the WebSocket protocol (RFC 6455), what fixed GUID does the server append to Sec-WebSocket-Key when computing Sec-WebSocket-Accept, and what is the maximum payload length allowed for a control frame?</b></div>
+  <div class="sub">category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What GUID string is concatenated with Sec-WebSocket-Key to compute Sec-WebSocket-Accept?</td><td class="mono">/\b258EAFA5-E914-47DA-95CA-C5AB0DC85B11\b/i</td></tr><tr><td>What is the maximum payload length of a WebSocket control frame?</td><td class="mono">/(?&lt;![\d,.])125(?![\d,])/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: In the WebSocket protocol (RFC 6455), what fixed GUID does the server append to Sec-WebSocket-Key when computing Sec-WebSocket-Accept, and what is the maximum payload length allowed for a control frame?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What GUID string is concatenated with Sec-WebSocket-Key to compute Sec-WebSocket-Accept?
+2. What is the maximum payload length of a WebSocket control frame?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.rfc-editor.org/rfc/rfc6455.txt">https://www.rfc-editor.org/rfc/rfc6455.txt</a></li><li><a href="https://www.rfc-editor.org/rfc/rfc6455.html#section-5.5">https://www.rfc-editor.org/rfc/rfc6455.html#section-5.5</a></li><li>blind check 2026-10-25 (high): 258EAFA5-E914-47DA-95CA-C5AB0DC85B11; 125 bytes</li></ul></details>
+</div><div class="task" id="s-doc-3">
+  <div><span class="tag">s-doc-3</span><b>SQLite limits: by default, how many databases can be attached to a single connection at the same time, and what is the highest that limit can ever be raised to?</b></div>
+  <div class="sub">category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the default maximum number of simultaneously attached databases in SQLite (SQLITE_MAX_ATTACHED)?</td><td class="mono">/(?&lt;![\d,.])(10|ten)(?![\d,])/i</td></tr><tr><td>What is the absolute maximum value the attached-database limit can be increased to?</td><td class="mono">/(?&lt;![\d,.])125(?![\d,])/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: SQLite limits: by default, how many databases can be attached to a single connection at the same time, and what is the highest that limit can ever be raised to?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the default maximum number of simultaneously attached databases in SQLite (SQLITE_MAX_ATTACHED)?
+2. What is the absolute maximum value the attached-database limit can be increased to?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.sqlite.org/limits.html">https://www.sqlite.org/limits.html</a></li><li><a href="https://www.sqlite.org/lang_attach.html">https://www.sqlite.org/lang_attach.html</a></li><li>blind check 2026-10-25 (high): 10; 125</li></ul></details>
+</div><div class="task" id="s-doc-4">
+  <div><span class="tag">s-doc-4</span><b>In Python 3.13, what is the default limit on the number of digits when converting a large int to or from a decimal string, and what is the lowest non-zero value that limit can be set to?</b></div>
+  <div class="sub">category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the default int/str conversion digit limit in Python 3.13 (sys.int_info.default_max_str_digits)?</td><td class="mono">/(?&lt;![\d,.])4[,.]?300(?![\d,])/i</td></tr><tr><td>What is the lowest non-zero value the limit can be configured to (sys.int_info.str_digits_check_threshold)?</td><td class="mono">/(?&lt;![\d,.])640(?![\d,])/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: In Python 3.13, what is the default limit on the number of digits when converting a large int to or from a decimal string, and what is the lowest non-zero value that limit can be set to?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the default int/str conversion digit limit in Python 3.13 (sys.int_info.default_max_str_digits)?
+2. What is the lowest non-zero value the limit can be configured to (sys.int_info.str_digits_check_threshold)?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://docs.python.org/3.13/library/stdtypes.html#int-max-str-digits">https://docs.python.org/3.13/library/stdtypes.html#int-max-str-digits</a></li><li><a href="https://docs.python.org/3.13/library/sys.html#sys.int_info">https://docs.python.org/3.13/library/sys.html#sys.int_info</a></li><li>blind check 2026-10-25 (high): 4300 digits; 640 digits</li></ul></details>
+</div><div class="task" id="s-doc-5">
+  <div><span class="tag">s-doc-5</span><b>In PostgreSQL 17, what are the default values of jit_above_cost and jit_inline_above_cost?</b></div>
+  <div class="sub">category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the default value of jit_above_cost in PostgreSQL 17?</td><td class="mono">/(?&lt;![\d,.])100[, ]?000(?![\d,])/i</td></tr><tr><td>What is the default value of jit_inline_above_cost in PostgreSQL 17?</td><td class="mono">/(?&lt;![\d,.])500[, ]?000(?![\d,])/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: In PostgreSQL 17, what are the default values of jit_above_cost and jit_inline_above_cost?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the default value of jit_above_cost in PostgreSQL 17?
+2. What is the default value of jit_inline_above_cost in PostgreSQL 17?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.postgresql.org/docs/17/runtime-config-query.html">https://www.postgresql.org/docs/17/runtime-config-query.html</a></li><li><a href="https://raw.githubusercontent.com/postgres/postgres/REL_17_STABLE/src/backend/utils/misc/postgresql.conf.sample">https://raw.githubusercontent.com/postgres/postgres/REL_17_STABLE/src/backend/utils/misc/postgresql.conf.sample</a></li><li>blind check 2026-10-25 (high): 100000; 500000</li></ul></details>
+</div><div class="task" id="s-doc-6">
+  <div><span class="tag">s-doc-6</span><b>What is the current AWS Lambda maximum payload size for asynchronous invocations, and the maximum response size for a function using response streaming?</b></div>
+  <div class="sub">category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the maximum invocation payload size for asynchronous Lambda invocations?</td><td class="mono">/(?&lt;![\d,.])1\s*(MB|MiB|megabytes?)\b/i</td></tr><tr><td>What is the maximum response payload size for a streamed Lambda response?</td><td class="mono">/(?&lt;![\d,.])200\s*(MB|MiB|megabytes?)\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is the current AWS Lambda maximum payload size for asynchronous invocations, and the maximum response size for a function using response streaming?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the maximum invocation payload size for asynchronous Lambda invocations?
+2. What is the maximum response payload size for a streamed Lambda response?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html">https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html</a></li><li><a href="https://aws.amazon.com/about-aws/whats-new/2025/10/aws-lambda-payload-size-256-kb-1-mb-invocations/">https://aws.amazon.com/about-aws/whats-new/2025/10/aws-lambda-payload-size-256-kb-1-mb-invocations/</a></li><li>blind check 2026-10-25 (medium): 1 MB; 200 MB</li></ul></details>
+</div><div class="task" id="s-doc-7">
+  <div><span class="tag">s-doc-7</span><b>GitHub Actions limits: what is the maximum number of jobs a matrix can generate in one workflow run, and how long can a single job run on a self-hosted runner before it is terminated?</b></div>
+  <div class="sub">category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the maximum number of jobs a matrix can generate per workflow run?</td><td class="mono">/(?&lt;![\d,.])256(?![\d,])/i</td></tr><tr><td>What is the maximum execution time for a single job on a self-hosted runner?</td><td class="mono">/\b(5|five)\s*days?\b|(?&lt;![\d,.])120\s*hours?\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: GitHub Actions limits: what is the maximum number of jobs a matrix can generate in one workflow run, and how long can a single job run on a self-hosted runner before it is terminated?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the maximum number of jobs a matrix can generate per workflow run?
+2. What is the maximum execution time for a single job on a self-hosted runner?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://docs.github.com/en/actions/reference/limits">https://docs.github.com/en/actions/reference/limits</a></li><li><a href="https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax">https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax</a></li><li>blind check 2026-10-25 (high): 256 jobs per workflow run; 5 days</li></ul></details>
+</div><div class="task" id="s-hop-1">
+  <div><span class="tag">s-hop-1</span><b>The Ukrainian mathematician who won a Fields Medal in 2022 for her sphere-packing work earned a doctorate at a German university in 2013. Which university was it, and what was her dissertation titled?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>At which German university did she earn her 2013 doctorate?</td><td class="mono">/\bbonn\b/i</td></tr><tr><td>What was the title of her 2013 doctoral dissertation?</td><td class="mono">/\bmodular\s+functions\s+and\s+special\s+cycles\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: The Ukrainian mathematician who won a Fields Medal in 2022 for her sphere-packing work earned a doctorate at a German university in 2013. Which university was it, and what was her dissertation titled?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. At which German university did she earn her 2013 doctorate?
+2. What was the title of her 2013 doctoral dissertation?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://en.wikipedia.org/wiki/Maryna_Viazovska">https://en.wikipedia.org/wiki/Maryna_Viazovska</a></li><li><a href="https://mathshistory.st-andrews.ac.uk/Biographies/Viazovska/">https://mathshistory.st-andrews.ac.uk/Biographies/Viazovska/</a></li><li>blind check 2026-10-25 (high): University of Bonn (Rheinische Friedrich-Wilhelms-Universität Bonn); Modular Functions and Special Cycles</li></ul></details>
+</div><div class="task" id="s-hop-2">
+  <div><span class="tag">s-hop-2</span><b>Two researchers shared a Turing Award for laying the foundations of reinforcement learning, and one of them had been the other's PhD advisor. Where did that advisor earn his own PhD, and what was his doctoral thesis about?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>At which university did the advisor (the senior of the two laureates) earn his PhD?</td><td class="mono">/\bmichigan\b/i</td></tr><tr><td>What was the subject of the advisor's doctoral thesis?</td><td class="mono">/\bcellular\s+automat/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Two researchers shared a Turing Award for laying the foundations of reinforcement learning, and one of them had been the other's PhD advisor. Where did that advisor earn his own PhD, and what was his doctoral thesis about?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. At which university did the advisor (the senior of the two laureates) earn his PhD?
+2. What was the subject of the advisor's doctoral thesis?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://en.wikipedia.org/wiki/Andrew_Barto">https://en.wikipedia.org/wiki/Andrew_Barto</a></li><li><a href="https://amturing.acm.org/award_winners/barto_9471663.cfm">https://amturing.acm.org/award_winners/barto_9471663.cfm</a></li><li>blind check 2026-10-25 (high): University of Michigan (Ann Arbor), PhD in computer science, 1975; Cellular automata, with the thesis titled 'Cellular Automata as Models of Natural Systems'</li></ul></details>
+</div><div class="task" id="s-hop-3">
+  <div><span class="tag">s-hop-3</span><b>Which South African novelist finally won the Booker Prize after having been shortlisted twice before, which book won it, and who chaired the judging panel that year?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Which South African novelist won?</td><td class="mono">/\bgalgut\b/i</td></tr><tr><td>What was the title of the winning novel?</td><td class="mono">/\bpromise\b/i</td></tr><tr><td>Who chaired the Booker judges the year he won?</td><td class="mono">/\bjasanoff\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Which South African novelist finally won the Booker Prize after having been shortlisted twice before, which book won it, and who chaired the judging panel that year?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Which South African novelist won?
+2. What was the title of the winning novel?
+3. Who chaired the Booker judges the year he won?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://thebookerprizes.com/the-booker-library/prize-years/2021">https://thebookerprizes.com/the-booker-library/prize-years/2021</a></li><li><a href="https://en.wikipedia.org/wiki/Damon_Galgut">https://en.wikipedia.org/wiki/Damon_Galgut</a></li><li>blind check 2026-10-25 (high): The Promise (Damon Galgut, 2021 Booker Prize); Maya Jasanoff</li></ul></details>
+</div><div class="task" id="s-hop-4">
+  <div><span class="tag">s-hop-4</span><b>The most recent bridge built across Venice's Grand Canal was designed by a Spanish architect-engineer. What is its official name, and on what date did it open to the public?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the bridge's official name?</td><td class="mono">/\b(costituzione|constitution)\b/i</td></tr><tr><td>On what date did it open to the public?</td><td class="mono">/\b1[12](th)?\s+(of\s+)?sep(t(ember)?)?\.?,?\s+2008\b|\bsep(t(ember)?)?\.?\s+1[12](th)?,?\s+2008\b|\b2008-09-1[12]\b|\b1[12][\/.]0?9[\/.]2008\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: The most recent bridge built across Venice's Grand Canal was designed by a Spanish architect-engineer. What is its official name, and on what date did it open to the public?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the bridge's official name?
+2. On what date did it open to the public?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://en.wikipedia.org/wiki/Ponte_della_Costituzione">https://en.wikipedia.org/wiki/Ponte_della_Costituzione</a></li><li><a href="https://www.meetingvenice.it/en/art-and-history/can-t-miss/constitution-bridge">https://www.meetingvenice.it/en/art-and-history/can-t-miss/constitution-bridge</a></li><li>blind check 2026-10-25 (medium): Ponte della Costituzione (Constitution Bridge), commonly called the Calatrava Bridge; 11 September 2008</li><li>opened ~23:44 on 11 Sep 2008: 11 or 12 Sep accepted</li></ul></details>
+</div><div class="task" id="s-hop-5">
+  <div><span class="tag">s-hop-5</span><b>The first African-born architect to win the Pritzker Prize built his very first building, a primary school, in his home village. What is the village called, and what major architecture award did that school win in 2004?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the name of the home village where his first building stands?</td><td class="mono">/\bgando\b/i</td></tr><tr><td>Which award did the school win in 2004?</td><td class="mono">/\baga\s+khan\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: The first African-born architect to win the Pritzker Prize built his very first building, a primary school, in his home village. What is the village called, and what major architecture award did that school win in 2004?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the name of the home village where his first building stands?
+2. Which award did the school win in 2004?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.pritzkerprize.com/laureates/diebedo-francis-kere">https://www.pritzkerprize.com/laureates/diebedo-francis-kere</a></li><li><a href="https://en.wikipedia.org/wiki/Di%C3%A9b%C3%A9do_Francis_K%C3%A9r%C3%A9">https://en.wikipedia.org/wiki/Di%C3%A9b%C3%A9do_Francis_K%C3%A9r%C3%A9</a></li><li>blind check 2026-10-25 (high): Gando, Burkina Faso; Aga Khan Award for Architecture (2004 cycle)</li></ul></details>
+</div><div class="task" id="s-hop-6">
+  <div><span class="tag">s-hop-6</span><b>The European spacecraft that delivered the first-ever lander onto a comet ended its own mission by deliberately crash-landing on that same comet. What name was given to its final impact site, and in which region of the comet is that site?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What name was given to the orbiter's final impact site?</td><td class="mono">/\bsa[i\u00EF]s\b/i</td></tr><tr><td>In which region of the comet is the impact site?</td><td class="mono">/\bma['\u2019`]?at\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: The European spacecraft that delivered the first-ever lander onto a comet ended its own mission by deliberately crash-landing on that same comet. What name was given to its final impact site, and in which region of the comet is that site?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What name was given to the orbiter's final impact site?
+2. In which region of the comet is the impact site?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://en.wikipedia.org/wiki/Rosetta_(spacecraft)">https://en.wikipedia.org/wiki/Rosetta_(spacecraft)</a></li><li><a href="https://blogs.esa.int/rosetta/2016/10/03/rosetta-impact-site-named-sais/index.html">https://blogs.esa.int/rosetta/2016/10/03/rosetta-impact-site-named-sais/index.html</a></li><li>blind check 2026-10-25 (high): Sais (named after the Egyptian town where the Rosetta Stone was originally located); Ma'at region, on the comet's small lobe ('head') of 67P/Churyumov-Gerasimenko, just inside a shallow anc</li></ul></details>
+</div><div class="task" id="s-hop-7">
+  <div><span class="tag">s-hop-7</span><b>The Nobel literature laureate who fled Zanzibar as a teenage refugee and later spent decades teaching English literature in England — what was his first novel, and what was the title of his PhD thesis?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What was his first novel?</td><td class="mono">/\bmemory\s+of\s+departure\b/i</td></tr><tr><td>What was the title of his PhD thesis?</td><td class="mono">/\bcriteria\b.*\bwest\s+african\s+fiction\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: The Nobel literature laureate who fled Zanzibar as a teenage refugee and later spent decades teaching English literature in England — what was his first novel, and what was the title of his PhD thesis?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What was his first novel?
+2. What was the title of his PhD thesis?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://en.wikipedia.org/wiki/Abdulrazak_Gurnah">https://en.wikipedia.org/wiki/Abdulrazak_Gurnah</a></li><li><a href="https://kar.kent.ac.uk/94388/">https://kar.kent.ac.uk/94388/</a></li><li>blind check 2026-10-25 (high): Memory of Departure (1987); Criteria in the Criticism of West African Fiction (PhD, University of Kent, 1982)</li></ul></details>
+</div><div class="task" id="s-num-1">
+  <div><span class="tag">s-num-1</span><b>What were Apple's total net sales and net income for fiscal year 2025 (the year ended September 27, 2025), per its 10-K?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What were Apple's total net sales for fiscal 2025?</td><td class="mono">/\b416,161\b|\b416(?:\.16?1?|\.2)?\s*(?:billion|bn|b)\b/i</td></tr><tr><td>What was Apple's net income for fiscal 2025?</td><td class="mono">/\b112,010\b|\b112(?:\.01?0?)?\s*(?:billion|bn|b)\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What were Apple's total net sales and net income for fiscal year 2025 (the year ended September 27, 2025), per its 10-K?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What were Apple's total net sales for fiscal 2025?
+2. What was Apple's net income for fiscal 2025?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.apple.com/newsroom/2025/10/apple-reports-fourth-quarter-results/">https://www.apple.com/newsroom/2025/10/apple-reports-fourth-quarter-results/</a></li><li><a href="https://data.sec.gov/api/xbrl/companyconcept/CIK0000320193/us-gaap/RevenueFromContractWithCustomerExcludingAssessedTax.json">https://data.sec.gov/api/xbrl/companyconcept/CIK0000320193/us-gaap/RevenueFromContractWithCustomerExcludingAssessedTax.json</a></li><li>blind check 2026-10-25 (high): $416,161 million (~$416.2 billion); $112,010 million (~$112.0 billion)</li></ul></details>
+</div><div class="task" id="s-num-2">
+  <div><span class="tag">s-num-2</span><b>How much total revenue and GAAP net income did NVIDIA report for its fiscal year 2026 (ended January 25, 2026)?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What was NVIDIA's total revenue for fiscal 2026?</td><td class="mono">/\b215,938\b|\b215\.9(?:4|38)?\s*(?:billion|bn|b)\b/i</td></tr><tr><td>What was NVIDIA's GAAP net income for fiscal 2026?</td><td class="mono">/\b120,067\b|\b120\.(?:1|07|067)\s*(?:billion|bn|b)\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: How much total revenue and GAAP net income did NVIDIA report for its fiscal year 2026 (ended January 25, 2026)?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What was NVIDIA's total revenue for fiscal 2026?
+2. What was NVIDIA's GAAP net income for fiscal 2026?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2026">https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2026</a></li><li>blind check 2026-10-25 (high): $215,938 million (~$215.9 billion); $120,067 million (~$120.1 billion) GAAP net income</li></ul></details>
+</div><div class="task" id="s-num-3">
+  <div><span class="tag">s-num-3</span><b>What did the ECB set its deposit facility rate and main refinancing operations rate to at its 5 June 2025 monetary policy meeting?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What deposit facility rate did the ECB set on 5 June 2025?</td><td class="mono">/(?&lt;![\d.])2(?:\.00?)?\s*(?:%|percent|per cent)/i</td></tr><tr><td>What main refinancing operations rate did the ECB set on 5 June 2025?</td><td class="mono">/(?&lt;![\d.])2\.15\s*(?:%|percent|per cent)?(?!\d)/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What did the ECB set its deposit facility rate and main refinancing operations rate to at its 5 June 2025 monetary policy meeting?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What deposit facility rate did the ECB set on 5 June 2025?
+2. What main refinancing operations rate did the ECB set on 5 June 2025?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.ecb.europa.eu/press/pr/date/2025/html/ecb.mp250605~3b5f67d007.en.html">https://www.ecb.europa.eu/press/pr/date/2025/html/ecb.mp250605~3b5f67d007.en.html</a></li><li><a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/key_ecb_interest_rates/html/index.en.html">https://www.ecb.europa.eu/stats/policy_and_exchange_rates/key_ecb_interest_rates/html/index.en.html</a></li><li>blind check 2026-10-25 (high): 2.00% (deposit facility rate); 2.15% (main refinancing operations rate)</li></ul></details>
+</div><div class="task" id="s-num-4">
+  <div><span class="tag">s-num-4</span><b>At the Federal Reserve's December 10, 2025 FOMC meeting, what target range was set for the federal funds rate, and how many voting members dissented?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What target range for the federal funds rate did the FOMC set on December 10, 2025?</td><td class="mono">/3(?:\.50?|-1\/2|\s1\/2|\u00BD)\s*(?:%|percent|per cent)?\s*(?:-|\u2013|\u2014|to)\s*3(?:\.75|-3\/4|\s3\/4|\u00BE)/i</td></tr><tr><td>How many FOMC voting members dissented from the December 10, 2025 decision?</td><td class="mono">/\b(3|three)\b(?![.\d%\-\u2013\/])/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: At the Federal Reserve's December 10, 2025 FOMC meeting, what target range was set for the federal funds rate, and how many voting members dissented?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What target range for the federal funds rate did the FOMC set on December 10, 2025?
+2. How many FOMC voting members dissented from the December 10, 2025 decision?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20251210a.htm">https://www.federalreserve.gov/newsevents/pressreleases/monetary20251210a.htm</a></li><li>blind check 2026-10-25 (high): 3.50% to 3.75% (cut by 25 bp); 3 dissents: Stephen Miran (wanted a 50 bp cut); Austan Goolsbee and Jeffrey Schmid (wanted no change)</li></ul></details>
+</div><div class="task" id="s-num-5">
+  <div><span class="tag">s-num-5</span><b>According to the BLS September 2025 CPI release, how much did the CPI-U all items index rise over the 12 months ending September 2025, and what was the 12-month change in the energy index?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What was the 12-month (not seasonally adjusted) change in the CPI-U all items index for September 2025?</td><td class="mono">/(?&lt;![\d.])3(?:\.0)?\s*(?:%|percent|per cent)/i</td></tr><tr><td>What was the 12-month change in the CPI-U energy index for September 2025?</td><td class="mono">/(?&lt;![\d.])2\.8\s*(?:%|percent|per cent)?(?!\d)/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: According to the BLS September 2025 CPI release, how much did the CPI-U all items index rise over the 12 months ending September 2025, and what was the 12-month change in the energy index?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What was the 12-month (not seasonally adjusted) change in the CPI-U all items index for September 2025?
+2. What was the 12-month change in the CPI-U energy index for September 2025?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.bls.gov/news.release/archives/cpi_10242025.htm">https://www.bls.gov/news.release/archives/cpi_10242025.htm</a></li><li>blind check 2026-10-25 (high): +3.0%; +2.8%</li></ul></details>
+</div><div class="task" id="s-num-6">
+  <div><span class="tag">s-num-6</span><b>In NOAA's annual 2025 global climate report, how far above the 20th-century average was the 2025 global surface temperature, and where did 2025 rank in the record?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>How far above the 20th-century average was the 2025 global surface temperature according to NOAA?</td><td class="mono">/\b1\.1[678]\s*\u00B0?\s*c?\b|\b2\.1[01]\s*\u00B0?\s*f?\b/i</td></tr><tr><td>Where did 2025 rank among the warmest years in NOAA's record?</td><td class="mono">/\b(?:3rd|third)\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: In NOAA's annual 2025 global climate report, how far above the 20th-century average was the 2025 global surface temperature, and where did 2025 rank in the record?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. How far above the 20th-century average was the 2025 global surface temperature according to NOAA?
+2. Where did 2025 rank among the warmest years in NOAA's record?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.ncei.noaa.gov/news/global-climate-202513">https://www.ncei.noaa.gov/news/global-climate-202513</a></li><li>blind check 2026-10-25 (high): 1.17°C (2.11°F) above the 20th-century average; Third-warmest year on record (records since 1850), behind 2024 and 2023</li></ul></details>
+</div><div class="task" id="s-num-7">
+  <div><span class="tag">s-num-7</span><b>What height won the men's pole vault final at the 2025 World Athletics Championships in Tokyo, and who took the silver medal?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What was the winning height in the men's pole vault final at the 2025 World Athletics Championships in Tokyo?</td><td class="mono">/(?&lt;![\d.])6[.,]30?(?!\d)/i</td></tr><tr><td>Who won silver in the men's pole vault at the 2025 World Athletics Championships?</td><td class="mono">/karalis/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What height won the men's pole vault final at the 2025 World Athletics Championships in Tokyo, and who took the silver medal?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What was the winning height in the men's pole vault final at the 2025 World Athletics Championships in Tokyo?
+2. Who won silver in the men's pole vault at the 2025 World Athletics Championships?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://worldathletics.org/news/report/world-championships-tokyo-25-report-mens-pole-vault">https://worldathletics.org/news/report/world-championships-tokyo-25-report-mens-pole-vault</a></li><li><a href="https://www.olympics.com/en/news/world-athletics-championships-tokyo-25-track-field-schedule-medal-table-finals-results">https://www.olympics.com/en/news/world-athletics-championships-tokyo-25-track-field-schedule-medal-table-finals-results</a></li><li>blind check 2026-10-25 (high): 6.30 m (world record, Armand 'Mondo' Duplantis); Emmanouil Karalis (Greece), 6.00 m</li></ul></details>
+</div><div class="task" id="s-loc-1">
+  <div><span class="tag">s-loc-1</span><b>明石市立天文科学館は何年何月何日に開館しましたか？また、プラネタリウムのドームの直径は何メートルですか？</b></div>
+  <div class="sub">category general · lang ja</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>On what date did the Akashi Municipal Planetarium open?</td><td class="mono">/(1960|\u662D\u548C\s*35).*(6\s*\u6708\s*10\s*\u65E5|june\s*10|10\s*june|0?6[-\/.]10\b)|(6\s*\u6708\s*10\s*\u65E5|june\s*10|10\s*june).*(1960|\u662D\u548C\s*35)/i</td></tr><tr><td>What is the diameter of the planetarium dome, in metres?</td><td class="mono">/(^|[^0-9.,])20\s*(m\b|\uFF4D|\u30E1\u30FC\u30C8\u30EB|meters?\b|metres?\b)/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: 明石市立天文科学館は何年何月何日に開館しましたか？また、プラネタリウムのドームの直径は何メートルですか？
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. On what date did the Akashi Municipal Planetarium open?
+2. What is the diameter of the planetarium dome, in metres?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.am12.jp/about/">https://www.am12.jp/about/</a></li><li><a href="https://www.am12.jp/akashi-shigosen/">https://www.am12.jp/akashi-shigosen/</a></li><li>blind check 2026-10-25 (high): 10 June 1960 (1960年6月10日, 時の記念日); 20 m</li></ul></details>
+</div><div class="task" id="s-loc-2">
+  <div><span class="tag">s-loc-2</span><b>In welchem Jahr ging das Deutsche Spielkartenmuseum in Leinfelden-Echterdingen an das Land Baden-Württemberg und die Stadt über, und wann wurde es unter diesem Namen in Leinfelden eröffnet?</b></div>
+  <div class="sub">category general · lang de</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>In which year was the German Playing Card Museum transferred (sold) to the State of Baden-Württemberg and the city of Leinfelden-Echterdingen?</td><td class="mono">/\b1982\b/i</td></tr><tr><td>In which year was the Deutsches Spielkartenmuseum opened in Leinfelden (at today's Schönbuchschule site)?</td><td class="mono">/\b1974\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: In welchem Jahr ging das Deutsche Spielkartenmuseum in Leinfelden-Echterdingen an das Land Baden-Württemberg und die Stadt über, und wann wurde es unter diesem Namen in Leinfelden eröffnet?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. In which year was the German Playing Card Museum transferred (sold) to the State of Baden-Württemberg and the city of Leinfelden-Echterdingen?
+2. In which year was the Deutsches Spielkartenmuseum opened in Leinfelden (at today's Schönbuchschule site)?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://de.wikipedia.org/wiki/Deutsches_Spielkartenmuseum">https://de.wikipedia.org/wiki/Deutsches_Spielkartenmuseum</a></li><li><a href="https://www.museum.de/de/museen/deutsches-spielkarten-museum">https://www.museum.de/de/museen/deutsches-spielkarten-museum</a></li><li><a href="https://www.leinfelden-echterdingen.de/site/Leinfelden-Echterdingen-Internet/get/params_E1468261240/11388732/Chronik%20Leinfelden%20bis%201974.pdf (city chronicle, 1974: &quot;Eröffnung des Spielkartenmuseums in der Grundschule Süd&quot;)">https://www.leinfelden-echterdingen.de/site/Leinfelden-Echterdingen-Internet/get/params_E1468261240/11388732/Chronik%20Leinfelden%20bis%201974.pdf (city chronicle, 1974: &quot;Eröffnung des Spielkartenmuseums in der Grundschule Süd&quot;)</a></li><li>museum 40-year programme: transfer to the state and the city on 18 August 1982</li><li>blind check 2026-10-25 (medium): 1982 (sold by ASS on 18 August 1982 to the State of Baden-Württemberg and the city; became a branch of the Württembergisches Landesmuseum); 1974</li></ul></details>
+</div><div class="task" id="s-loc-3">
+  <div><span class="tag">s-loc-3</span><b>Quelle est la hauteur du phare de Cordouan et combien de marches faut-il gravir pour atteindre le sommet ouvert au public ?</b></div>
+  <div class="sub">category general · lang fr</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>How tall is the Cordouan lighthouse, in metres?</td><td class="mono">/\b67[.,]50?(?!\d)/i</td></tr><tr><td>How many steps must visitors climb to reach the top open to the public?</td><td class="mono">/\b301\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Quelle est la hauteur du phare de Cordouan et combien de marches faut-il gravir pour atteindre le sommet ouvert au public ?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. How tall is the Cordouan lighthouse, in metres?
+2. How many steps must visitors climb to reach the top open to the public?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.phare-de-cordouan.fr/decouvrir/visite-virtuelle/">https://www.phare-de-cordouan.fr/decouvrir/visite-virtuelle/</a></li><li><a href="https://www.phare-de-cordouan.fr/accessibilite/">https://www.phare-de-cordouan.fr/accessibilite/</a></li><li>blind check 2026-10-25 (high): 67.5 m (67,50 m); 301 steps</li></ul></details>
+</div><div class="task" id="s-loc-4">
+  <div><span class="tag">s-loc-4</span><b>¿En qué fecha se inauguró el Museo del Ferrocarril de Asturias en Gijón y en qué antigua estación está instalado?</b></div>
+  <div class="sub">category general · lang es</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>On what date was the Asturias Railway Museum in Gijón officially inaugurated?</td><td class="mono">/\b22\b.*(octubre|october|\boct\b|\/10\/|-10-|\.10\.).*1998|(october|octubre)\s*22.*1998|1998-10-22/i</td></tr><tr><td>Which former railway station building houses the museum?</td><td class="mono">/estaci[o\u00F3]n\s+(de(l)?\s+)?norte|north(ern)?\s+station/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: ¿En qué fecha se inauguró el Museo del Ferrocarril de Asturias en Gijón y en qué antigua estación está instalado?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. On what date was the Asturias Railway Museum in Gijón officially inaugurated?
+2. Which former railway station building houses the museum?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://directoriomuseos.mcu.es/dirmuseos/generaPDF.do?id=1091&amp;tipoPDF=fichaDetalle">https://directoriomuseos.mcu.es/dirmuseos/generaPDF.do?id=1091&amp;tipoPDF=fichaDetalle</a></li><li><a href="https://www.lne.es/gijon/2023/09/17/cuarto-siglo-futuro-tren-92191408.html">https://www.lne.es/gijon/2023/09/17/cuarto-siglo-futuro-tren-92191408.html</a></li><li>blind check 2026-10-25 (high): 22 October 1998 (inaugurated by Felipe, then Prince of Asturias; opened to the public the next day); The former Estación del Norte (Gijón's old Norte railway station)</li></ul></details>
+</div><div class="task" id="s-loc-5">
+  <div><span class="tag">s-loc-5</span><b>Quando è stato inaugurato il Museo del Violino di Cremona e chi ha curato il progetto acustico dell'Auditorium Giovanni Arvedi?</b></div>
+  <div class="sub">category general · lang it</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>On what date was the Museo del Violino in Cremona inaugurated?</td><td class="mono">/\b14\b.*(settembre|september|\bsept?\b|\/0?9\/|-09-|\.0?9\.).*2013|september\s*14.*2013|2013-09-14/i</td></tr><tr><td>Who was responsible for the acoustic design of the Auditorium Giovanni Arvedi?</td><td class="mono">/\btoyota\b|\bnagata\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Quando è stato inaugurato il Museo del Violino di Cremona e chi ha curato il progetto acustico dell'Auditorium Giovanni Arvedi?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. On what date was the Museo del Violino in Cremona inaugurated?
+2. Who was responsible for the acoustic design of the Auditorium Giovanni Arvedi?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.cremonaoggi.it/2013/09/14/aperto-lo-scrigno-della-liuteria-via-ufficiale-al-museo-violino/">https://www.cremonaoggi.it/2013/09/14/aperto-lo-scrigno-della-liuteria-via-ufficiale-al-museo-violino/</a></li><li><a href="https://museodelviolino.org/it/auditorium/">https://museodelviolino.org/it/auditorium/</a></li><li>blind check 2026-10-25 (high): 14 September 2013; Yasuhisa Toyota of Nagata Acoustics</li></ul></details>
+</div><div class="task" id="s-loc-6">
+  <div><span class="tag">s-loc-6</span><b>Em que data foi inaugurado o Ascensor da Bica, em Lisboa, e em que ano passou a ser propriedade da Carris?</b></div>
+  <div class="sub">category general · lang pt</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>On what date was the Bica funicular (Ascensor da Bica) inaugurated?</td><td class="mono">/\b28\b.*(junho|june|\bjun\b|\/0?6\/|-06-|\.0?6\.).*1892|june\s*28.*1892|1892-06-28/i</td></tr><tr><td>In which year did the Bica funicular become property of Carris?</td><td class="mono">/\b1926\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Em que data foi inaugurado o Ascensor da Bica, em Lisboa, e em que ano passou a ser propriedade da Carris?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. On what date was the Bica funicular (Ascensor da Bica) inaugurated?
+2. In which year did the Bica funicular become property of Carris?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.carris.pt/a-carris/historia/">https://www.carris.pt/a-carris/historia/</a></li><li><a href="https://carris.pt/descubra/frota/funciulares/">https://carris.pt/descubra/frota/funciulares/</a></li><li>blind check 2026-10-25 (high): 28 June 1892; 1926 (Carris acquired the Nova Companhia dos Ascensores Mecânicos de Lisboa's assets when that company was dissolved)</li></ul></details>
+</div><div class="task" id="s-loc-7">
+  <div><span class="tag">s-loc-7</span><b>How much does the official Fairphone 5 replacement battery weigh, and what is its capacity?</b></div>
+  <div class="sub">category general</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the weight of the Fairphone 5 spare battery?</td><td class="mono">/\b63[.,]7(?!\d)/i</td></tr><tr><td>What is the battery's capacity?</td><td class="mono">/\b4[,. ]?200\s*mah\b|\b4[,. ]?200\b|\b16[.,]25\s*wh\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: How much does the official Fairphone 5 replacement battery weigh, and what is its capacity?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the weight of the Fairphone 5 spare battery?
+2. What is the battery's capacity?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.fairphone.com/shop/fairphone-5-battery-259">https://www.fairphone.com/shop/fairphone-5-battery-259</a></li><li><a href="https://support.fairphone.com/hc/en-us/articles/10380972881681-Maximize-your-battery-life">https://support.fairphone.com/hc/en-us/articles/10380972881681-Maximize-your-battery-life</a></li><li>blind check 2026-10-25 (high): 63.7 g; 4200 mAh (16.25 Wh)</li></ul></details>
+</div><div class="task" id="s-new-1">
+  <div><span class="tag">s-new-1</span><b>Who won the men's singles final at the 2026 US Open tennis championships, and who did he beat in the final?</b></div>
+  <div class="sub">category news</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Who won the 2026 US Open men's singles title?</td><td class="mono">/zverev/i</td></tr><tr><td>Who was the runner-up (the losing finalist) in the 2026 US Open men's singles final?</td><td class="mono">/shelton/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Who won the men's singles final at the 2026 US Open tennis championships, and who did he beat in the final?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Who won the 2026 US Open men's singles title?
+2. Who was the runner-up (the losing finalist) in the 2026 US Open men's singles final?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.usopen.org/en_US/news/articles/2026-09-13/alexander_zverev_defeats_ben_shelton_to_win_2026_us_open.html">https://www.usopen.org/en_US/news/articles/2026-09-13/alexander_zverev_defeats_ben_shelton_to_win_2026_us_open.html</a></li><li><a href="https://www.atptour.com/en/news/us-open-2026-results">https://www.atptour.com/en/news/us-open-2026-results</a></li><li>blind check 2026-10-25 (high): Alexander Zverev; Ben Shelton (final score 6-3, 7-6(2), 5-7, 6-2 on 13 Sep 2026)</li></ul></details>
+</div><div class="task" id="s-new-2">
+  <div><span class="tag">s-new-2</span><b>Who received the 2026 Nobel Prize in Chemistry, and what was it awarded for?</b></div>
+  <div class="sub">category news</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Name the laureate(s) of the 2026 Nobel Prize in Chemistry.</td><td class="mono">/^(?=[\s\S]*kagan)(?=[\s\S]*soai)/i</td></tr><tr><td>What was the prize awarded for?</td><td class="mono">/asymmetric.*autocataly|autocataly.*asymmetric/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Who received the 2026 Nobel Prize in Chemistry, and what was it awarded for?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Name the laureate(s) of the 2026 Nobel Prize in Chemistry.
+2. What was the prize awarded for?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.nobelprize.org/prizes/chemistry/2026/press-release/">https://www.nobelprize.org/prizes/chemistry/2026/press-release/</a></li><li><a href="https://www.kva.se/nyheter/nobelpriset-i-kemi-2026/">https://www.kva.se/nyheter/nobelpriset-i-kemi-2026/</a></li><li>blind check 2026-10-25 (high): Henri B. Kagan and Kenso Soai (jointly, 'for the discovery of non-linear effects and autocatalysis in asymmetric organic synthesis')</li></ul></details>
+</div><div class="task" id="s-new-3">
+  <div><span class="tag">s-new-3</span><b>What are the official US starting prices of the iPhone 18 Pro and iPhone 18 Pro Max that Apple announced in September 2026?</b></div>
+  <div class="sub">category news</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the US starting price of the iPhone 18 Pro?</td><td class="mono">/(?&lt;![\d,])1,?199(?![\d])/i</td></tr><tr><td>What is the US starting price of the iPhone 18 Pro Max?</td><td class="mono">/(?&lt;![\d,])1,?299(?![\d])/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What are the official US starting prices of the iPhone 18 Pro and iPhone 18 Pro Max that Apple announced in September 2026?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the US starting price of the iPhone 18 Pro?
+2. What is the US starting price of the iPhone 18 Pro Max?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/">https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/</a></li><li><a href="https://www.macrumors.com/2026/09/09/iphone-18-pro-pricing/">https://www.macrumors.com/2026/09/09/iphone-18-pro-pricing/</a></li><li>blind check 2026-10-25 (high): $1,199 (256GB); $1,299 (256GB)</li></ul></details>
+</div><div class="task" id="s-new-4">
+  <div><span class="tag">s-new-4</span><b>Who won the 2026 Mercury Prize, and for which album?</b></div>
+  <div class="sub">category news</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Which artist won the 2026 Mercury Prize?</td><td class="mono">/\braye\b/i</td></tr><tr><td>What is the title of the album that won the 2026 Mercury Prize?</td><td class="mono">/this music may contain hope/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Who won the 2026 Mercury Prize, and for which album?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Which artist won the 2026 Mercury Prize?
+2. What is the title of the album that won the 2026 Mercury Prize?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.mercuryprize.com/news/2026/raye-announced-as-overall-winner-of-the-2026-mercury-prize-album-of-the-year/">https://www.mercuryprize.com/news/2026/raye-announced-as-overall-winner-of-the-2026-mercury-prize-album-of-the-year/</a></li><li><a href="https://www.theguardian.com/music/2026/oct/22/raye-wins-2026-mercury-prize-for-this-music-may-contain-hope">https://www.theguardian.com/music/2026/oct/22/raye-wins-2026-mercury-prize-for-this-music-may-contain-hope</a></li><li>blind check 2026-10-25 (high): RAYE; THIS MUSIC MAY CONTAIN HOPE.</li></ul></details>
+</div><div class="task" id="s-new-5">
+  <div><span class="tag">s-new-5</span><b>In the final results of Sweden's September 2026 Riksdag election, how many seats did the Sweden Democrats and the Social Democrats each win?</b></div>
+  <div class="sub">category news</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>How many Riksdag seats did the Sweden Democrats (SD) win in the 2026 Swedish general election?</td><td class="mono">/\b62\b/i</td></tr><tr><td>How many Riksdag seats did the Social Democrats (S) win in the 2026 Swedish general election?</td><td class="mono">/\b99\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: In the final results of Sweden's September 2026 Riksdag election, how many seats did the Sweden Democrats and the Social Democrats each win?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. How many Riksdag seats did the Sweden Democrats (SD) win in the 2026 Swedish general election?
+2. How many Riksdag seats did the Social Democrats (S) win in the 2026 Swedish general election?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.riksdagen.se/sv/aktuellt/aktuelltnotiser/2026/sep/19/den-nya-riksdagen-efter-valet_cmsad780a37-f1ae-4d47-a4a7-b6ea2a69a21esv/">https://www.riksdagen.se/sv/aktuellt/aktuelltnotiser/2026/sep/19/den-nya-riksdagen-efter-valet_cmsad780a37-f1ae-4d47-a4a7-b6ea2a69a21esv/</a></li><li><a href="https://www.val.se/download/18.7faaad3f1a0b0c300e4282/1789822515986/beslutsprotokoll-resultat-riksdagen-2026.pdf">https://www.val.se/download/18.7faaad3f1a0b0c300e4282/1789822515986/beslutsprotokoll-resultat-riksdagen-2026.pdf</a></li><li>blind check 2026-10-25 (high): 62; 99</li></ul></details>
+</div><div class="task" id="s-new-6">
+  <div><span class="tag">s-new-6</span><b>Who were awarded the 2026 Sveriges Riksbank Prize in Economic Sciences (the economics Nobel)?</b></div>
+  <div class="sub">category news</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Name the laureate(s) of the 2026 Prize in Economic Sciences in Memory of Alfred Nobel.</td><td class="mono">/^(?=[\s\S]*\bhall\b)(?=[\s\S]*woodford)/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Who were awarded the 2026 Sveriges Riksbank Prize in Economic Sciences (the economics Nobel)?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Name the laureate(s) of the 2026 Prize in Economic Sciences in Memory of Alfred Nobel.
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://www.nobelprize.org/prizes/economic-sciences/2026/press-release/">https://www.nobelprize.org/prizes/economic-sciences/2026/press-release/</a></li><li><a href="https://www.riksbank.se/en-gb/press-and-published/notices-and-press-releases/notices/2026/they-are-awarded-the-prize-in-economic-sciences-2026/">https://www.riksbank.se/en-gb/press-and-published/notices-and-press-releases/notices/2026/they-are-awarded-the-prize-in-economic-sciences-2026/</a></li><li>blind check 2026-10-25 (high): Robert E. Hall and Michael Woodford (jointly, 'for microeconomic foundations of macroeconomic stabilisation')</li></ul></details>
+</div><h2>search · live-feed · 11</h2><div class="task" id="f-hn">
+  <div><span class="tag">f-hn</span><b>What are the top stories on Hacker News right now?</b></div>
+  <div class="sub">site news.ycombinator.com · fresh within 1 days · category news</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Hacker News Firebase API (topstories).</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 30 (token overlap or containment). Only what the pages fetched from news.ycombinator.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What are the top stories on Hacker News right now?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>HN Firebase API probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-ts">
+  <div><span class="tag">f-ts</span><b>What is the latest release of microsoft/TypeScript on GitHub?</b></div>
+  <div class="sub">site github.com · fresh within 60 days · category reference</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: GitHub releases API for microsoft/TypeScript (version tags only).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Only what the pages fetched from github.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is the latest release of microsoft/TypeScript on GitHub?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {&quot;answer&quot;: string}; use &quot;NOT FOUND&quot; if the documents do not contain it.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>GitHub releases API probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-node">
+  <div><span class="tag">f-node</span><b>What is the latest Node.js LTS version?</b></div>
+  <div class="sub">fresh within 60 days · category reference</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: https://nodejs.org/dist/index.json (newest LTS).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Pass at ≥ 0.8.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is the latest Node.js LTS version?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {&quot;answer&quot;: string}; use &quot;NOT FOUND&quot; if the documents do not contain it.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://nodejs.org/dist/index.json probed 2026-10-22">https://nodejs.org/dist/index.json probed 2026-10-22</a></li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-bbc">
+  <div><span class="tag">f-bbc</span><b>What are the top stories on BBC News right now?</b></div>
+  <div class="sub">site bbc.com · fresh within 1 days · category news</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://feeds.bbci.co.uk/news/rss.xml">https://feeds.bbci.co.uk/news/rss.xml</a> + <a href="https://feeds.bbci.co.uk/news/world/rss.xml">https://feeds.bbci.co.uk/news/world/rss.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Only what the pages fetched from bbc.com / bbc.co.uk / bbci.co.uk show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What are the top stories on BBC News right now?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>BBC News RSS probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-fr">
+  <div><span class="tag">f-fr</span><b>Quels sont les titres à la une du Monde ?</b></div>
+  <div class="sub">site lemonde.fr · fresh within 1 days · category news · lang fr</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.lemonde.fr/rss/une.xml">https://www.lemonde.fr/rss/une.xml</a> + <a href="https://www.lemonde.fr/rss/en_continu.xml">https://www.lemonde.fr/rss/en_continu.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Only what the pages fetched from lemonde.fr show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Quels sont les titres à la une du Monde ?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>Le Monde une.xml probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-de">
+  <div><span class="tag">f-de</span><b>Was sind die Top-Schlagzeilen auf Spiegel Online?</b></div>
+  <div class="sub">site spiegel.de · fresh within 1 days · category news · lang de</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.spiegel.de/index.rss">https://www.spiegel.de/index.rss</a> + <a href="https://www.spiegel.de/schlagzeilen/tops/index.rss">https://www.spiegel.de/schlagzeilen/tops/index.rss</a> + <a href="https://www.spiegel.de/schlagzeilen/index.rss">https://www.spiegel.de/schlagzeilen/index.rss</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Only what the pages fetched from spiegel.de show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Was sind die Top-Schlagzeilen auf Spiegel Online?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>Spiegel schlagzeilen RSS probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-wiki">
+  <div><span class="tag">f-wiki</span><b>What is today's featured article on English Wikipedia?</b></div>
+  <div class="sub">site wikipedia.org · fresh within 1 days · category reference</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Wikimedia featured-content API (today's featured article).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Only what the pages fetched from wikipedia.org show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is today's featured article on English Wikipedia?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {&quot;answer&quot;: string}; use &quot;NOT FOUND&quot; if the documents do not contain it.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>Wikipedia REST featured feed probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-spx">
+  <div><span class="tag">f-spx</span><b>What was the S&amp;P 500's closing level on the last trading day?</b></div>
+  <div class="sub">fresh within 4 days · category general</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: FRED series SP500.</p><p>The reader gives one number. Score 1 within ±0.02% of the latest value, 0.5 for the previous value, else 0. Pass at ≥ 0.8.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What was the S&amp;P 500's closing level on the last trading day?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single number it asks for, as written in the documents. Reply as {&quot;answer&quot;: number | null}.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>FRED SP500 series probed 2026-10-22 (last close 2026-10-21: 7757.17)</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-f1">
+  <div><span class="tag">f-f1</span><b>Who won the most recent Formula 1 Grand Prix?</b></div>
+  <div class="sub">category media</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: the Jolpica (Ergast) F1 API, winner of the most recent race; the surname alone also counts.</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Pass at ≥ 0.8.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Who won the most recent Formula 1 Grand Prix?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {&quot;answer&quot;: string}; use &quot;NOT FOUND&quot; if the documents do not contain it.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://api.jolpi.ca/ergast/f1/current/last/results.json (United States GP 2026-10-25: Andrea Kimi Antonelli)">https://api.jolpi.ca/ergast/f1/current/last/results.json (United States GP 2026-10-25: Andrea Kimi Antonelli)</a></li><li>the winner's surname alone also counts</li></ul></details>
+</div><div class="task" id="f-fx">
+  <div><span class="tag">f-fx</span><b>What is today's euro to US dollar exchange rate?</b></div>
+  <div class="sub">category general</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: the ECB reference rate via <a href="https://api.frankfurter.dev/v1/latest?from=EUR&amp;to=USD">Frankfurter</a>.</p><p>The reader gives one number. Score 1 within ±0.50% of the latest value, 0.5 for the previous value, else 0. Pass at ≥ 0.8.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is today's euro to US dollar exchange rate?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single number it asks for, as written in the documents. Reply as {&quot;answer&quot;: number | null}.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://api.frankfurter.dev/v1/latest?from=EUR&amp;to=USD (ECB reference rate)">https://api.frankfurter.dev/v1/latest?from=EUR&amp;to=USD (ECB reference rate)</a></li><li>±0.5% covers market quotes between ECB fixings</li></ul></details>
+</div><div class="task" id="f-pypi">
+  <div><span class="tag">f-pypi</span><b>What is the latest version of the Python requests library?</b></div>
+  <div class="sub">category reference</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: the PyPI JSON API (<a href="https://pypi.org/pypi/requests/json">requests</a>).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Pass at ≥ 0.8.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is the latest version of the Python requests library?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {&quot;answer&quot;: string}; use &quot;NOT FOUND&quot; if the documents do not contain it.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://pypi.org/pypi/requests/json (2.34.2 on 2026-10-25)">https://pypi.org/pypi/requests/json (2.34.2 on 2026-10-25)</a></li></ul></details>
+</div><h2>access · stable-read · 10</h2><div class="task" id="r-ig">
+  <div><span class="tag">r-ig</span><b>Read this Instagram profile and report the account handle and follower count.</b></div>
+  <div class="sub">site instagram.com · url <a href="https://www.instagram.com/nasa/">https://www.instagram.com/nasa/</a> · category social</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the account's handle or display name?</td><td class="mono">/nasa/i</td></tr><tr><td>How many followers does the account have?</td><td class="mono">/\b1\d{2}(\.\d+)?\s*(m\b|million)|\b1\d{2},\d{3},\d{3}\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this Instagram profile and report the account handle and follower count.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the account's handle or display name?
+2. How many followers does the account have?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>page capture 2026-10: 104,335,282 followers</li><li>blind check 2026-10-22: og tags &quot;104M Followers&quot;, @nasa</li></ul></details>
+</div><div class="task" id="r-x">
+  <div><span class="tag">r-x</span><b>Read this X profile and report the display name, handle and follower count.</b></div>
+  <div class="sub">site x.com · url <a href="https://x.com/NASA">https://x.com/NASA</a> · category social</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the profile's display name?</td><td class="mono">/nasa/i</td></tr><tr><td>What is the profile's handle?</td><td class="mono">/@?nasa\b/i</td></tr><tr><td>How many followers does the profile have?</td><td class="mono">/\b\d{2,3}(\.\d+)?\s*(m\b|million)|\b\d{2,3},\d{3},\d{3}\b/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this X profile and report the display name, handle and follower count.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the profile's display name?
+2. What is the profile's handle?
+3. How many followers does the profile have?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://x.com/NASA">https://x.com/NASA</a></li><li>blind check 2026-10-22: NASA @NASA, 92.3M followers</li></ul></details>
+</div><div class="task" id="r-nyt">
+  <div><span class="tag">r-nyt</span><b>Read this New York Times article and report its headline and the example bot it builds.</b></div>
+  <div class="sub">site nytimes.com · url <a href="https://www.nytimes.com/2023/03/28/technology/ai-chatbots-chatgpt-bing-bard-llm.html">https://www.nytimes.com/2023/03/28/technology/ai-chatbots-chatgpt-bing-bard-llm.html</a> · category news</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the article's headline?</td><td class="mono">/how does chatgpt really work|how chatbots and large language models.{0,20}actually work/i</td></tr><tr><td>What is the name of the example email bot the article walks through building?</td><td class="mono">/mailbot/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this New York Times article and report its headline and the example bot it builds.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the article's headline?
+2. What is the name of the example email bot the article walks through building?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>page capture (tavily, exa) 2026-10</li><li>blind check: visible headline &quot;How Does ChatGPT Really Work?&quot;, &lt;title&gt; &quot;How Chatbots and Large Language Models, or LLMs, Actually Work&quot;; MailBot (Wayback 2024)</li></ul></details>
+</div><div class="task" id="r-bbc">
+  <div><span class="tag">r-bbc</span><b>Read this BBC article and report its author and the share of digital communications carried by subsea cables.</b></div>
+  <div class="sub">site bbc.com · url <a href="https://www.bbc.com/future/article/20241014-the-deep-sea-emergency-service-that-keeps-the-internet-running">https://www.bbc.com/future/article/20241014-the-deep-sea-emergency-service-that-keeps-the-internet-running</a> · category news</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Who wrote the article?</td><td class="mono">/william park/i</td></tr><tr><td>What share of the world's digital communications rely on subsea cables, per the article?</td><td class="mono">/\b99\b|ninety-nine/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this BBC article and report its author and the share of digital communications carried by subsea cables.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Who wrote the article?
+2. What share of the world's digital communications rely on subsea cables, per the article?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>page capture (exa) 2026-10</li><li>blind check: William Park; 99% of digital communications</li></ul></details>
+</div><div class="task" id="r-amz">
+  <div><span class="tag">r-amz</span><b>Read this Amazon product page and report the product, its storage, screen size and star rating.</b></div>
+  <div class="sub">site amazon.com · url <a href="https://www.amazon.com/New-Amazon-Kindle-glare-free-adjustable/dp/B0DDZQTYHL">https://www.amazon.com/New-Amazon-Kindle-glare-free-adjustable/dp/B0DDZQTYHL</a> · category ecommerce</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What product is this?</td><td class="mono">/kindle/i</td></tr><tr><td>How much storage does it have?</td><td class="mono">/16\s?gb/i</td></tr><tr><td>What is the display size?</td><td class="mono">/\b6(\.0)?\s*(\u201D|&quot;|''|-?\s?inch|in\b)/i</td></tr><tr><td>What is its average star rating?</td><td class="mono">/\b4\.\d\b/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this Amazon product page and report the product, its storage, screen size and star rating.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What product is this?
+2. How much storage does it have?
+3. What is the display size?
+4. What is its average star rating?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>page capture (keenable) 2026-10: Kindle 16 GB (2024), 6&quot; display, 4.5 stars</li><li>blind check: Kindle 16 GB (2024), 6&quot; display, 4.5 stars (19,598 ratings)</li></ul></details>
+</div><div class="task" id="r-tgt">
+  <div><span class="tag">r-tgt</span><b>Read this Target product page and report the product name and price.</b></div>
+  <div class="sub">site target.com · url <a href="https://www.target.com/p/airpods-pro-2nd-generation-with-magsafe-case-usb-c/-/A-85978622">https://www.target.com/p/airpods-pro-2nd-generation-with-magsafe-case-usb-c/-/A-85978622</a> · category ecommerce</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What product is this?</td><td class="mono">/airpods pro/i</td></tr><tr><td>What is the listed price?</td><td class="mono">/\$\s?\d{2,3}(\.\d{2})?/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this Target product page and report the product name and price.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What product is this?
+2. What is the listed price?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>page capture 2026-10</li><li>blind check: Apple AirPods Pro 2, $249.99 (redsky API)</li></ul></details>
+</div><div class="task" id="r-hd">
+  <div><span class="tag">r-hd</span><b>Read this Home Depot product page and report the model number, battery capacity and top speed.</b></div>
+  <div class="sub">site homedepot.com · url <a href="https://www.homedepot.com/p/DEWALT-20V-MAX-Cordless-1-2-in-Drill-Driver-2-20V-1-3Ah-Batteries-Charger-and-Bag-DCD771C2/204279858">https://www.homedepot.com/p/DEWALT-20V-MAX-Cordless-1-2-in-Drill-Driver-2-20V-1-3Ah-Batteries-Charger-and-Bag-DCD771C2/204279858</a> · category ecommerce</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the model number?</td><td class="mono">/dcd771c2/i</td></tr><tr><td>What is the capacity of the included batteries?</td><td class="mono">/1\.3\s?ah/i</td></tr><tr><td>What is the maximum speed in RPM?</td><td class="mono">/1,?500/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this Home Depot product page and report the model number, battery capacity and top speed.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the model number?
+2. What is the capacity of the included batteries?
+3. What is the maximum speed in RPM?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>page capture (exa) 2026-10: DCD771C2, (2) 1.3Ah, 0-1500 rpm</li><li>blind check: DCD771C2, 2x 1.3Ah, 0-1,500 RPM</li></ul></details>
+</div><div class="task" id="r-yt">
+  <div><span class="tag">r-yt</span><b>Read this YouTube video page and report the title and channel.</b></div>
+  <div class="sub">site youtube.com · url <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a> · category media</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the video's title?</td><td class="mono">/never gonna give you up/i</td></tr><tr><td>Which channel published it?</td><td class="mono">/rick astley/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this YouTube video page and report the title and channel.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the video's title?
+2. Which channel published it?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a></li><li>blind check: oEmbed title &quot;Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)&quot;, channel Rick Astley</li></ul></details>
+</div><div class="task" id="r-li">
+  <div><span class="tag">r-li</span><b>Read this LinkedIn company page and report the company, headquarters and industry.</b></div>
+  <div class="sub">site linkedin.com · url <a href="https://www.linkedin.com/company/openai/">https://www.linkedin.com/company/openai/</a> · category social</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>Which company is this?</td><td class="mono">/openai/i</td></tr><tr><td>Where is it headquartered?</td><td class="mono">/san francisco/i</td></tr><tr><td>What industry is it listed under?</td><td class="mono">/research/i</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this LinkedIn company page and report the company, headquarters and industry.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. Which company is this?
+2. Where is it headquartered?
+3. What industry is it listed under?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>page capture (tavily) 2026-10: Research Services, San Francisco, CA</li><li>blind check: OpenAI, San Francisco CA, Research Services</li></ul></details>
+</div><div class="task" id="r-arxiv">
+  <div><span class="tag">r-arxiv</span><b>Read this arXiv abstract page and report the title, first author and submission year.</b></div>
+  <div class="sub">site arxiv.org · url <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a> · category reference</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>What is the paper's title?</td><td class="mono">/attention is all you need/i</td></tr><tr><td>Who is the first author?</td><td class="mono">/vaswani/i</td></tr><tr><td>In what year was it first submitted?</td><td class="mono">/2017/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Read this arXiv abstract page and report the title, first author and submission year.
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. What is the paper's title?
+2. Who is the first author?
+3. In what year was it first submitted?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a></li><li>blind check: Attention Is All You Need, Vaswani, v1 12 Jun 2017</li></ul></details>
+</div><h2>access · stable-lookup · 1</h2><div class="task" id="l-wmt">
+  <div><span class="tag">l-wmt</span><b>How many days does Walmart give you to return most items?</b></div>
+  <div class="sub">site walmart.com · category ecommerce</div>
+  <p>The reader answers each question; each answer is matched against its regex. Score = share of facts matched (partial credit). Pass at ≥ 0.8.</p>
+<table><thead><tr><th>question sent to the reader</th><th>accepted answer (regex)</th></tr></thead><tbody>
+<tr><td>How many days do you have to return most items?</td><td class="mono">/\b90\b/</td></tr>
+</tbody></table>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: How many days does Walmart give you to return most items?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+QUESTIONS:
+1. How many days do you have to return most items?
+
+Reply as {&quot;answers&quot;: [string, ...]} with one answer per question, in order. Use &quot;NOT FOUND&quot; for any answer the documents do not contain.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li><a href="https://www.walmart.com/cp/returns/1231920 (90 days, checked 2026-10-22)">https://www.walmart.com/cp/returns/1231920 (90 days, checked 2026-10-22)</a></li><li>blind check: https://www.walmart.com/help/article/walmart-standard-return-policy/adc0dfb692954e67a4de206fb8d9e03a (90 days)</li></ul></details>
+</div><h2>access · live-feed · 13</h2><div class="task" id="f-yt">
+  <div><span class="tag">f-yt</span><b>What is MrBeast's latest YouTube video?</b></div>
+  <div class="sub">site youtube.com · fresh within 14 days · category media</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA">https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA</a>.</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Only what the pages fetched from youtube.com / youtu.be show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is MrBeast's latest YouTube video?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {&quot;answer&quot;: string}; use &quot;NOT FOUND&quot; if the documents do not contain it.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>channel RSS returns &lt;name&gt;MrBeast&lt;/name&gt;, probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-rd1">
+  <div><span class="tag">f-rd1</span><b>What are the top posts on r/technology today?</b></div>
+  <div class="sub">site reddit.com · fresh within 2 days · category social</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.reddit.com/r/technology/top/.rss?t=day&amp;limit=25">https://www.reddit.com/r/technology/top/.rss?t=day&amp;limit=25</a> + <a href="https://www.reddit.com/r/technology/.rss?limit=25">https://www.reddit.com/r/technology/.rss?limit=25</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 50 (token overlap or containment). Only what the pages fetched from reddit.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What are the top posts on r/technology today?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>RSS probed 2026-10-22 (JSON API returns 403 to servers)</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-rd2">
+  <div><span class="tag">f-rd2</span><b>What are the top posts on r/LocalLLaMA this week?</b></div>
+  <div class="sub">site reddit.com · fresh within 7 days · category social</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://www.reddit.com/r/LocalLLaMA/top/.rss?t=week&amp;limit=25">https://www.reddit.com/r/LocalLLaMA/top/.rss?t=week&amp;limit=25</a> + <a href="https://www.reddit.com/r/LocalLLaMA/.rss?limit=25">https://www.reddit.com/r/LocalLLaMA/.rss?limit=25</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 50 (token overlap or containment). Only what the pages fetched from reddit.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What are the top posts on r/LocalLLaMA this week?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>RSS probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="f-nyt">
+  <div><span class="tag">f-nyt</span><b>What are the top headlines on nytimes.com right now?</b></div>
+  <div class="sub">site nytimes.com · fresh within 1 days · category news</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: <a href="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml">https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml</a>.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 100 (token overlap or containment). Only what the pages fetched from nytimes.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What are the top headlines on nytimes.com right now?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-22</summary><ul><li>NYT HomePage RSS probed 2026-10-22</li><li>live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied</li></ul></details>
+</div><div class="task" id="a-nba">
+  <div><span class="tag">a-nba</span><b>What were last night's NBA scores?</b></div>
+  <div class="sub">site espn.com · fresh within 2 days · category media</div>
+  <p><b>Ground truth</b> captured for the round's date (finals never change, so the capture time does not matter), from: ESPN's public scoreboard API (<a href="https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard">NBA</a>), every final of the most recent US game day before the round.</p><p>The reader lists the games and final scores the documents show. A game counts when both teams and both scores match an official final of that game day and the pages show them; score = counted games / 2, capped at 1. Scores from an older game day count for nothing. Only what the pages fetched from espn.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What were last night's NBA scores?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the final scores the DOCUMENTS show for the games the REQUEST asks about, as written in the documents (at most 15 games). Reply as {&quot;games&quot;: [{&quot;teams&quot;: [string, string], &quot;scores&quot;: [number, number]}, ...]} with each score in the same order as its team; use [] if the documents show none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-25</summary><ul><li><a href="https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard">https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard</a></li><li>reference = final scores of the most recent US game day before the round (America/New_York)</li></ul></details>
+</div><div class="task" id="a-npm">
+  <div><span class="tag">a-npm</span><b>What is the latest version of React on npmjs.com?</b></div>
+  <div class="sub">site npmjs.com · category reference</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: the npm registry (<a href="https://registry.npmjs.org/react/latest">react/latest</a>).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Only what the pages fetched from npmjs.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is the latest version of React on npmjs.com?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {&quot;answer&quot;: string}; use &quot;NOT FOUND&quot; if the documents do not contain it.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://registry.npmjs.org/react (dist-tags.latest = 19.3.1 on 2026-10-25)">https://registry.npmjs.org/react (dist-tags.latest = 19.3.1 on 2026-10-25)</a></li><li>npmjs.com answers a plain fetch with a Cloudflare 403</li></ul></details>
+</div><div class="task" id="a-cmc">
+  <div><span class="tag">a-cmc</span><b>What is the price of Bitcoin on CoinMarketCap right now?</b></div>
+  <div class="sub">site coinmarketcap.com · category general</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: the mean of the Coinbase and CoinGecko spot prices, fetched together.</p><p>The reader gives one number. Score 1 within ±1.00% of the latest value, 0.5 for the previous value, else 0. Only what the pages fetched from coinmarketcap.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is the price of Bitcoin on CoinMarketCap right now?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single number it asks for, as written in the documents. Reply as {&quot;answer&quot;: number | null}.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://api.coinbase.com/v2/prices/BTC-USD/spot">https://api.coinbase.com/v2/prices/BTC-USD/spot</a></li><li><a href="https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&amp;vs_currencies=usd">https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&amp;vs_currencies=usd</a></li><li>reference = mean of both spots in the same minute; ±1% covers page lag</li></ul></details>
+</div><div class="task" id="a-bsky">
+  <div><span class="tag">a-bsky</span><b>What has The New York Times posted on Bluesky today?</b></div>
+  <div class="sub">site bsky.app · category social</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Bluesky's public AppView (<a href="https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=nytimes.com">nytimes.com</a>), its own posts, newest first.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 50 (token overlap or containment). Only what the pages fetched from bsky.app show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What has The New York Times posted on Bluesky today?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=nytimes.com">https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=nytimes.com</a></li><li>bsky.app renders posts with JavaScript only</li></ul></details>
+</div><div class="task" id="a-epl">
+  <div><span class="tag">a-epl</span><b>Who are the top 5 teams in the Premier League table on ESPN?</b></div>
+  <div class="sub">site espn.com · category media</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: ESPN's public standings API (<a href="https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings">eng.1</a>), the table in rank order.</p><p>The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top 5 (token overlap or containment). Only what the pages fetched from espn.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: Who are the top 5 teams in the Premier League table on ESPN?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the 5 most prominent items (headlines or post titles; an item's summary line if the page shows no headline) from the DOCUMENTS that answer the REQUEST, copied exactly as written, most prominent first. List fewer only if the documents contain fewer than 5. Reply as {&quot;items&quot;: [string, ...]}; use [] if the documents contain none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings">https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings</a></li><li>reference = the top 5 by table rank; espn.com answers bots with an empty 202</li></ul></details>
+</div><div class="task" id="a-nfl">
+  <div><span class="tag">a-nfl</span><b>What were the scores of the most recent NFL games on NFL.com?</b></div>
+  <div class="sub">site nfl.com · category media</div>
+  <p><b>Ground truth</b> captured for the round's date (finals never change, so the capture time does not matter), from: ESPN's public scoreboard API (<a href="https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard">NFL</a>), every final of the most recent US game day before the round.</p><p>The reader lists the games and final scores the documents show. A game counts when both teams and both scores match an official final of that game day and the pages show them; score = counted games / 2, capped at 1. Scores from an older game day count for nothing. Only what the pages fetched from nfl.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What were the scores of the most recent NFL games on NFL.com?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+List the final scores the DOCUMENTS show for the games the REQUEST asks about, as written in the documents (at most 15 games). Reply as {&quot;games&quot;: [{&quot;teams&quot;: [string, string], &quot;scores&quot;: [number, number]}, ...]} with each score in the same order as its team; use [] if the documents show none.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard">https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard</a></li><li>reference = finals of the most recent US game day before the round; a one-game day needs that one game</li></ul></details>
+</div><div class="task" id="a-yhoo">
+  <div><span class="tag">a-yhoo</span><b>What is Apple's stock price on Yahoo Finance?</b></div>
+  <div class="sub">site finance.yahoo.com · category general</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Yahoo Finance's chart API (<a href="https://query1.finance.yahoo.com/v8/finance/chart/AAPL">AAPL</a>): the quote the page shows; the previous close earns half.</p><p>The reader gives one number. Score 1 within ±0.50% of the latest value, 0.5 for the previous value, else 0. Only what the pages fetched from finance.yahoo.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is Apple's stock price on Yahoo Finance?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single number it asks for, as written in the documents. Reply as {&quot;answer&quot;: number | null}.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://query1.finance.yahoo.com/v8/finance/chart/AAPL">https://query1.finance.yahoo.com/v8/finance/chart/AAPL</a></li><li>reference = the quote the page itself shows (last trade, or the last close when the market is shut); previous close earns half</li></ul></details>
+</div><div class="task" id="a-steam">
+  <div><span class="tag">a-steam</span><b>What does Elden Ring cost on Steam, in US dollars?</b></div>
+  <div class="sub">site store.steampowered.com · category ecommerce</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Steam's app-details API (<a href="https://store.steampowered.com/api/appdetails?appids=1245620&amp;cc=us">US store</a>); during a sale the pre-sale price earns half.</p><p>The reader gives one number. Score 1 within ±1.00% of the latest value, 0.5 for the previous value, else 0. Only what the pages fetched from store.steampowered.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What does Elden Ring cost on Steam, in US dollars?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single number it asks for, as written in the documents. Reply as {&quot;answer&quot;: number | null}.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://store.steampowered.com/api/appdetails?appids=1245620&amp;cc=us">https://store.steampowered.com/api/appdetails?appids=1245620&amp;cc=us</a></li><li>reference = the current US price; the pre-sale price earns half during a discount; the store page sits behind an age gate</li></ul></details>
+</div><div class="task" id="a-app">
+  <div><span class="tag">a-app</span><b>What is the current version of the ChatGPT app on the App Store?</b></div>
+  <div class="sub">site apps.apple.com · category reference</div>
+  <p><b>Ground truth</b> captured in the same round, minutes before the providers run, from: Apple's iTunes lookup API (<a href="https://itunes.apple.com/lookup?id=6448311069&amp;country=us">app 6448311069</a>).</p><p>The reader names one item. Score 1 if it is the newest reference item (or another item the source marks as also current), 0.5 for one of the two before it or the same major version, else 0. Only what the pages fetched from apps.apple.com show counts; the same answer read off a mirror or aggregator fetched alongside earns nothing. Pass at ≥ 0.8, and at least one fetched page must be on the site.</p>
+  <details><summary>Exact prompt sent to the reader</summary><pre>RUN DATE: &lt;RUN DATE, YYYY-MM-DD&gt;
+REQUEST: What is the current version of the ChatGPT app on the App Store?
+
+DOCUMENTS:
+--- DOCUMENT 1 — SOURCE URL: &lt;url of the 1st fetched page&gt;
+PAGE TITLE: &lt;only when the provider returned the title as metadata&gt;
+&lt;page content as returned by the provider, first 40,000 characters&gt;
+
+--- DOCUMENT 2 — SOURCE URL: &lt;url of the 2nd fetched page&gt;
+&lt;…&gt;
+
+--- DOCUMENT 3 — SOURCE URL: &lt;url of the 3rd fetched page&gt;
+&lt;…&gt;
+
+Answer the REQUEST with the single item it asks for (exact title, name or version number as written in the documents). Reply as {&quot;answer&quot;: string}; use &quot;NOT FOUND&quot; if the documents do not contain it.</pre></details>
+  <details><summary>Verification: agent-check · 2026-10-26</summary><ul><li>feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07</li><li><a href="https://itunes.apple.com/lookup?id=6448311069&amp;country=us (1.2026.286 on 2026-10-25)">https://itunes.apple.com/lookup?id=6448311069&amp;country=us (1.2026.286 on 2026-10-25)</a></li></ul></details>
+</div>
+
+</div></div>
+
+</body></html>

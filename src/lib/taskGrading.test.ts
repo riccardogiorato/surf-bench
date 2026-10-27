@@ -81,6 +81,7 @@ describe("groundedIn", () => {
     expect(groundedIn("3.0%", "| Sep'25 | 3.0 | 3.0 |")).toBe(true);
     expect(groundedIn("120.1 billion", "| Net income | | $120,067 |")).toBe(true);
     expect(groundedIn("24.22.0", "| [24.22.0](https://github.com/nodejs/node) (14 Oct 2026) |")).toBe(true);
+    expect(groundedIn("1.2026.286", "Version History 1.2026.2862d ago 1.2026.279Oct 16")).toBe(true);
     expect(groundedIn("September 11, 2008", "on 11 September 2008 the paper")).toBe(true);
     expect(groundedIn("1960年6月10日", "開業は1960年6月10日です")).toBe(true);
     expect(groundedIn("Criteria in the Criticism of West African Fiction", "thesis was on “Criteria in the [Criticism](https://m-w.com/c) of West African Fiction”")).toBe(true);
@@ -91,6 +92,7 @@ describe("groundedIn", () => {
     expect(groundedIn("1926", "the Bica funicular opened in 1927")).toBe(false);
     expect(groundedIn("2017", "arXiv:1706.03762 Attention Is All You Need")).toBe(false);
     expect(groundedIn("24.22.1", "latest 24.22.0 and 24.22.10")).toBe(false);
+    expect(groundedIn("1.2026.28", "Version 1.2026.286 released")).toBe(false);
     expect(groundedIn("Kagan", "Kaganovich was a politician")).toBe(false);
   });
   it("takes each required term from a lookahead-only key", () => {
@@ -137,10 +139,10 @@ describe("gradeScores", () => {
 });
 
 describe("task set", () => {
-  it("has 84 unique tasks with a grading contract each, 53 search / 31 access", () => {
-    expect(TASKS).toHaveLength(84);
-    expect(new Set(TASKS.map((t) => t.id)).size).toBe(84);
-    expect(TASKS.filter((t) => trackOf(t) === "access")).toHaveLength(31);
+  it("has 80 unique tasks with a grading contract each, 56 search / 24 access", () => {
+    expect(TASKS).toHaveLength(80);
+    expect(new Set(TASKS.map((t) => t.id)).size).toBe(80);
+    expect(TASKS.filter((t) => trackOf(t) === "access")).toHaveLength(24);
     for (const t of TASKS) {
       if (t.tier.startsWith("stable")) expect(t.facts?.length, t.id).toBeGreaterThan(0);
       if (t.tier === "stable-read") expect(t.url, t.id).toBeTruthy();

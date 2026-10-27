@@ -1,4 +1,4 @@
-// SurfBench v2 task set: 84 hand-curated tasks in two weighted tracks (search,
+// SurfBench v2 task set: 80 hand-curated tasks in two weighted tracks (search,
 // access; see TRACKS below), one event.
 //
 // Every task carries its own grading contract (gold facts, a live reference
@@ -35,7 +35,18 @@ export type FeedSource =
   | { type: "node-lts" }
   | { type: "wikipedia-featured" }
   | { type: "fred"; series: string }
-  | { type: "espn-scoreboard"; league: "nba" };
+  | { type: "espn-scoreboard"; sport: string; league: string }
+  | { type: "espn-standings"; league: string }
+  | { type: "npm-latest"; pkg: string }
+  | { type: "pypi-latest"; pkg: string }
+  | { type: "itunes-version"; appId: number }
+  | { type: "crypto-spot"; coin: "bitcoin" }
+  | { type: "bluesky-feed"; actor: string }
+  | { type: "polymarket-events" }
+  | { type: "yahoo-quote"; symbol: string }
+  | { type: "steam-price"; appId: number }
+  | { type: "f1-last-winner" }
+  | { type: "ecb-rate"; from: string; to: string };
 
 export interface Task {
   id: string;
@@ -60,6 +71,7 @@ export const AGENT_CHECK = "agent-check";
 const draft = (...evidence: string[]) => ({ by: AGENT_DRAFT, at: "2026-10-22", evidence });
 const checked = (...evidence: string[]) => ({ by: AGENT_CHECK, at: "2026-10-22", evidence });
 const checkedOn = (at: string, ...evidence: string[]) => ({ by: AGENT_CHECK, at, evidence });
+const draftOn = (at: string, ...evidence: string[]) => ({ by: AGENT_DRAFT, at, evidence });
 
 // Repeats per release. Stable tasks are deterministic enough to run once;
 // live tasks are averaged over rounds so one flaky request can't flip a cell.
@@ -75,8 +87,7 @@ const ACCESS_TASKS = new Set([
   "r-ig", "r-x", "r-nyt", "r-bbc", "r-amz", "r-tgt", "r-hd", "r-yt", "r-li", "r-arxiv",
   "l-wmt",
   "f-yt", "f-rd1", "f-rd2", "f-nyt",
-  "j-x1", "j-x2", "j-ig", "j-fb", "j-tt", "j-li", "j-amz1", "j-amz2", "j-ebay", "j-wmt",
-  "j-bby", "j-zil", "j-cl", "j-abnb", "f-espn", "j-ml",
+  "a-nba", "a-npm", "a-cmc", "a-bsky", "a-epl", "a-nfl", "a-yhoo", "a-steam", "a-app",
 ]);
 export const trackOf = (t: Task | string): Track => (ACCESS_TASKS.has(typeof t === "string" ? t : t.id) ? "access" : "search");
 
@@ -91,7 +102,7 @@ export const TASK_GROUPS = [
   { id: "lookups", label: "Classic lookups", prefix: "l-" },
   { id: "feeds", label: "Live feeds", prefix: "f-" },
   { id: "pages", label: "Hard-site pages", prefix: "r-" },
-  { id: "walled", label: "Live on walled sites", prefix: "j-" },
+  { id: "walled", label: "Live on hard sites", prefix: "a-" },
 ] as const;
 export type TaskGroup = (typeof TASK_GROUPS)[number]["id"];
 export const groupOf = (t: Task | string): TaskGroup => {
@@ -678,103 +689,81 @@ export const TASKS: Task[] = [
     verified: checked("FRED SP500 series probed 2026-10-22 (last close 2026-10-21: 7757.17)", "live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
   },
 
-  // ---------------- live-judge: no feed exists; explicit yes/no constraints ----------------
+  // ---------------- live-feed on hard sites: the site walls bots, a free official API gives the truth ----------------
   {
-    id: "j-x1", tier: "live-judge", category: "social", site: "x.com", freshDays: 14,
-    request: "Show me MrBeast's 5 most recent posts on X.",
-    constraints: ["At least 3 distinct posts by @MrBeast are shown with their text"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-x2", tier: "live-judge", category: "social", site: "x.com", freshDays: 7,
-    request: "What did NASA post on X this week?",
-    constraints: ["At least 1 post by @NASA is shown with its text"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-ig", tier: "live-judge", category: "social", site: "instagram.com", freshDays: 14,
-    request: "What are National Geographic's latest Instagram posts?",
-    constraints: ["At least 2 posts by @natgeo are shown with their captions"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-fb", tier: "live-judge", category: "social", site: "facebook.com", freshDays: 14,
-    request: "What has NASA posted on Facebook recently?",
-    constraints: ["At least 1 post by NASA's main Facebook page (facebook.com/NASA) is shown with its text; NASA center or mission pages do not count"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-tt", tier: "live-judge", category: "social", site: "tiktok.com", freshDays: 30,
-    request: "What are NASA's most recent TikTok videos?",
-    constraints: ["At least 2 videos by @nasa are listed with titles or captions"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-li", tier: "live-judge", category: "social", site: "linkedin.com", freshDays: 30,
-    request: "Find open software engineer roles at Stripe on LinkedIn.",
-    constraints: ["A LinkedIn job listing (linkedin.com/jobs/...) for a software engineering role at Stripe is shown; feed posts about hiring do not count", "The listing is not marked as no longer accepting applications"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-amz1", tier: "live-judge", category: "ecommerce", site: "amazon.com",
-    request: "What is the current price of the Kindle Paperwhite on Amazon?",
-    constraints: ["The product shown is a Kindle Paperwhite (not another Kindle model)", "A specific price in USD is shown for it", "The listing looks currently purchasable (in stock, add to cart, pre-order or similar), not discontinued or unavailable"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-amz2", tier: "live-judge", category: "ecommerce", site: "amazon.com",
-    request: "Find a USB-C charger on Amazon under $30.",
-    constraints: ["One specific product is identified with its own details and price (an item page, or a single named item with its price on a results page)", "The product is a USB-C wall charger (a power adapter, not just a cable)", "Its price is under $30", "The listing looks currently purchasable (in stock, add to cart, pre-order or similar), not discontinued or unavailable"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-ebay", tier: "live-judge", category: "ecommerce", site: "ebay.com",
-    request: "Find a used Nintendo Switch OLED listed on eBay right now.",
-    constraints: ["A specific active eBay listing is shown", "The item is a Nintendo Switch OLED", "The item is used or pre-owned", "A price is shown"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-wmt", tier: "live-judge", category: "ecommerce", site: "walmart.com",
-    request: "What does Walmart charge for AirPods Pro 2?",
-    constraints: ["The product shown is new Apple AirPods Pro 2 (not pre-owned, refurbished, restored or open-box)", "A specific Walmart price for that new product is shown", "The listing looks currently purchasable (in stock, add to cart, pre-order or similar), not discontinued or unavailable"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-bby", tier: "live-judge", category: "ecommerce", site: "bestbuy.com",
-    request: "Is the 13-inch MacBook Air M5 in stock at Best Buy, and what does it cost?",
-    constraints: ["The product shown is a 13-inch MacBook Air with M5 chip", "A specific Best Buy price is shown", "Availability or stock status is stated"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-zil", tier: "live-judge", category: "realestate", site: "zillow.com",
-    request: "Find a 2-bedroom home for sale in Austin, TX under $500k on Zillow.",
-    constraints: ["One specific property listing is identified with its own details and price (an item page, or a single named item with its price on a results page)", "It is in Austin, TX", "It has 2 bedrooms", "It is listed for sale (active, not sold, pending or a rental) at under $500,000"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-cl", tier: "live-judge", category: "realestate", site: "craigslist.org", freshDays: 30,
-    request: "Find a 1-bedroom apartment for rent in Brooklyn on Craigslist.",
-    constraints: ["One specific rental listing is identified with its own details and rent", "It is in Brooklyn", "It has 1 bedroom"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "j-abnb", tier: "live-judge", category: "realestate", site: "airbnb.com",
-    request: "Find an Airbnb in Lisbon for 2 guests under $120 a night.",
-    constraints: ["One specific Airbnb listing is identified with its own details", "It is in Lisbon", "It fits at least 2 guests", "A nightly price under $120 is shown"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
-  },
-  {
-    id: "f-espn", tier: "live-feed", category: "media", site: "espn.com", freshDays: 2,
+    id: "a-nba", tier: "live-feed", category: "media", site: "espn.com", freshDays: 2,
     request: "What were last night's NBA scores?",
-    // Was a judged task (j-espn); ESPN's public scoreboard API gives the true finals.
-    reference: { kind: "scores", minGames: 2, source: { type: "espn-scoreboard", league: "nba" } },
+    // Was a judged task (j-espn, then f-espn); ESPN's public scoreboard API gives the true finals.
+    reference: { kind: "scores", minGames: 2, source: { type: "espn-scoreboard", sport: "basketball", league: "nba" } },
     verified: checkedOn("2026-10-25", "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard", "reference = final scores of the most recent US game day before the round (America/New_York)"),
   },
   {
-    id: "j-ml", tier: "live-judge", category: "ecommerce", site: "mercadolibre.com.mx", lang: "es",
-    request: "¿Cuánto cuesta el iPhone 16 en Mercado Libre México?",
-    constraints: ["One specific base iPhone 16 (not 16 Plus, 16 Pro, 16e or iPhone 15) is identified with its own price", "A price in MXN is shown", "The listing looks currently purchasable (in stock, add to cart, pre-order or similar), not discontinued or unavailable"],
-    verified: checked("live-task review 2026-10-22: contract checked against run 2026-10-22T11-29 data by an independent agent; fixes applied"),
+    id: "a-npm", tier: "live-feed", category: "reference", site: "npmjs.com",
+    request: "What is the latest version of React on npmjs.com?",
+    reference: { kind: "latest", source: { type: "npm-latest", pkg: "react" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://registry.npmjs.org/react (dist-tags.latest = 19.3.1 on 2026-10-25)", "npmjs.com answers a plain fetch with a Cloudflare 403"),
+  },
+  {
+    id: "a-cmc", tier: "live-feed", category: "general", site: "coinmarketcap.com",
+    request: "What is the price of Bitcoin on CoinMarketCap right now?",
+    reference: { kind: "numeric", tolerance: 0.01, source: { type: "crypto-spot", coin: "bitcoin" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://api.coinbase.com/v2/prices/BTC-USD/spot", "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", "reference = mean of both spots in the same minute; ±1% covers page lag"),
+  },
+  {
+    id: "a-bsky", tier: "live-feed", category: "social", site: "bsky.app",
+    request: "What has The New York Times posted on Bluesky today?",
+    reference: { kind: "overlap", pool: 50, source: { type: "bluesky-feed", actor: "nytimes.com" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=nytimes.com", "bsky.app renders posts with JavaScript only"),
+  },
+  {
+    id: "a-epl", tier: "live-feed", category: "media", site: "espn.com",
+    request: "Who are the top 5 teams in the Premier League table on ESPN?",
+    reference: { kind: "overlap", pool: 5, source: { type: "espn-standings", league: "eng.1" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings", "reference = the top 5 by table rank; espn.com answers bots with an empty 202"),
+  },
+  {
+    id: "a-nfl", tier: "live-feed", category: "media", site: "nfl.com",
+    request: "What were the scores of the most recent NFL games on NFL.com?",
+    reference: { kind: "scores", minGames: 2, source: { type: "espn-scoreboard", sport: "football", league: "nfl" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard", "reference = finals of the most recent US game day before the round; a one-game day needs that one game"),
+  },
+  {
+    id: "a-yhoo", tier: "live-feed", category: "general", site: "finance.yahoo.com",
+    request: "What is Apple's stock price on Yahoo Finance?",
+    reference: { kind: "numeric", tolerance: 0.005, source: { type: "yahoo-quote", symbol: "AAPL" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://query1.finance.yahoo.com/v8/finance/chart/AAPL", "reference = the quote the page itself shows (last trade, or the last close when the market is shut); previous close earns half"),
+  },
+  {
+    id: "a-steam", tier: "live-feed", category: "ecommerce", site: "store.steampowered.com",
+    request: "What does Elden Ring cost on Steam, in US dollars?",
+    reference: { kind: "numeric", tolerance: 0.01, source: { type: "steam-price", appId: 1245620 } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://store.steampowered.com/api/appdetails?appids=1245620&cc=us", "reference = the current US price; the pre-sale price earns half during a discount; the store page sits behind an age gate"),
+  },
+  {
+    id: "a-app", tier: "live-feed", category: "reference", site: "apps.apple.com",
+    request: "What is the current version of the ChatGPT app on the App Store?",
+    reference: { kind: "latest", source: { type: "itunes-version", appId: 6448311069 } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://itunes.apple.com/lookup?id=6448311069&country=us (1.2026.286 on 2026-10-25)"),
+  },
+
+  // ---------------- live-feed on the open web ----------------
+  {
+    id: "f-f1", tier: "live-feed", category: "media",
+    request: "Who won the most recent Formula 1 Grand Prix?",
+    reference: { kind: "latest", source: { type: "f1-last-winner" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://api.jolpi.ca/ergast/f1/current/last/results.json (United States GP 2026-10-25: Andrea Kimi Antonelli)", "the winner's surname alone also counts"),
+  },
+  {
+    id: "f-fx", tier: "live-feed", category: "general",
+    request: "What is today's euro to US dollar exchange rate?",
+    reference: { kind: "numeric", tolerance: 0.005, source: { type: "ecb-rate", from: "EUR", to: "USD" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://api.frankfurter.dev/v1/latest?from=EUR&to=USD (ECB reference rate)", "±0.5% covers market quotes between ECB fixings"),
+  },
+  {
+    id: "f-pypi", tier: "live-feed", category: "reference",
+    request: "What is the latest version of the Python requests library?",
+    reference: { kind: "latest", source: { type: "pypi-latest", pkg: "requests" } },
+    verified: checkedOn("2026-10-26", "feed values cross-checked against the live API and graded answers of run 2026-10-26T16-07", "https://pypi.org/pypi/requests/json (2.34.2 on 2026-10-25)"),
   },
 ];
 

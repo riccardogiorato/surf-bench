@@ -106,7 +106,9 @@ function hasNumber(h: string, x: string): boolean {
   const decimal = /^\d+\.\d+$/.test(x);
   const core = decimal ? x.replace(/0+$/, "").replace(/\.$/, "") : x;
   const tail = !decimal ? "" : core.includes(".") ? "0*" : "(?:\\.0+)?";
-  return new RegExp(`(?<![\\d.])${escapeRe(core)}${tail}(?!\\d|\\.\\d)`).test(h);
+  // Listings glue a relative time onto the value ("1.2026.2862d ago").
+  const end = `(?:(?!\\d|\\.\\d)|(?=\\d{1,2}\\s?(?:s|sec|min|m|h|hr|d|w|wk|mo|y|yr)s?\\s+ago\\b))`;
+  return new RegExp(`(?<![\\d.])${escapeRe(core)}${tail}${end}`).test(h);
 }
 
 // "120.1 billion" read off a table in millions ("$120,067").
@@ -167,6 +169,7 @@ export interface Grade {
   constraints?: { text: string; value: number }[];
   verdicts?: ConstraintVerdict[];
   error?: string; // grading failed — the record must be re-graded, never scored
+  offSiteScore?: number; // site tasks: the score had mirror pages counted
 }
 
 // `pages` is the text the reader saw; without it the answers are graded on the key alone.
@@ -368,16 +371,25 @@ export async function gradeTask(input: {
       const reader = await cachedReader(built.prompt);
       // A site task's answer must be on that site's pages, not on a mirror fetched alongside.
       const evidence = task.site ? formatBundle(docs.filter((d) => hostMatches(d.url, task.site!))) : pages;
-      const g =
+      const grade = (text: string) =>
         ref.kind === "overlap"
-          ? gradeOverlap(Array.isArray(reader.items) ? reader.items.map(String) : [], reference, evidence)
+          ? gradeOverlap(Array.isArray(reader.items) ? reader.items.map(String) : [], reference, text)
           : ref.kind === "latest"
-            ? gradeLatest(String(reader.answer ?? ""), reference, evidence)
+            ? gradeLatest(String(reader.answer ?? ""), reference, text)
             : ref.kind === "scores"
-              ? gradeScores(Array.isArray(reader.games) ? reader.games : [], reference, ref.minGames, evidence)
-              : gradeNumeric(parseNumber(reader.answer), reference, ref.tolerance, evidence);
+              ? gradeScores(Array.isArray(reader.games) ? reader.games : [], reference, ref.minGames, text)
+              : gradeNumeric(parseNumber(reader.answer), reference, ref.tolerance, text);
+      const g = grade(evidence);
+      // What the same answer would score off the mirrors: published, never scored.
+      const offSite = task.site ? grade(pages).score : g.score;
       const gated = task.site ? onSite : true;
-      return { ...g, pass: g.score >= PASS_SCORE && gated, reader, detail: gated ? g.detail : `${g.detail}; not from ${task.site}` };
+      return {
+        ...g,
+        pass: g.score >= PASS_SCORE && gated,
+        reader,
+        ...(offSite > g.score ? { offSiteScore: offSite } : {}),
+        detail: gated ? g.detail : `${g.detail}; not from ${task.site}`,
+      };
     }
 
     // live-judge

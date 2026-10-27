@@ -34,12 +34,11 @@ export const PRICES: Record<string, PriceEntry> = {
     source: "https://docs.parallel.ai/getting-started/pricing",
     asOf: "2026-09",
   },
-  "exa-fast": {
-    searchUsd: 7 / 1000, // type "fast": same rate as auto
+  "exa-lite": {
+    searchUsd: 4 / 1000, // type "lite", up to 10 results
     fetchUsd: flat(1 / 1000),
     source: "https://exa.ai/pricing",
-    asOf: "2026-10-22",
-    note: "Exa lists fast as a legacy search type; its price is unchanged",
+    asOf: "2026-10-26",
   },
   "parallel-turbo": {
     searchUsd: 1 / 1000, // turbo mode, up to 10 results

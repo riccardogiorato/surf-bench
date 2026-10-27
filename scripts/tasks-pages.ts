@@ -107,7 +107,18 @@ ${task.facts.map((f) => `<tr><td>${esc(f.q)}</td><td class="mono">/${esc(f.patte
       : src.type === "github-releases" ? `GitHub releases API for ${esc(src.repo)} (version tags only)`
       : src.type === "node-lts" ? "https://nodejs.org/dist/index.json (newest LTS)"
       : src.type === "wikipedia-featured" ? "Wikimedia featured-content API (today's featured article)"
-      : src.type === "espn-scoreboard" ? `ESPN's public scoreboard API (<a href="https://site.api.espn.com/apis/site/v2/sports/basketball/${src.league}/scoreboard">${src.league.toUpperCase()}</a>), every final of the most recent US game day before the round`
+      : src.type === "espn-scoreboard" ? `ESPN's public scoreboard API (<a href="https://site.api.espn.com/apis/site/v2/sports/${src.sport}/${src.league}/scoreboard">${src.league.toUpperCase()}</a>), every final of the most recent US game day before the round`
+      : src.type === "espn-standings" ? `ESPN's public standings API (<a href="https://site.api.espn.com/apis/v2/sports/soccer/${src.league}/standings">${esc(src.league)}</a>), the table in rank order`
+      : src.type === "npm-latest" ? `the npm registry (<a href="https://registry.npmjs.org/${src.pkg}/latest">${esc(src.pkg)}/latest</a>)`
+      : src.type === "pypi-latest" ? `the PyPI JSON API (<a href="https://pypi.org/pypi/${src.pkg}/json">${esc(src.pkg)}</a>)`
+      : src.type === "itunes-version" ? `Apple's iTunes lookup API (<a href="https://itunes.apple.com/lookup?id=${src.appId}&amp;country=us">app ${src.appId}</a>)`
+      : src.type === "crypto-spot" ? `the mean of the Coinbase and CoinGecko spot prices, fetched together`
+      : src.type === "bluesky-feed" ? `Bluesky's public AppView (<a href="https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=${src.actor}">${esc(src.actor)}</a>), its own posts, newest first`
+      : src.type === "polymarket-events" ? `Polymarket's public gamma API, active events by 24-hour volume`
+      : src.type === "yahoo-quote" ? `Yahoo Finance's chart API (<a href="https://query1.finance.yahoo.com/v8/finance/chart/${src.symbol}">${esc(src.symbol)}</a>): the quote the page shows; the previous close earns half`
+      : src.type === "steam-price" ? `Steam's app-details API (<a href="https://store.steampowered.com/api/appdetails?appids=${src.appId}&amp;cc=us">US store</a>); during a sale the pre-sale price earns half`
+      : src.type === "f1-last-winner" ? `the Jolpica (Ergast) F1 API, winner of the most recent race; the surname alone also counts`
+      : src.type === "ecb-rate" ? `the ECB reference rate via <a href="https://api.frankfurter.dev/v1/latest?from=${src.from}&amp;to=${src.to}">Frankfurter</a>`
       : `FRED series ${esc(src.series)}`;
     const how =
       r.kind === "overlap" ? `The reader lists 5 items; score = matched / 5, where an item matches if it is the same headline as any of the reference's top ${r.pool} (token overlap or containment).`
@@ -123,7 +134,8 @@ ${task.facts.map((f) => `<tr><td>${esc(f.q)}</td><td class="mono">/${esc(f.patte
 function methodology(runId: string, manifest: any): string {
   const stale = manifest.gradeStamp !== GRADE_STAMP;
   const pipeline = manifest.pipeline ?? {};
-  const tiers = ["stable-read", "stable-lookup", "live-feed", "live-judge"] as const;
+  const tiers = (["stable-read", "stable-lookup", "live-feed", "live-judge"] as const).filter((tier) => TASKS.some((t) => t.tier === tier));
+  const judged = tiers.includes("live-judge");
   const body = `
 <h1>Methodology</h1>
 <p class="sub">Generated from the code that grades the benchmark: every prompt below is produced by <span class="mono">buildPrompt()</span> in <span class="mono">src/lib/taskGrading.ts</span>, the same function <span class="mono">tasks:grade</span> calls. Run <b>${esc(runId)}</b> · commit <span class="mono">${esc(manifest.commit)}</span> · grade stamp <span class="mono">${esc(manifest.gradeStamp)}</span>.</p>
@@ -136,23 +148,23 @@ ${stale ? `<div class="banner">The code has changed since this run was graded (c
   <li>Each leg has a ${((pipeline.legTimeoutMs ?? 30000) / 1000).toFixed(0)}-second limit; going over is a DNF. Rate-limited calls are retried twice with backoff; survivors are excluded from scoring, never scored as 0.</li>
   <li>Fast modes are separate rows: ${Object.entries(FETCH_PROVIDER).map(([fast, parent]) => `<span class="mono">${esc(fast)}</span> searches in its fast mode and fetches with <span class="mono">${esc(parent)}</span>`).join("; ")}.</li>
   <li>${[...SEARCH_CONTENT].map((p) => `<span class="mono">${esc(p)}</span>`).join(" and ")} have no fetch API: their search returns each page's extracted text, and the top 3 results' text is their fetch leg (fetch time 0, no fetch cost). On stable-read tasks they search for the given URL.</li>
-  <li>Reader: <span class="mono">${esc(READER_MODEL)}</span>, temperature 0, sees each fetched page up to ${DOC_CHARS.toLocaleString("en-US")} characters. Judges: ${JUDGE_MODELS.map((m) => `<span class="mono">${esc(m)}</span>`).join(" and ")}, temperature 0. Neither ever sees the provider's name.</li>
+  <li>Reader: <span class="mono">${esc(READER_MODEL)}</span>, temperature 0, sees each fetched page up to ${DOC_CHARS.toLocaleString("en-US")} characters and never sees the provider's name.${judged ? ` Judges: ${JUDGE_MODELS.map((m) => `<span class="mono">${esc(m)}</span>`).join(" and ")}, temperature 0.` : " There is no LLM judge: every task has an answer key or an official same-round reference."}</li>
   <li>Answers must come from the pages. A reader answer that matches the key but is not in the documents it was given (the reader knew it by heart) earns nothing: the part the key matched has to appear in the pages, numbers as their own number (thousands separators, markdown escapes and million→billion conversions allowed) and text after normalization. The same check applies to feed headlines, latest versions and live numbers.</li>
-  <li>Live tasks (live-feed, live-judge) run ${LIVE_ROUNDS} rounds; a task's score and pass are averaged over its rounds.</li>
+  <li>Live tasks (${tiers.filter((t) => t.startsWith("live")).join(", ")}) run ${LIVE_ROUNDS} rounds; a task's score and pass are averaged over its rounds.</li>
 </ul>
 
 <h2>Scoring</h2>
 <ul>
-  <li>Two tracks: <b>search</b> (${TASKS.filter((t) => trackOf(t) === "search").length} tasks: find the answer on the open web) and <b>access</b> (${TASKS.filter((t) => trackOf(t) === "access").length} tasks: open a given page, or reach a named bot-walled site such as X, Instagram, Amazon or Zillow). <b>Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access.</b> The weights were fixed before the run.</li>
+  <li>Two tracks: <b>search</b> (${TASKS.filter((t) => trackOf(t) === "search").length} tasks: find the answer on the open web) and <b>access</b> (${TASKS.filter((t) => trackOf(t) === "access").length} tasks: open a given page, or get a live answer from a named bot-walled site such as X, Instagram, Amazon or ESPN). <b>Overall = ${TRACK_WEIGHTS.search} × search + ${TRACK_WEIGHTS.access} × access.</b> The weights were fixed before the run.</li>
   <li>Each track's score: <b>quality</b> (${WEIGHTS.quality}) = mean task score × 100; <b>reliability</b> (${WEIGHTS.reliability}) = share of tasks passed; <b>speed</b> (${WEIGHTS.speed}) = the fastest row's end-to-end median in that track ÷ this row's, floored at ${SPEED_FLOOR * 100}.</li>
   <li>A provider needs ≥ ${MIN_COVERAGE * 100}% of each track's tasks scorable (not quota / rate-limited) to get a number.</li>
   <li>95% confidence intervals from a paired bootstrap over tasks, resampled within each track; providers whose gap to a group's leader has an interval including 0 share its tie group.</li>
-  <li>Cost is published, never scored: list price × the calls each provider actually made, per 1,000 passed tasks. Reader and judge calls are excluded.</li>
+  <li>Cost is published, never scored: list price × the calls each provider actually made, per 1,000 passed tasks. Reader${judged ? " and judge" : ""} calls are excluded.</li>
 </ul>
 
 <h2>System prompts (verbatim)</h2>
 <h3>Reader system message</h3><pre>${esc(READER_SYSTEM)}</pre>
-<h3>Judge system message (live-judge rubric)</h3><pre>${esc(TASK_CONSTRAINTS_RUBRIC)}</pre>
+${judged ? `<h3>Judge system message (live-judge rubric)</h3><pre>${esc(TASK_CONSTRAINTS_RUBRIC)}</pre>` : ""}
 
 <h2>Prices used for the cost column</h2>
 <table><thead><tr><th>provider</th><th>search</th><th>fetch</th><th>source</th><th>read</th><th>note</th></tr></thead><tbody>

@@ -1,5 +1,6 @@
 import { NON_SCORING, classifyError, type ErrorClass } from "../src/lib/errorClass.js";
 import { PRICES } from "../src/lib/pricing.js";
+import { RETIRED } from "../src/lib/searchClients.js";
 import { AGENT_CHECK, AGENT_DRAFT, LIVE_ROUNDS, TASKS, isLive } from "../src/lib/tasks.js";
 import { gradeIsCurrent, readJsonl, runKey } from "./tasks-grade.js";
 
@@ -33,7 +34,7 @@ async function main() {
     blocking.push("no run recorded");
   } else {
     const runs = new Map<string, any>();
-    for (const r of records.filter((r) => r.runId === runId)) runs.set(runKey(r), r);
+    for (const r of records.filter((r) => r.runId === runId && !RETIRED.has(r.provider))) runs.set(runKey(r), r);
     const grades = new Map<string, any>();
     for (const g of await readJsonl(`${RAW}/tasks-graded.jsonl`)) if (g.runId === runId) grades.set(runKey(g), g);
     const refs = (await readJsonl(`${RAW}/tasks-refs.jsonl`)).filter((r) => r.runId === runId);

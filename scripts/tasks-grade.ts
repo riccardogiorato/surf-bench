@@ -18,7 +18,7 @@ import { TASKS, hostMatches, type Task } from "../src/lib/tasks.js";
 const RAW = "results/raw";
 // Bump when grader logic in taskGrading.ts changes; answer-key edits are
 // picked up automatically through the contract hash.
-const GRADER_VERSION = 5;
+const GRADER_VERSION = 7;
 const CONTRACT_ID = createHash("sha256")
   .update(JSON.stringify(TASKS.map((t) => ({ ...t, verified: undefined, facts: t.facts?.map((f) => [f.q, f.pattern.source, f.pattern.flags]) }))))
   .digest("hex")
